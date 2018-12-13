@@ -49,11 +49,11 @@
 
 <style lang="scss" scoped>
   @import '@/common/css/variable.scss';
-
   .ktv-container {
     height: 100%;
     background: $color-white;
     padding: 10px;
+    box-sizing: border-box;
     border-radius: 5px;
   }
   .room-container {
