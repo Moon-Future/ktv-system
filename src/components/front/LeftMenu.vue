@@ -20,7 +20,8 @@
         avatar: require('@/assets/avatar.jpg'),
         menuList: [
           {icon: 'icon-money-bag', text: '收银台', index: '1'},
-          {icon: 'icon-vip', text: '会员', index: '2'}
+          {icon: 'icon-vip', text: '会员', index: '2'},
+          {icon: 'icon-vip', text: '设置', index: '3'}
         ],
         activeIndex: 0
       }

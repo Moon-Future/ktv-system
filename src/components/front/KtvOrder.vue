@@ -36,7 +36,11 @@
           {name: '豪华大包', no: 7},
           {name: '豪华大包', no: 8},
           {name: '豪华大包', no: 9},
-          {name: '豪华大包', no: 10}
+          {name: '豪华大包', no: 10},
+          {name: '豪华大包', no: 11},
+          {name: '豪华大包', no: 12},
+          {name: '豪华大包', no: 13},
+          {name: '豪华大包', no: '欢迎光临'}
         ],
         activeName: 'first'
       }
@@ -68,17 +72,20 @@
       display: flex;
       flex-wrap: wrap;
       .room {
-        width: 17%;
-        min-width: 17%;
-        max-width: 17%;
+        width: 11%;
+        min-width: 11%;
+        max-width: 11%;
         height: 100px;
         box-sizing: border-box;
-        border: 1px solid $color-shallowgray;
+        border: 1px solid $color-gray;
         margin: 10px;
         flex: 1;
         display: flex;
         align-items: center;
         justify-content: center;
+        &:hover {
+          border: 1px solid $color-deepgray;
+        }
       }
     }
   }
