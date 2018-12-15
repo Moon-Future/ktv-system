@@ -83,6 +83,7 @@
   .top-title {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 14px;
     margin-bottom: 10px;
   }
@@ -93,7 +94,6 @@
   .operate-divide {
     margin: 0 5px;
   }
-
   .add-wrapper .add-form {
     text-align: left;
   }

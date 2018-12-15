@@ -18,23 +18,23 @@
 
 <script>
   import { dateFormat } from '@/common/js/util'
+  const datMap = {
+    0: '星期天', 1: '星期一', 2: '星期二', 3: '星期三', 4: '星期四', 5: '星期五', 6: '星期六', 
+  }
   export default {
     data() {
       return {
         currentDate: '2018-18-21',
-        currentDay: '星期',
-        currentTime: dateFormat(new Date(), 'hh:mm'),
+        currentDay: `${datMap[new Date().getDay()]}`,
+        currentTime: dateFormat(new Date(), 'hh:mm:ss'),
       }
     },
-    mounted() {
+    created() {
       clearInterval(this.timer)
-      const datMap = {
-        0: '星期天', 1: '星期一', 2: '星期二', 3: '星期三', 4: '星期四', 5: '星期五', 6: '星期六', 
-      }
       this.timer = setInterval(() => {
         this.currentData = dateFormat(new Date(), 'yyyy-MM-dd')
         this.currentDay = datMap[new Date().getDay()]
-        this.currentTime = dateFormat(new Date(), 'hh:mm')
+        this.currentTime = dateFormat(new Date(), 'hh:mm:ss')
       }, 1000)
     },
   }

@@ -91,13 +91,11 @@
 
 <style lang="scss" scoped>
   @import '@/common/css/variable.scss';
-
   .mobile-menu {
     position: fixed;
     padding: 5px;
     text-align: left;
   }
-
   .menu-wrapper {
     position: absolute;
     top: 0;
@@ -107,7 +105,6 @@
     text-align: left;
     display: flex;
     flex-flow: column;
-    background-color: $color-deepgray;
     overflow-y: auto;
     z-index: 100;
     .menu-item {

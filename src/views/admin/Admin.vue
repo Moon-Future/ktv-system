@@ -20,11 +20,14 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '@/common/css/variable.scss';
+  
   .right-contain {
     position: fixed;
     left: 100px;
     right: 0;
     height: 100%;
+    background: $color-gray;
   }
   .view-container {
     padding: 20px;
