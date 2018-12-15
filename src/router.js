@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/front/Home.vue'
+import Admin from './views/admin/Admin.vue'
 
 Vue.use(Router)
 
@@ -13,6 +14,18 @@ export default new Router({
       name: 'home',
       component: Home
     },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: Admin,
+      children: [
+        {
+          path: 'baseinfo',
+          name: 'baseinfo',
+          component: () => import('@/views/admin/BaseInfo.vue')
+        }
+      ]
+    }
     // {
     //   path: '/about',
     //   name: 'about',

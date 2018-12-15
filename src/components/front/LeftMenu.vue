@@ -4,10 +4,10 @@
         <img :src="avatar" alt="">
       </div>
       <ul class="menu-wrapper">
-        <li v-for="(item, i) in menuList" :class="[i === activeIndex ? 'active' : '']" :key="i" @click="changeIndex(i)">
+        <router-link tag="li" :to="item.to" v-for="(item, i) in menuList" :class="[i === activeIndex ? 'active' : '']" :key="i" @click="changeIndex(i)">
           <icon-font :icon="i === activeIndex ? `${item.icon}-active` : item.icon" fontSize="22"></icon-font>
           <p>{{ item.text }}</p>
-        </li>
+        </router-link>
       </ul>
     </div>
 </template>
@@ -19,9 +19,9 @@
       return {
         avatar: require('@/assets/avatar.jpg'),
         menuList: [
-          {icon: 'icon-money-bag', text: '收银台', index: '1'},
-          {icon: 'icon-vip', text: '会员', index: '2'},
-          {icon: 'icon-vip', text: '设置', index: '3'}
+          {icon: 'icon-money-bag', text: '收银台', index: '1', to: '/home'},
+          {icon: 'icon-vip', text: '会员', index: '2', to: '/vip'},
+          {icon: 'icon-vip', text: '设置', index: '3', to: '/admin'}
         ],
         activeIndex: 0
       }

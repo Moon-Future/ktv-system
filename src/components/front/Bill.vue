@@ -1,7 +1,7 @@
 <template>
   <div class="bill-container">
     <div class="bill-icon">
-      <icon-font icon="icon-zhijia-copy" fontSize="80"></icon-font>
+      <icon-font icon="icon-zhijia" fontSize="80"></icon-font>
     </div>
     <div class="bill-wrapper">
       <div class="bill-title">KTV消费账单</div>
