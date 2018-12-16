@@ -13,7 +13,7 @@
       width="50%"
       :mask-closable="false"
       :styles="styles">
-      <Form :model="formData" :rules="tableOptions.ruleValidate || {}">
+      <Form ref="submitForm" :model="formData" :rules="tableOptions.ruleValidate || {}">
         <template v-for="(item, i) in tableOptions.formArray">
           <FormItem :label="item.title" :prop="item.key" :key="i">
             <i-input v-if="item.type === 'input'" v-model="formData[item.key]" :placeholder="item.placeholder || '请输入...'"></i-input>
@@ -28,7 +28,7 @@
       </Form>
       <div class="drawer-footer">
           <Button style="margin-right: 8px" @click="addFlag = false">取消</Button>
-          <Button type="primary" @click="addFlag = false">提交</Button>
+          <Button type="primary" @click="submitForm">提交</Button>
       </div>
     </Drawer>
   </div>
@@ -78,7 +78,17 @@
       }
     },
     methods: {
-      
+      submitForm() {
+        console.log(this.formData)
+        this.$refs.submitForm.validate((valid) => {
+          if (!valid) {
+            this.$Message.error('Fail!')
+            return false
+          }
+          this.$Message.success('Success!');
+          this.addFlag = false
+        })
+      }
     }
   }
 </script>
