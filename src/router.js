@@ -22,7 +22,29 @@ export default new Router({
         {
           path: 'baseinfo',
           name: 'baseinfo',
-          component: () => import('@/views/admin/BaseInfo.vue')
+          component: () => import('@/views/admin/BaseInfo.vue'),
+          children: [
+            {
+              path: 'roominfo',
+              name: 'roominfo',
+              component: () => import('@/views/admin/RoomInfo.vue'),
+            },
+            {
+              path: 'goodsinfo',
+              name: 'goodsinfo',
+              component: () => import('@/views/admin/GoodsInfo.vue'),
+            },
+            {
+              path: 'packageinfo',
+              name: 'packageinfo',
+              component: () => import('@/views/admin/PackageInfo.vue'),
+            },
+            {
+              path: 'unitinfo',
+              name: 'unitinfo',
+              component: () => import('@/views/admin/UnitInfo.vue'),
+            }
+          ]
         }
       ]
     }

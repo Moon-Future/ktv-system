@@ -40,45 +40,6 @@
           <p>Copyright © 2018 - {{ new Date().getFullYear() }} KTV Co., Ltd.</p>
         </div>
       </Menu>
-      <!-- <el-menu class="aside-menu"
-        :default-active="activeIndex"
-        background-color="#324157"
-        text-color="#fff"
-        text-align="center"
-        active-text-color="#E9F01D"
-        router>
-        <div class="close-menu" v-if="mobileFlag" index="closeMenu">
-          <icon-font icon="icon-close" @click.native="closeMenu"></icon-font>
-        </div>
-        <div class="user-message" index="userMessage">
-          <div class="user-avatar">
-            <img :src="userInfo.avatar || avatar" alt="">
-          </div>
-        </div>
-        <template v-for="item in items">
-          <template v-if="item.subs">
-            <el-submenu :key="item.index" :index="item.index" class="menu-item">
-              <template slot="title">
-                <icon-font :icon="item.icon"></icon-font>
-                <span>{{ item.title }}</span>
-              </template>
-              <el-menu-item v-for="(subItem, i) in item.subs" :key="i" :index="subItem.index">
-                <icon-font :icon="subItem.icon"></icon-font>
-                <span>{{ subItem.title }}</span>
-              </el-menu-item>
-            </el-submenu>
-          </template>
-          <template v-else>
-            <el-menu-item :key="item.index" :index="item.index" class="menu-item">
-              <icon-font :icon="item.icon"></icon-font>
-              <span>{{ item.title }}</span>
-            </el-menu-item>
-          </template>
-        </template>
-        <div class="rights" index="rights">
-          <p>Copyright © 2018 - {{ new Date().getFullYear() }} KTV Co., Ltd.</p>
-        </div>
-      </el-menu> -->
     </div>
   </div>
 </template>
@@ -104,7 +65,7 @@
         items: [
           {
             icon: 'icon-shezhi',
-            index: '/admin/baseinfo',
+            index: '/admin/baseinfo/roominfo',
             title: '基本设置'
           }
         ]

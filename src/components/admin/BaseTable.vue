@@ -1,11 +1,11 @@
 <template>
   <div class="basetable-container">
-    <div class="sift-wrapper" v-show="!addFlag">
+    <div class="sift-wrapper">
       <div class="top-title">
-        <h1>总数：25</h1>
+        <h2>总数：25</h2>
         <Button type="primary" size="small" @click="addFlag = true">添加</Button>
       </div>
-      <Table :columns="tableColumns" :data="tableOptions.tableData" size="small"></Table>
+      <Table :columns="tableColumns" :data="tableOptions.tableData" :loading="false" size="small"></Table>
     </div>
     <Drawer
       title="新增"
@@ -27,8 +27,8 @@
         </template>
       </Form>
       <div class="drawer-footer">
-          <Button style="margin-right: 8px" @click="addFlag = false">取消</Button>
-          <Button type="primary" @click="submitForm">提交</Button>
+        <Button style="margin-right: 8px" @click="addFlag = false">取消</Button>
+        <Button type="primary" @click="submitForm">提交</Button>
       </div>
     </Drawer>
   </div>
@@ -36,6 +36,7 @@
 
 <script>
   import { deepClone } from '@/common/js/util'
+  import apiUrl from '@/serviceAPI.config.js'
   export default {
     props: {
       tableOptions: {
@@ -79,14 +80,21 @@
     },
     methods: {
       submitForm() {
-        console.log(this.formData)
         this.$refs.submitForm.validate((valid) => {
           if (!valid) {
-            this.$Message.error('Fail!')
+            this.$Message.error('*号为必填项')
             return false
           }
-          this.$Message.success('Success!');
-          this.addFlag = false
+          this.$http.post(apiUrl[this.tableOptions.addApi], {
+            data: [this.formData]
+          }).then(res => {
+            if (res.data.code === 200) {
+              this.$Message.success('添加成功')
+              this.addFlag = false
+            } else {
+              this.$Message.error(res.data.message)
+            }
+          })
         })
       }
     }

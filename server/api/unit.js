@@ -10,7 +10,7 @@ router.post('/insertUnit', async (ctx) => {
       ctx.body = checkResult
       return
     }
-    
+
     const data = ctx.request.body.data
     let result = []
     for (let i = 0 , len = data.length; i < len; i++) {
@@ -29,7 +29,7 @@ router.post('/insertUnit', async (ctx) => {
       ctx.body = {code: 200, message: `单位 ${result.join(', ')} 已存在`, repeat: true}
     }
   } catch(err) {
-    ctx.body = {code: 500, message: err}
+    throw new Error(err)
   }
 })
 
@@ -48,7 +48,7 @@ router.post('/getUnit', async (ctx) => {
     const unitList = await query(`SELECT * FROM unit WHERE off != 1 ORDER BY createTime ASC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`)
     ctx.body = {code: 200, message: unitList, count: count[0].count}
   } catch(err) {
-    ctx.body = {code: 500, message: err}
+    throw new Error(err)
   }
 })
 
@@ -68,7 +68,7 @@ router.post('/deleteUnit', async (ctx) => {
     await query(`UPDATE unit SET off = 1, updateTime = ${new Date().getTime()} WHERE id IN ( ${ids.join()} )`)
     ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {
-    ctx.body = {code: 500, message: err}
+    throw new Error(err)
   }
 })
 
@@ -90,7 +90,7 @@ router.post('/updUnit', async (ctx) => {
     const result = await query(`SELECT * FROM unit WHERE off != 1 AND id = ${data.id}`)
     ctx.body = {code: 200, message: '更新成功', result: result}
   } catch(err) {
-    ctx.body = {code: 500, message: err}
+    throw new Error(err)
   }
 })
 

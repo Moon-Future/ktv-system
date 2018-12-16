@@ -12,13 +12,6 @@
     data() {
       return {
         tableOptions: {
-          formArray: [
-            {key: 'name', title: '名称', type: 'input'},
-            {key: 'sign', title: '符号', type: 'input'}
-          ],
-          formData: {
-            name: '', sign: ''
-          },
           tableData: [
             {name: '间', sign: '1'}
           ],
@@ -26,9 +19,17 @@
             {key: 'name', title: '名称'},
             {key: 'sign', title: '符号'}
           ],
+          formArray: [
+            {key: 'name', title: '名称', type: 'input'},
+            {key: 'sign', title: '符号', type: 'input'}
+          ],
+          formData: {
+            name: '', sign: ''
+          },
           ruleValidate: {
             name: [{required: true, message: '*号为必填项', trigger: 'blur'}]
-          }
+          },
+          addApi: 'insertUnit'
         }
       }
     },

@@ -1,40 +1,48 @@
 <template>
   <div class="baseinfo-container">
-    <div class="tab-wrapper">
-      <Tabs size="small">
-        <TabPane label="房间">
-          <room-info></room-info>
-        </TabPane>
-        <TabPane label="套餐">
-          <package-info></package-info>
-        </TabPane>
-        <TabPane label="商品">
-          <goods-info></goods-info>
-        </TabPane>
-        <TabPane label="单位">
-          <unit-info></unit-info>
-        </TabPane>
-      </Tabs>
+    <div class="menu-wrapper">
+      <ul class="menu-ui">
+        <router-link
+          v-for="(item, i) in menuItem"
+          tag="li"
+          :to="item.to"
+          :class="{active: activeName === i}"
+          :key="i">{{ item.title }}</router-link>
+      </ul>
+      <router-view></router-view>
     </div>
   </div>
 </template>
 
 <script>
-  import RoomInfo from '@/components/admin/RoomInfo'
-  import PackageInfo from '@/components/admin/PackageInfo'
-  import GoodsInfo from '@/components/admin/GoodsInfo'
-  import UnitInfo from '@/components/admin/UnitInfo'
   export default {
     data() {
       return {
-        tabPosition: 'top'
+        activeName: 0,
+        menuItem: [
+          {to: '/admin/baseinfo/roominfo', title: '房间'},
+          {to: '/admin/baseinfo/goodsinfo', title: '商品'},
+          {to: '/admin/baseinfo/packageinfo', title: '套餐'},
+          {to: '/admin/baseinfo/unitinfo', title: '单位'}
+        ]
       }
     },
-    components: {
-      RoomInfo,
-      PackageInfo,
-      GoodsInfo,
-      UnitInfo
+    created() {
+      this.routeMap = {
+        roominfo: 0,
+        goodsinfo: 1,
+        packageinfo: 2,
+        unitinfo: 3
+      }
+      this.activeName = this.routeMap[this.$route.name]
+    },
+    methods: {
+      
+    },
+    watch: {
+      $route() {
+        this.activeName = this.routeMap[this.$route.name]
+      }
     }
   }
 </script>
@@ -42,4 +50,25 @@
 <style lang="scss" scoped>
   @import '@/common/css/variable.scss';
 
+  .menu-ui {
+    display: flex;
+    justify-content: space-around;
+    background: $color-shallowblack;
+    color: $color-white;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    li {
+      width: 25%;
+      padding: 5px 0;
+      cursor: pointer;
+      &:hover {
+        background: $color-origin;
+        color: $color-black;
+      }
+      &.active {
+        background: $color-origin;
+        color: $color-black;
+      }
+    }
+  }
 </style>

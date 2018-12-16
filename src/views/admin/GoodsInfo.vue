@@ -23,11 +23,11 @@
             name: '', no: '', descr: '', price: '', package: ''
           },
           tableData: [
-            {name: '香烟', unitPrice: '20 元', unit: '包'},
-            {name: '香烟', unitPrice: '20 元', unit: '包'},
-            {name: '香烟', unitPrice: '20 元', unit: '包'},
-            {name: '香烟', unitPrice: '20 元', unit: '包'},
-            {name: '香烟', unitPrice: '20 元', unit: '包'},
+            // {name: '香烟', unitPrice: '20 元', unit: '包'},
+            // {name: '香烟', unitPrice: '20 元', unit: '包'},
+            // {name: '香烟', unitPrice: '20 元', unit: '包'},
+            // {name: '香烟', unitPrice: '20 元', unit: '包'},
+            // {name: '香烟', unitPrice: '20 元', unit: '包'},
           ],
           tableColumns: [
             {key: 'name', title: '名称'},
