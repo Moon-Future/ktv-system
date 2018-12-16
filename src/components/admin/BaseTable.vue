@@ -3,50 +3,39 @@
     <div class="sift-wrapper" v-show="!addFlag">
       <div class="top-title">
         <h1>总数：25</h1>
-        <el-button type="primary" size="mini" @click="goAdd">添加</el-button>
+        <Button type="primary" size="small" @click="addFlag = true">添加</Button>
       </div>
-      <el-table
-        :data="tableOptions.siftData"
-        size="small"
-        :stripe="true"
-        :header-cell-style="{background:'#f1f1f1', color:'black'}"
-        style="width: 100%">
-          <template v-for="(item, i) in siftField">
-            <el-table-column :min-width="item.minWidth ? item.minWidth : ''" :prop="item.prop" :label="item.label" :key="i"></el-table-column>
-          </template>
-          <el-table-column width="150" label="操作">
-            <template slot-scope="scope">
-              <span class="operate-item">详情</span>
-              <span class="operate-divide">|</span>
-              <span class="operate-item">修改</span>
-              <span class="operate-divide">|</span>
-              <span class="operate-item">删除</span>
-            </template>
-          </el-table-column>
-      </el-table>
+      <Table :columns="tableColumns" :data="tableOptions.tableData" size="small"></Table>
     </div>
-    <div class="add-wrapper" v-show="addFlag">
-      <div class="top-title">
-        <h1></h1>
-        <el-button type="primary" size="mini" @click="goSift">返回</el-button>
+    <Drawer
+      title="新增"
+      v-model="addFlag"
+      width="50%"
+      :mask-closable="false"
+      :styles="styles">
+      <Form :model="formData" :rules="tableOptions.ruleValidate || {}">
+        <template v-for="(item, i) in tableOptions.formArray">
+          <FormItem :label="item.title" :prop="item.key" :key="i">
+            <i-input v-if="item.type === 'input'" v-model="formData[item.key]" :placeholder="item.placeholder || '请输入...'"></i-input>
+            <i-input v-if="item.type === 'textarea'" v-model="formData[item.key]" type="textarea" :placeholder="item.placeholder || '请输入...'"></i-input>
+            <CheckboxGroup v-if="item.type === 'checkbox'">
+              <Checkbox label="香蕉"></Checkbox>
+              <Checkbox label="苹果"></Checkbox>
+              <Checkbox label="西瓜"></Checkbox>
+            </CheckboxGroup>
+          </FormItem>
+        </template>
+      </Form>
+      <div class="drawer-footer">
+          <Button style="margin-right: 8px" @click="addFlag = false">取消</Button>
+          <Button type="primary" @click="addFlag = false">提交</Button>
       </div>
-      <div class="add-form">
-        <el-form :label-position="labelPosition" size="small" label-width="80px">
-          <template v-for="(item, i) in addField">
-            <el-form-item :label="item.label" :key="i">
-              <el-input v-if="item.type === 'input'" size="small" :placeholder="item.placeholder || '请输入内容'"></el-input>
-              <el-input v-if="item.type === 'textarea'" size="small" type="textarea" :rows="5" :placeholder="item.placeholder || '请输入内容'"></el-input>
-              <el-checkbox v-if="item.type === 'checkbox'">套餐一</el-checkbox>
-              <el-checkbox v-if="item.type === 'checkbox'">套餐二</el-checkbox>
-            </el-form-item>
-          </template>
-        </el-form>
-      </div>
-    </div>
+    </Drawer>
   </div>
 </template>
 
 <script>
+  import { deepClone } from '@/common/js/util'
   export default {
     props: {
       tableOptions: {
@@ -57,29 +46,46 @@
     data() {
       return {
         addFlag: false,
-        labelPosition: 'right'
-      }
-    },
-    methods: {
-      goAdd() {
-        this.addFlag = true
-      },
-      goSift() {
-        this.addFlag = false
+        styles: {
+          height: 'calc(100% - 55px)',
+          overflow: 'auto',
+          paddingBottom: '53px',
+          position: 'static'
+        },
       }
     },
     computed: {
-      siftField() {
-        return this.tableOptions.siftField || this.tableOptions.addField
+      tableColumns() {
+        let columns = deepClone(this.tableOptions.tableColumns)
+        let obj = {
+          key: 'operate',
+          title: '操作',
+          render: (h, params) => {
+            return h('div', [
+              h('span', {class: {'operate-item' : true}}, '详情'),
+              h('span', {class: {'operate-divide' : true}}, '|'),
+              h('span', {class: {'operate-item' : true}}, '更新'),
+              h('span', {class: {'operate-divide' : true}}, '|'),
+              h('span', {class: {'operate-item' : true}}, '删除')
+            ])
+          }
+        }
+        columns.push(obj)
+        return columns
       },
-      addField() {
-        return this.tableOptions.addField
-      },
+      formData() {
+        return this.tableOptions.formData
+      }
+    },
+    methods: {
+      
     }
   }
 </script>
 
 <style lang="scss" scoped>
+  @import '@/common/css/variable.scss';
+
   .top-title {
     display: flex;
     justify-content: space-between;
@@ -87,14 +93,14 @@
     font-size: 14px;
     margin-bottom: 10px;
   }
-  .operate-item:hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
-  .operate-divide {
-    margin: 0 5px;
-  }
-  .add-wrapper .add-form {
-    text-align: left;
+  .drawer-footer{
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    border-top: 1px solid $color-gray;
+    padding: 10px 16px;
+    text-align: right;
+    background: $color-white;
   }
 </style>

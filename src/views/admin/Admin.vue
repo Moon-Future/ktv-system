@@ -27,7 +27,7 @@
     left: 100px;
     right: 0;
     height: 100%;
-    background: $color-gray;
+    background: $color-shallowgray;
   }
   .view-container {
     padding: 20px;

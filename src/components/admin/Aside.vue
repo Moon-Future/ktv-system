@@ -4,7 +4,43 @@
       <icon-font icon="icon-menu" @click.native="openMenu"></icon-font>
     </div>
     <div class="menu-wrapper" v-show="showFlag">
-      <el-menu class="aside-menu"
+      <Menu class="aside-menu"
+        theme="dark"
+        mode="vertical"
+        width="auto">
+        <div class="close-menu" v-if="mobileFlag" index="closeMenu">
+          <icon-font icon="icon-close" @click.native="closeMenu"></icon-font>
+        </div>
+        <div class="user-message" index="userMessage">
+          <div class="user-avatar">
+            <img :src="userInfo.avatar || avatar" alt="">
+          </div>
+        </div>
+        <template v-for="item in items">
+          <template v-if="item.subs">
+            <Submenu :key="item.index" :name="item.index" class="menu-item">
+              <template slot="title">
+                <icon-font :icon="item.icon"></icon-font>
+                <span>{{ item.title }}</span>
+              </template>
+              <menu-item v-for="(subItem, i) in item.subs" :key="i" :name="subItem.index" :to="subItem.index">
+                <icon-font :icon="subItem.icon"></icon-font>
+                <span>{{ subItem.title }}</span>
+              </menu-item>
+            </Submenu>
+          </template>
+          <template v-else>
+            <menu-item :key="item.index" :name="item.index" :to="item.index" class="menu-item">
+              <icon-font :icon="item.icon"></icon-font>
+              <span>{{ item.title }}</span>
+            </menu-item>
+          </template>
+        </template>
+        <div class="rights" index="rights">
+          <p>Copyright © 2018 - {{ new Date().getFullYear() }} KTV Co., Ltd.</p>
+        </div>
+      </Menu>
+      <!-- <el-menu class="aside-menu"
         :default-active="activeIndex"
         background-color="#324157"
         text-color="#fff"
@@ -18,7 +54,6 @@
           <div class="user-avatar">
             <img :src="userInfo.avatar || avatar" alt="">
           </div>
-          <!-- <div class="user-name">{{ userInfo.name || user }}</div> -->
         </div>
         <template v-for="item in items">
           <template v-if="item.subs">
@@ -43,7 +78,7 @@
         <div class="rights" index="rights">
           <p>Copyright © 2018 - {{ new Date().getFullYear() }} KTV Co., Ltd.</p>
         </div>
-      </el-menu>
+      </el-menu> -->
     </div>
   </div>
 </template>
@@ -110,7 +145,7 @@
     .menu-item {
       display: flex;
       align-items: center;
-      padding: 0 10px !important;
+      padding: 10px !important;
     }
     .close-menu {
       text-align: right;

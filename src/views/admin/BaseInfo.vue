@@ -1,19 +1,21 @@
 <template>
   <div class="baseinfo-container">
-    <el-tabs type="border-card">
-      <el-tab-pane label="房间">
-        <room-info></room-info>
-      </el-tab-pane>
-      <el-tab-pane label="套餐">
-        <package-info></package-info>
-      </el-tab-pane>
-      <el-tab-pane label="商品">
-        <goods-info></goods-info>
-      </el-tab-pane>
-      <el-tab-pane label="单位">
-        <goods-info></goods-info>
-      </el-tab-pane>
-    </el-tabs>
+    <div class="tab-wrapper">
+      <Tabs size="small">
+        <TabPane label="房间">
+          <room-info></room-info>
+        </TabPane>
+        <TabPane label="套餐">
+          <package-info></package-info>
+        </TabPane>
+        <TabPane label="商品">
+          <goods-info></goods-info>
+        </TabPane>
+        <TabPane label="单位">
+          <unit-info></unit-info>
+        </TabPane>
+      </Tabs>
+    </div>
   </div>
 </template>
 
@@ -21,7 +23,7 @@
   import RoomInfo from '@/components/admin/RoomInfo'
   import PackageInfo from '@/components/admin/PackageInfo'
   import GoodsInfo from '@/components/admin/GoodsInfo'
-  import GoodsInfo from '@/components/admin/GoodsInfo'
+  import UnitInfo from '@/components/admin/UnitInfo'
   export default {
     data() {
       return {
@@ -31,13 +33,13 @@
     components: {
       RoomInfo,
       PackageInfo,
-      GoodsInfo
+      GoodsInfo,
+      UnitInfo
     }
   }
 </script>
 
 <style lang="scss" scoped>
-  .baseinfo-container {
-    
-  }
+  @import '@/common/css/variable.scss';
+
 </style>

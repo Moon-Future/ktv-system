@@ -2,8 +2,8 @@
   <div class="header-container">
     <div class="time-wrapper">
       <p>
-        <span>{{ currentDate }}， </span>
-        <span>{{ currentDay }}， </span>
+        <span>{{ currentDate }}, </span>
+        <span>{{ currentDay }}, </span>
         <span>{{ currentTime }}</span>
       </p>
     </div>
@@ -11,7 +11,7 @@
       <div class="user-info">
         <span>KTV</span>
       </div>
-      <el-button size="mini">退出</el-button>
+      <Button size="small">退出</Button>
     </div>
   </div>
 </template>

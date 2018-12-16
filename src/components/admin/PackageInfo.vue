@@ -12,27 +12,29 @@
     data() {
       return {
         tableOptions: {
-          siftField: [
-            {prop: 'name', label: '名称'},
-            {prop: 'content', label: '内容'},
-            {prop: 'descr', label: '描述'},
-            {prop: 'price', label: '总价'}
+          formArray: [
+            {key: 'name', title: '名称', type: 'input'},
+            {key: 'no', title: '编号', type: 'input'},
+            {key: 'descr', title: '描述', type: 'textarea'},
+            {key: 'price', title: '资费', type: 'input'},
+            {key: 'package', title: '套餐', type: 'checkbox'}
           ],
-          addField: [
-            {prop: 'name', label: '名称', type: 'input'},
-            {prop: 'no', label: '编号', type: 'input'},
-            {prop: 'descr', label: '描述', type: 'textarea'},
-            {prop: 'expense', label: '资费', type: 'input'},
-            {prop: 'package', label: '套餐', type: 'checkbox'}
-          ],
-          siftData: [
+          formData: {
+            name: '', no: '', descr: '', price: '', package: ''
+          },
+          tableData: [
             {name: '大包', no: '1', descr: '一堆描述', package: '套餐一'},
             {name: '大包', no: '1', descr: '一堆描述', package: '套餐一'},
             {name: '大包', no: '1', descr: '一堆描述', package: '套餐一'},
             {name: '大包', no: '1', descr: '一堆描述', package: '套餐一'},
             {name: '大包', no: '1', descr: '一堆描述', package: '套餐一'},
           ],
-          addData: {name: '', no: '', descr: '', expense: '', package: []}
+          tableColumns: [
+            {key: 'name', title: '名称'},
+            {key: 'content', title: '内容'},
+            {key: 'descr', title: '描述'},
+            {key: 'price', title: '总价'}
+          ]
         }
       }
     },

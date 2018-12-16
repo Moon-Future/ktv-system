@@ -12,24 +12,28 @@
     data() {
       return {
         tableOptions: {
-          siftField: [
-            {prop: 'name', label: '名称'},
-            {prop: 'unitPrice', label: '单价'},
-            {prop: 'unit', label: '单位'}
+          formArray: [
+            {key: 'name', title: '名称', type: 'input'},
+            {key: 'no', title: '编号', type: 'input'},
+            {key: 'descr', title: '描述', type: 'textarea'},
+            {key: 'price', title: '资费', type: 'input'},
+            {key: 'package', title: '套餐', type: 'checkbox'}
           ],
-          addField: [
-            {prop: 'name', label: '名称', type: 'input'},
-            {prop: 'no', label: '编号', type: 'input'},
-            {prop: 'descr', label: '描述', type: 'textarea'},
-          ],
-          siftData: [
+          formData: {
+            name: '', no: '', descr: '', price: '', package: ''
+          },
+          tableData: [
             {name: '香烟', unitPrice: '20 元', unit: '包'},
             {name: '香烟', unitPrice: '20 元', unit: '包'},
             {name: '香烟', unitPrice: '20 元', unit: '包'},
             {name: '香烟', unitPrice: '20 元', unit: '包'},
             {name: '香烟', unitPrice: '20 元', unit: '包'},
           ],
-          addData: {name: '', no: '', descr: '', expense: '', package: []}
+          tableColumns: [
+            {key: 'name', title: '名称'},
+            {key: 'unitPrice', title: '单价'},
+            {key: 'unit', title: '单位'}
+          ]
         }
       }
     },
