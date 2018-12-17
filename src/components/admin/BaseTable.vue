@@ -3,9 +3,9 @@
     <div class="sift-wrapper">
       <div class="top-title">
         <h2>总数：25</h2>
-        <Button type="primary" size="small" @click="addFlag = true">添加</Button>
+        <Button type="primary" size="small" @click="goAdd">添加</Button>
       </div>
-      <Table :columns="tableColumns" :data="tableOptions.tableData" :loading="false" size="small"></Table>
+      <Table :columns="tableColumns" :data="tableData" :loading="loading" size="small"></Table>
     </div>
     <Drawer
       title="新增"
@@ -44,15 +44,21 @@
         default: {}
       }
     },
+    mounted() {
+      this.getData()
+    },
     data() {
       return {
+        loading: false,
         addFlag: false,
+        updFlag: false,
         styles: {
           height: 'calc(100% - 55px)',
           overflow: 'auto',
           paddingBottom: '53px',
           position: 'static'
         },
+        tableData: []
       }
     },
     computed: {
@@ -63,11 +69,23 @@
           title: '操作',
           render: (h, params) => {
             return h('div', [
-              h('span', {class: {'operate-item' : true}}, '详情'),
+              h('span', {
+                class: {'operate-item' : true},
+                on: {
+                  click: () => {
+                    this.goUpdate(params)
+                  }
+                }
+              }, '更新'),
               h('span', {class: {'operate-divide' : true}}, '|'),
-              h('span', {class: {'operate-item' : true}}, '更新'),
-              h('span', {class: {'operate-divide' : true}}, '|'),
-              h('span', {class: {'operate-item' : true}}, '删除')
+              h('span', {
+                class: {'operate-item' : true},
+                on: {
+                  click: () => {
+                    this.goDelete(params)
+                  }
+                }
+              }, '删除')
             ])
           }
         }
@@ -79,22 +97,72 @@
       }
     },
     methods: {
+      getData(params = {}) {
+        this.loading = true
+        this.$http.post(apiUrl[this.tableOptions.siftApi], {
+          data: params
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.tableData = res.data.message
+          } else {
+            this.tableData = []
+          }
+          this.loading = false
+        })
+      },
+      goAdd() {
+        this.updFlag = false
+        this.addFlag = true
+        this.$emit('edit', {type: 'add'})
+      },
+      goUpdate(params) {
+        this.updFlag = true
+        this.addFlag = true
+        this.$emit('edit', {type: 'upd', params: deepClone(params)})
+      },
+      goDelete(params) {
+        this.$http.post(apiUrl[this.tableOptions.delApi], {
+          data: [this.formData]
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.tableData.splice(params.index, 1)
+            this.$Message.success(res.data.message)
+          } else {
+            this.$Message.error(res.data.message)
+          }
+        })
+      },
       submitForm() {
         this.$refs.submitForm.validate((valid) => {
           if (!valid) {
             this.$Message.error('*号为必填项')
             return false
           }
-          this.$http.post(apiUrl[this.tableOptions.addApi], {
-            data: [this.formData]
-          }).then(res => {
-            if (res.data.code === 200) {
-              this.$Message.success('添加成功')
-              this.addFlag = false
-            } else {
-              this.$Message.error(res.data.message)
-            }
-          })
+          if (!this.updFlag) {
+            this.$http.post(apiUrl[this.tableOptions.addApi], {
+              data: [this.formData]
+            }).then(res => {
+              if (res.data.code === 200) {
+                this.getData()
+                this.$Message.success(res.data.message)
+                this.addFlag = false
+              } else {
+                this.$Message.error(res.data.message)
+              }
+            })
+          } else {
+            this.$http.post(apiUrl[this.tableOptions.updApi], {
+              data: this.formData
+            }).then(res => {
+              if (res.data.code === 200) {
+                this.getData()
+                this.$Message.success(res.data.message)
+                this.addFlag = false
+              } else {
+                this.$Message.error(res.data.message)
+              }
+            })
+          }
         })
       }
     }

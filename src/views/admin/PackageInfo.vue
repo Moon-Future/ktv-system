@@ -34,7 +34,8 @@
             {key: 'content', title: '内容'},
             {key: 'descr', title: '描述'},
             {key: 'price', title: '总价'}
-          ]
+          ],
+          siftApi: 'getUnit'
         }
       }
     },

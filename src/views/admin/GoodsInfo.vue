@@ -33,7 +33,8 @@
             {key: 'name', title: '名称'},
             {key: 'unitPrice', title: '单价'},
             {key: 'unit', title: '单位'}
-          ]
+          ],
+          siftApi: 'getUnit'
         }
       }
     },

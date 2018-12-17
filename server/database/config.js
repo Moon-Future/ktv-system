@@ -3,7 +3,7 @@ module.exports = {
   host: 'localhost',
   user: 'root',
   password: '8023',
-  database: 'ktvSystem',
+  database: 'ktv',
   port: '3306',
   multipleStatements: true
 }

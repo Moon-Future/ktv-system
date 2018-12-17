@@ -20,10 +20,10 @@
       return {
         activeName: 0,
         menuItem: [
-          {to: '/admin/baseinfo/roominfo', title: '房间'},
-          {to: '/admin/baseinfo/goodsinfo', title: '商品'},
-          {to: '/admin/baseinfo/packageinfo', title: '套餐'},
-          {to: '/admin/baseinfo/unitinfo', title: '单位'}
+          {to: '/admin/baseinfo/roominfo', title: '房间设置'},
+          {to: '/admin/baseinfo/goodsinfo', title: '商品设置'},
+          {to: '/admin/baseinfo/packageinfo', title: '套餐设置'},
+          {to: '/admin/baseinfo/unitinfo', title: '单位设置'}
         ]
       }
     },
@@ -59,7 +59,7 @@
     margin-bottom: 10px;
     li {
       width: 25%;
-      padding: 5px 0;
+      padding: 10px 0;
       cursor: pointer;
       &:hover {
         background: $color-origin;

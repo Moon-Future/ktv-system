@@ -35,7 +35,8 @@
             {key: 'descr', title: '描述'},
             {key: 'price', title: '价格'},
             {key: 'package', title: '套餐'}
-          ]
+          ],
+          siftApi: 'getUnit'
         }
       }
     },

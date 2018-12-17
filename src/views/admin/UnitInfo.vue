@@ -1,7 +1,8 @@
 <template>
   <div class="room-info">
     <base-table
-      :tableOptions="tableOptions">
+      :tableOptions="tableOptions"
+      @edit="edit">
     </base-table>
   </div>
 </template>
@@ -12,9 +13,6 @@
     data() {
       return {
         tableOptions: {
-          tableData: [
-            {name: '间', sign: '1'}
-          ],
           tableColumns: [
             {key: 'name', title: '名称'},
             {key: 'sign', title: '符号'}
@@ -29,7 +27,21 @@
           ruleValidate: {
             name: [{required: true, message: '*号为必填项', trigger: 'blur'}]
           },
-          addApi: 'insertUnit'
+          addApi: 'insertUnit',
+          updApi: 'updUnit',
+          delApi: 'deleteUnit',
+          siftApi: 'getUnit'
+        }
+      }
+    },
+    methods: {
+      edit({type, params = {}}) {
+        if (type === 'add') {
+          this.tableOptions.formData = {
+            name: '', sign: ''
+          }
+        } else if (type === 'upd') {
+          this.tableOptions.formData = params.row
         }
       }
     },
