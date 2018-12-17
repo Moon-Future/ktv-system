@@ -1,8 +1,8 @@
 const apiUrl = {
-  insertProduct: '/api/product/insertProduct',
-  getProduct: '/api/product/getProduct',
-  deleteProduct: '/api/product/deleteProduct',
-  updProduct: '/api/product/updProduct',
+  insertGoods: '/api/goods/insertGoods',
+  getGoods: '/api/goods/getGoods',
+  deleteGoods: '/api/goods/deleteGoods',
+  updGoods: '/api/goods/updGoods',
 
   insertUnit: '/api/unit/insertUnit',
   getUnit: '/api/unit/getUnit',

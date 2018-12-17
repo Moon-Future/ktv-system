@@ -35,11 +35,11 @@
             {key: 'discount', title: '会员折扣', type: 'input', hide: true}
           ],
           formData: {
-            name: '', picture: '', price: '', vipDicount: false, discount: '', unit: ''
+            name: '', picture: '', price: '', vipDicount: false, discount: '', unit: '', descr: ''
           },
           ruleValidate: {
             name: [{required: true, message: '不得为空', trigger: 'blur'}],
-            unit: [{required: true, message: '请选择一个单位', trigger: 'blur'}],
+            // unit: [{required: true, message: '请选择一个单位', trigger: 'blur'}],
             price: [
               {required: true, message: '不得为空', trigger: 'blur'},
               {pattern: /^\d+(\.{0,1}\d{1,2}){0,1}$/, message: '必须为正数，最多两位小数', trigger: 'blur'}
@@ -49,6 +49,9 @@
             ]
           },
           width: 90,
+          addApi: 'insertGoods',
+          updApi: 'updGoods',
+          delApi: 'deleteGoods',
           siftApi: 'getUnit'
         }
       }

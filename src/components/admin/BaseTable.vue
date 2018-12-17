@@ -19,7 +19,7 @@
             <i-input v-if="item.type === 'input'" v-model="formData[item.key]" :placeholder="item.placeholder || '请输入...'"></i-input>
             <i-input v-if="item.type === 'textarea'" v-model="formData[item.key]" type="textarea" :placeholder="item.placeholder || '请输入...'"></i-input>
             <i-switch v-if="item.type === 'switch'" v-model="formData[item.key]" @on-change="changeSwitch" />
-            <Select v-if="item.type === 'select'">
+            <Select v-if="item.type === 'select'" v-model="formData[item.key]">
               <Option v-for="option in item.options" :value="option.value" :key="option.value">{{ option.label }}</Option>
             </Select>
             <CheckboxGroup v-if="item.type === 'checkbox'">

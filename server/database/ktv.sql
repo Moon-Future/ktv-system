@@ -5,17 +5,36 @@
  Source Server Type    : MySQL
  Source Server Version : 80011
  Source Host           : localhost:3306
- Source Schema         : ktvSystem
+ Source Schema         : ktv
 
  Target Server Type    : MySQL
  Target Server Version : 80011
  File Encoding         : 65001
 
- Date: 17/12/2018 01:18:31
+ Date: 18/12/2018 01:23:03
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for goods
+-- ----------------------------
+DROP TABLE IF EXISTS `goods`;
+CREATE TABLE `goods` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `picture` varchar(255) DEFAULT NULL,
+  `price` int(11) NOT NULL,
+  `unit` int(11) NOT NULL,
+  `descr` varchar(255) DEFAULT NULL,
+  `vipDiscount` int(11) NOT NULL DEFAULT '0' COMMENT '开启会员折扣',
+  `discount` int(11) DEFAULT NULL COMMENT '会员折扣',
+  `createTime` bigint(20) NOT NULL,
+  `updateTime` bigint(20) DEFAULT NULL,
+  `off` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for unit
