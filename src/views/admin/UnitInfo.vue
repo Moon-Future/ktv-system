@@ -27,6 +27,7 @@
           ruleValidate: {
             name: [{required: true, message: '*号为必填项', trigger: 'blur'}]
           },
+          width: 50,
           addApi: 'insertUnit',
           updApi: 'updUnit',
           delApi: 'deleteUnit',

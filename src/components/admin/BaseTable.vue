@@ -13,11 +13,15 @@
       width="50%"
       :mask-closable="false"
       :styles="styles">
-      <Form ref="submitForm" :model="formData" :rules="tableOptions.ruleValidate || {}">
+      <Form ref="submitForm" label-position="right" :label-width="tableOptions.width || 60" :model="formData" :rules="tableOptions.ruleValidate || {}">
         <template v-for="(item, i) in tableOptions.formArray">
-          <FormItem :label="item.title" :prop="item.key" :key="i">
+          <FormItem :label="item.title" :prop="item.key" :key="i" v-if="!item.hide">
             <i-input v-if="item.type === 'input'" v-model="formData[item.key]" :placeholder="item.placeholder || '请输入...'"></i-input>
             <i-input v-if="item.type === 'textarea'" v-model="formData[item.key]" type="textarea" :placeholder="item.placeholder || '请输入...'"></i-input>
+            <i-switch v-if="item.type === 'switch'" v-model="formData[item.key]" @on-change="changeSwitch" />
+            <Select v-if="item.type === 'select'">
+              <Option v-for="option in item.options" :value="option.value" :key="option.value">{{ option.label }}</Option>
+            </Select>
             <CheckboxGroup v-if="item.type === 'checkbox'">
               <Checkbox label="香蕉"></Checkbox>
               <Checkbox label="苹果"></Checkbox>
@@ -131,6 +135,9 @@
             this.$Message.error(res.data.message)
           }
         })
+      },
+      changeSwitch(status) {
+        this.$emit('changeSwitch', status)
       },
       submitForm() {
         this.$refs.submitForm.validate((valid) => {
