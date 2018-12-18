@@ -11,7 +11,7 @@
  Target Server Version : 80011
  File Encoding         : 65001
 
- Date: 18/12/2018 01:23:03
+ Date: 19/12/2018 02:22:50
 */
 
 SET NAMES utf8mb4;
@@ -29,7 +29,7 @@ CREATE TABLE `goods` (
   `unit` int(11) NOT NULL,
   `descr` varchar(255) DEFAULT NULL,
   `vipDiscount` int(11) NOT NULL DEFAULT '0' COMMENT '开启会员折扣',
-  `discount` int(11) DEFAULT NULL COMMENT '会员折扣',
+  `discount` decimal(11,2) DEFAULT NULL COMMENT '会员折扣',
   `createTime` bigint(20) NOT NULL,
   `updateTime` bigint(20) DEFAULT NULL,
   `off` int(11) NOT NULL DEFAULT '0',

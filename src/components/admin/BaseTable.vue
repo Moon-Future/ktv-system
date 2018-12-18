@@ -125,14 +125,20 @@
         this.$emit('edit', {type: 'upd', params: deepClone(params)})
       },
       goDelete(params) {
-        this.$http.post(apiUrl[this.tableOptions.delApi], {
-          data: [this.formData]
-        }).then(res => {
-          if (res.data.code === 200) {
-            this.tableData.splice(params.index, 1)
-            this.$Message.success(res.data.message)
-          } else {
-            this.$Message.error(res.data.message)
+        this.$Modal.confirm({
+          title: '确认删除',
+          content: '此操作将删除该数据, 并且会影响到与之相关的数据, 是否继续?',
+          onOk: () => {
+            this.$http.post(apiUrl[this.tableOptions.delApi], {
+              data: [this.formData]
+            }).then(res => {
+              if (res.data.code === 200) {
+                this.tableData.splice(params.index, 1)
+                this.$Message.success(res.data.message)
+              } else {
+                this.$Message.error(res.data.message)
+              }
+            })
           }
         })
       },

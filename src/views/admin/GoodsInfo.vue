@@ -2,7 +2,8 @@
   <div class="room-info">
     <base-table
       :tableOptions="tableOptions"
-      @changeSwitch="changeSwitch">
+      @changeSwitch="changeSwitch"
+      @edit="edit">
     </base-table>
   </div>
 </template>
@@ -23,19 +24,30 @@
         tableOptions: {
           tableColumns: [
             {key: 'name', title: '名称'},
-            {key: 'unitPrice', title: '单价'},
-            {key: 'unit', title: '单位'}
+            {key: 'price', title: '单价'},
+            {key: 'unitm', title: '单位'},
+            {key: 'descr', title: '描述'},
+            {
+              key: 'vipDiscount',
+              title: '会员折扣',
+              render: (h, params) => {
+                return h('i-switch', {
+                  props: {disabled: 'disabled', value: params.row.vipDiscount}
+                })
+              }
+            },
+            {key: 'discount', title: '折扣'}
           ],
           formArray: [
             {key: 'name', title: '名称', type: 'input'},
             {key: 'price', title: '价格', type: 'input'},
             {key: 'unit', title: '单位', type: 'select', options: []},
             {key: 'descr', title: '描述', type: 'textarea'},
-            {key: 'vipDicount', title: '开启会员折扣', type: 'switch'},
+            {key: 'vipDiscount', title: '开启会员折扣', type: 'switch'},
             {key: 'discount', title: '会员折扣', type: 'input', hide: true}
           ],
           formData: {
-            name: '', picture: '', price: '', vipDicount: false, discount: '', unit: '', descr: ''
+            name: '', picture: '', price: '', vipDiscount: false, discount: '', unit: '', descr: ''
           },
           ruleValidate: {
             name: [{required: true, message: '不得为空', trigger: 'blur'}],
@@ -52,7 +64,7 @@
           addApi: 'insertGoods',
           updApi: 'updGoods',
           delApi: 'deleteGoods',
-          siftApi: 'getUnit'
+          siftApi: 'getGoods'
         }
       }
     },
@@ -80,6 +92,21 @@
         } else {
           this.tableOptions.formArray.splice(5, 1, {key: 'discount', title: '会员折扣', type: 'input', hide: true})
           this.tableOptions.formData.discount = ''
+        }
+      },
+      edit({type, params = {}}) {
+        if (type === 'add') {
+          this.tableOptions.formData = {
+            name: '', picture: '', price: '', vipDiscount: false, discount: '', unit: '', descr: ''
+          }
+          this.changeSwitch(false)
+        } else if (type === 'upd') {
+          this.tableOptions.formData = params.row
+          if (params.row.vipDiscount) {
+            this.changeSwitch(true)
+          } else {
+            this.changeSwitch(false)
+          }
         }
       }
     },

@@ -34,7 +34,7 @@ router.post('/insertGoods', async (ctx) => {
   }
 })
 
-router.post('/getUnit', async (ctx) => {
+router.post('/getGoods', async (ctx) => {
   try {
     const checkResult = checkRoot(ctx)
     if (checkResult.code === 500) {
@@ -45,9 +45,13 @@ router.post('/getUnit', async (ctx) => {
     const data = ctx.request.body.data
     const pageNo = data && data.pageNo || 1
     const pageSize = data && data.pageSize || 10
-    const count = await query(`SELECT COUNT(*) as count FROM unit WHERE off != 1`)
-    const unitList = await query(`SELECT * FROM unit WHERE off != 1 ORDER BY createTime ASC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`)
-    ctx.body = {code: 200, message: unitList, count: count[0].count}
+    const count = await query(`SELECT COUNT(*) as count FROM goods WHERE off != 1`)
+    const goodsList = await query(`SELECT g.id, g.name, g.picture, g.price, g.descr, g.vipDiscount, g.discount,
+      u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.off != 1 ORDER BY g.createTime ASC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`)
+    goodsList.forEach(ele => {
+      ele.vipDiscount = ele.vipDiscount === 1
+    })
+    ctx.body = {code: 200, message: goodsList, count: count[0].count}
   } catch(err) {
     throw new Error(err)
   }
