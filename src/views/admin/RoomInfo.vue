@@ -22,13 +22,6 @@
           formData: {
             name: '', no: '', descr: '', price: '', package: ''
           },
-          tableData: [
-            // {name: '大包', no: '1', descr: '一堆描述', package: '套餐一'},
-            // {name: '大包', no: '1', descr: '一堆描述', package: '套餐一'},
-            // {name: '大包', no: '1', descr: '一堆描述', package: '套餐一'},
-            // {name: '大包', no: '1', descr: '一堆描述', package: '套餐一'},
-            // {name: '大包', no: '1', descr: '一堆描述', package: '套餐一'},
-          ],
           tableColumns: [
             {key: 'name', title: '名称'},
             {key: 'no', title: '编号'},

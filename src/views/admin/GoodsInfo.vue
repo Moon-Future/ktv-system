@@ -24,7 +24,11 @@
         tableOptions: {
           tableColumns: [
             {key: 'name', title: '名称'},
-            {key: 'price', title: '单价'},
+            {key: 'price', title: '单价',
+              render: (h, params) => {
+                return h('span', {}, params.row.price + ' 元')
+              }
+            },
             {key: 'unitm', title: '单位'},
             {key: 'descr', title: '描述'},
             {
@@ -51,7 +55,7 @@
           },
           ruleValidate: {
             name: [{required: true, message: '不得为空', trigger: 'blur'}],
-            // unit: [{required: true, message: '请选择一个单位', trigger: 'blur'}],
+            unit: [{required: true, message: '不得为空', trigger: 'change'}],
             price: [
               {required: true, message: '不得为空', trigger: 'blur'},
               {pattern: /^\d+(\.{0,1}\d{1,2}){0,1}$/, message: '必须为正数，最多两位小数', trigger: 'blur'}
@@ -79,7 +83,7 @@
           if (res.data.code === 200) {
             let options = res.data.message
             options.forEach(ele => {
-              ele.value = ele.id
+              ele.value = ele.id + ''
               ele.label = ele.name
             })
             this.tableOptions.formArray.splice(2, 1, {key: 'unit', title: '单位', type: 'select', options})
@@ -107,6 +111,7 @@
           } else {
             this.changeSwitch(false)
           }
+          this.tableOptions.formData.price = this.tableOptions.formData.price + ''
         }
       }
     },

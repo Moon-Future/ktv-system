@@ -9,12 +9,17 @@ const apiUrl = {
   deleteUnit: '/api/unit/deleteUnit',
   updUnit: '/api/unit/updUnit',
 
-  insertCompany: '/api/company/insertCompany',
-  getCompany: '/api/company/getCompany',
-  deleteCompany: '/api/company/deleteCompany',
-  updCompany: '/api/company/updCompany',
+  insertRoomType: '/api/room/insertRoomType',
+  getRoomType: '/api/room/getRoomType',
+  deleteRoomType: '/api/room/deleteRoomType',
+  updRoomType: '/api/room/updRoomType',
+  insertRoomInfo: '/api/room/insertRoomInfo',
+  getRoomInfo: '/api/room/getRoomInfo',
+  deleteRoomInfo: '/api/room/deleteRoomInfo',
+  updRoomInfo: '/api/room/updRoomInfo',
 
-  getOptions: '/api/supply/getOptions',
+  getOptions: '/api/option/getOptions',
+
   insertSupply: '/api/supply/insertSupply',
   getSupply: '/api/supply/getSupply',
   deleteSupply: '/api/supply/deleteSupply',

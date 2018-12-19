@@ -30,6 +30,11 @@ export default new Router({
               component: () => import('@/views/admin/RoomInfo.vue'),
             },
             {
+              path: 'roomtype',
+              name: 'roomtype',
+              component: () => import('@/views/admin/RoomType.vue'),
+            },
+            {
               path: 'goodsinfo',
               name: 'goodsinfo',
               component: () => import('@/views/admin/GoodsInfo.vue'),

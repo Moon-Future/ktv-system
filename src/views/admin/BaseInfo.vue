@@ -1,14 +1,23 @@
 <template>
   <div class="baseinfo-container">
     <div class="menu-wrapper">
-      <ul class="menu-ui">
+      <!-- <ul class="menu-ui">
         <router-link
           v-for="(item, i) in menuItem"
           tag="li"
           :to="item.to"
           :class="{active: activeName === i}"
           :key="i">{{ item.title }}</router-link>
-      </ul>
+      </ul> -->
+      <Menu class="menu-ui" mode="horizontal" :active-name="activeName">
+        <template v-for="(menu, i) in menuItem">
+          <menu-item v-if="!menu.submenu" :name="menu.name" :key="i" @click.native="goPage(menu.to)">{{ menu.title }}</menu-item>
+          <Submenu v-else :name="menu.name" :key="i">
+            <template slot="title">{{ menu.title }}</template>
+            <menu-item v-for="(sub, j) in menu.submenu" :name="sub.name" @click.native="goPage(sub.to)" :key="j">{{ sub.title }}</menu-item>
+        </Submenu>
+        </template>
+    </Menu>
       <router-view></router-view>
     </div>
   </div>
@@ -18,26 +27,34 @@
   export default {
     data() {
       return {
-        activeName: 0,
+        activeName: '1-1',
         menuItem: [
-          {to: '/admin/baseinfo/roominfo', title: '房间设置'},
-          {to: '/admin/baseinfo/goodsinfo', title: '商品设置'},
-          {to: '/admin/baseinfo/packageinfo', title: '套餐设置'},
-          {to: '/admin/baseinfo/unitinfo', title: '单位设置'}
+          {name: '1', title: '房间设置',
+            submenu: [
+              {name: '1-1', to: '/admin/baseinfo/roominfo', title: '房间列表'},
+              {name: '1-2', to: '/admin/baseinfo/roomtype', title: '房间类型'}
+            ]
+          },
+          {name: '2', to: '/admin/baseinfo/goodsinfo', title: '商品设置'},
+          {name: '3', to: '/admin/baseinfo/packageinfo', title: '套餐设置'},
+          {name: '4', to: '/admin/baseinfo/unitinfo', title: '单位设置'}
         ]
       }
     },
     created() {
       this.routeMap = {
-        roominfo: 0,
-        goodsinfo: 1,
-        packageinfo: 2,
-        unitinfo: 3
+        roominfo: '1-1',
+        roomtype: '1-2',
+        goodsinfo: '2',
+        packageinfo: '3',
+        unitinfo: '4'
       }
       this.activeName = this.routeMap[this.$route.name]
     },
     methods: {
-      
+      goPage(href) {
+        this.$router.push(href)
+      }
     },
     watch: {
       $route() {
@@ -55,20 +72,21 @@
     justify-content: space-around;
     background: $color-shallowblack;
     color: $color-white;
+    height: 35px;
+    line-height: 35px;
     border-radius: 3px;
     margin-bottom: 10px;
-    li {
-      width: 25%;
-      padding: 10px 0;
-      cursor: pointer;
-      &:hover {
-        background: $color-origin;
-        color: $color-black;
-      }
-      &.active {
-        background: $color-origin;
-        color: $color-black;
-      }
-    }
   }
+  .menu-ui>li {
+    width: 25%;
+    color: $color-white !important;
+    &:hover {
+      background: $color-origin;
+      color: $color-black !important;
+    }
+    &.ivu-menu-item-active {
+      background: $color-origin !important;
+      color: $color-black !important;
+    }
+    }
 </style>

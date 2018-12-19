@@ -2,10 +2,10 @@
   <div class="basetable-container">
     <div class="sift-wrapper">
       <div class="top-title">
-        <h2>总数：25</h2>
+        <h2>总数：{{ total }}</h2>
         <Button type="primary" size="small" @click="goAdd">添加</Button>
       </div>
-      <Table :columns="tableColumns" :data="tableData" :loading="loading" size="small"></Table>
+      <Table :columns="tableColumns" :data="tableData" :loading="loading" stripe size="small"></Table>
     </div>
     <Drawer
       title="新增"
@@ -22,11 +22,25 @@
             <Select v-if="item.type === 'select'" v-model="formData[item.key]">
               <Option v-for="option in item.options" :value="option.value" :key="option.value">{{ option.label }}</Option>
             </Select>
-            <CheckboxGroup v-if="item.type === 'checkbox'">
-              <Checkbox label="香蕉"></Checkbox>
-              <Checkbox label="苹果"></Checkbox>
-              <Checkbox label="西瓜"></Checkbox>
+            <CheckboxGroup v-if="item.type === 'packCheckbox'">
+              <Checkbox v-for="(option, i) in item.options" :label="option.id" :key="i">
+                {{ option.name }}({{ option.price }}元)
+                <InputNumber :min="1" size="small" v-model="formData['goodsQty'][option.id]" style="width:50px"></InputNumber>
+              </Checkbox>
             </CheckboxGroup>
+            <RadioGroup v-if="item.type === 'radio'" v-model="formData[item.key]">
+              <Radio v-for="(option, i) in item.options" :label="option.label" :key="i">{{ option.name }}</Radio>
+            </RadioGroup>
+            <Row v-if="item.type === 'switchSelect'">
+              <i-col span="3">
+                <i-switch v-model="formData[item.key]" @on-change="changeSwitch" />
+              </i-col>
+              <i-col span="6" v-if="!item.hide2">
+                <Select v-model="formData[item.key2]">
+                  <Option v-for="option in item.options" :value="option.value" :key="option.value">{{ option.label }}</Option>
+                </Select>
+              </i-col>
+            </Row>
           </FormItem>
         </template>
       </Form>
@@ -62,7 +76,8 @@
           paddingBottom: '53px',
           position: 'static'
         },
-        tableData: []
+        tableData: [],
+        total: ''
       }
     },
     computed: {
@@ -108,8 +123,10 @@
         }).then(res => {
           if (res.data.code === 200) {
             this.tableData = res.data.message
+            this.total = res.data.count
           } else {
             this.tableData = []
+            this.total = 0
           }
           this.loading = false
         })
@@ -130,7 +147,7 @@
           content: '此操作将删除该数据, 并且会影响到与之相关的数据, 是否继续?',
           onOk: () => {
             this.$http.post(apiUrl[this.tableOptions.delApi], {
-              data: [this.formData]
+              data: [params.row]
             }).then(res => {
               if (res.data.code === 200) {
                 this.tableData.splice(params.index, 1)

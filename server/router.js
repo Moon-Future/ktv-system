@@ -1,11 +1,8 @@
 const Router = require('koa-router')
 const goods = require('./api/goods')
 const unit = require('./api/unit')
-const company = require('./api/company')
-const supply = require('./api/supply')
-const order = require('./api/order')
-const delivery = require('./api/delivery')
-const inventory = require('./api/inventory')
+const room = require('./api/room')
+const option = require('./api/option')
 const user = require('./api/user')
 const router = new Router({
   prefix: '/api'
@@ -13,11 +10,8 @@ const router = new Router({
 
 router.use('/goods', goods.routes())
 router.use('/unit', unit.routes())
-router.use('/company', company.routes())
-router.use('/supply', supply.routes())
-router.use('/order', order.routes())
-router.use('/delivery', delivery.routes())
-router.use('/inventory', inventory.routes())
+router.use('/room', room.routes())
+router.use('/option', option.routes())
 router.use('/user', user.routes())
 
 module.exports = router

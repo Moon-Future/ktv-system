@@ -57,7 +57,7 @@ router.post('/getGoods', async (ctx) => {
   }
 })
 
-router.post('/deleteUnit', async (ctx) => {
+router.post('/deleteGoods', async (ctx) => {
   try {
     const checkResult = checkRoot(ctx)
     if (checkResult.code === 500) {
@@ -70,14 +70,14 @@ router.post('/deleteUnit', async (ctx) => {
     data.forEach(ele => {
       ids.push(ele.id)
     })
-    await query(`UPDATE unit SET off = 1, updateTime = ${new Date().getTime()} WHERE id IN ( ${ids.join()} )`)
+    await query(`UPDATE goods SET off = 1, updateTime = ${new Date().getTime()} WHERE id IN ( ${ids.join()} )`)
     ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {
     throw new Error(err)
   }
 })
 
-router.post('/updUnit', async (ctx) => {
+router.post('/updGoods', async (ctx) => {
   try {
     const checkResult = checkRoot(ctx)
     if (checkResult.code === 500) {
@@ -86,13 +86,14 @@ router.post('/updUnit', async (ctx) => {
     }
     
     const data = ctx.request.body.data
-    const check = await query(`SELECT * FROM unit WHERE name = '${data.name}' AND off != 1`)
+    const check = await query(`SELECT * FROM goods WHERE name = '${data.name}' AND off != 1`)
     if (check.length !== 0 && check[0].id != data.id) {
-      ctx.body = {code: 500, message: `单位 ${data.name} 已存在`}
+      ctx.body = {code: 500, message: `商品 ${data.name} 已存在`}
       return
     }
-    await query(`UPDATE unit SET name = '${data.name}', sign = '${data.sign}', updateTime = ${new Date().getTime()} WHERE id = ${data.id}`)
-    const result = await query(`SELECT * FROM unit WHERE off != 1 AND id = ${data.id}`)
+    await query(`UPDATE goods SET name = '${data.name}', price = ${data.price}, unit = ${data.unit}, descr = '${data.descr}',
+      vipDiscount = ${data.vipDiscount ? 1 : 0}, discount = ${data.vipDiscount ? data.discount : null}, updateTime = ${new Date().getTime()} WHERE id = ${data.id}`)
+    const result = await query(`SELECT * FROM goods WHERE off != 1 AND id = ${data.id}`)
     ctx.body = {code: 200, message: '更新成功', result: result}
   } catch(err) {
     throw new Error(err)

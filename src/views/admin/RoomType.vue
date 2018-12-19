@@ -14,24 +14,22 @@
       return {
         tableOptions: {
           tableColumns: [
-            {key: 'name', title: '名称'},
-            {key: 'sign', title: '符号'}
+            {key: 'name', title: '名称'}
           ],
           formArray: [
-            {key: 'name', title: '名称', type: 'input'},
-            {key: 'sign', title: '符号', type: 'input'}
+            {key: 'name', title: '名称', type: 'input'}
           ],
           formData: {
-            name: '', sign: ''
+            name: ''
           },
           ruleValidate: {
             name: [{required: true, message: '不得为空', trigger: 'blur'}]
           },
           width: 50,
-          addApi: 'insertUnit',
-          updApi: 'updUnit',
-          delApi: 'deleteUnit',
-          siftApi: 'getUnit'
+          addApi: 'insertRoomType',
+          updApi: 'updRoomType',
+          delApi: 'deleteRoomType',
+          siftApi: 'getRoomType'
         }
       }
     },
