@@ -11,7 +11,7 @@
  Target Server Version : 80011
  File Encoding         : 65001
 
- Date: 19/12/2018 02:22:50
+ Date: 19/12/2018 23:40:10
 */
 
 SET NAMES utf8mb4;
@@ -25,7 +25,7 @@ CREATE TABLE `goods` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   `picture` varchar(255) DEFAULT NULL,
-  `price` int(11) NOT NULL,
+  `price` decimal(11,2) NOT NULL,
   `unit` int(11) NOT NULL,
   `descr` varchar(255) DEFAULT NULL,
   `vipDiscount` int(11) NOT NULL DEFAULT '0' COMMENT '开启会员折扣',
@@ -34,7 +34,20 @@ CREATE TABLE `goods` (
   `updateTime` bigint(20) DEFAULT NULL,
   `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for roomtype
+-- ----------------------------
+DROP TABLE IF EXISTS `roomtype`;
+CREATE TABLE `roomtype` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `createTime` bigint(20) NOT NULL,
+  `updateTime` bigint(20) DEFAULT NULL,
+  `off` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for unit
@@ -48,6 +61,6 @@ CREATE TABLE `unit` (
   `updateTime` bigint(20) DEFAULT NULL,
   `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 SET FOREIGN_KEY_CHECKS = 1;
