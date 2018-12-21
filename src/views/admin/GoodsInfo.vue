@@ -53,7 +53,7 @@
           },
           ruleValidate: {
             name: [{required: true, message: '不得为空', trigger: 'blur'}],
-            unit: [{required: true, message: '不得为空', trigger: 'change'}],
+            unit: [{required: true, message: '不得为空', trigger: 'blur'}],
             price: [
               {required: true, message: '不得为空', trigger: 'blur'},
               {pattern: /^\d+(\.{0,1}\d{1,2}){0,1}$/, message: '必须为正数，最多两位小数', trigger: 'blur'}
