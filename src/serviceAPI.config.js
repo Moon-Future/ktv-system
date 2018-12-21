@@ -20,10 +20,10 @@ const apiUrl = {
 
   getOptions: '/api/option/getOptions',
 
-  insertSupply: '/api/supply/insertSupply',
-  getSupply: '/api/supply/getSupply',
-  deleteSupply: '/api/supply/deleteSupply',
-  updSupply: '/api/supply/updSupply',
+  insertPackage: '/api/package/insertPackage',
+  getPackage: '/api/package/getPackage',
+  deletePackage: '/api/package/deletePackage',
+  updPackage: '/api/package/updPackage',
 
   insertInventoryIn: '//api/inventory/insertInventoryIn',
   deleteInventoryIn: '//api/inventory/deleteInventoryIn',

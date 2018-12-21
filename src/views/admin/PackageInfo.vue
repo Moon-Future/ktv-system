@@ -11,30 +11,53 @@
 <script>
   import BaseTable from '@/components/admin/BaseTable'
   import apiUrl from '@/serviceAPI.config.js'
-import { resolve, reject } from 'q';
   export default {
     data() {
       return {
-        hasGet: false,
         options: {},
         tableOptions: {
           tableColumns: [
+            {key: 'type', title: '类型', render: (h, params) => {
+              return h('span', {}, params.row.type === 1 ? '阳光档' : '黄金档')
+            }},
             {key: 'name', title: '名称'},
-            {key: 'content', title: '内容'},
-            {key: 'descr', title: '描述'},
-            {key: 'price', title: '总价'}
+            {key: 'goods', title: '包含商品', render: (h, params) => {
+              let array = []
+              params.row.goods.forEach(ele => {
+                array.push(h('Tag', {props: {color: 'primary'}}, `${ele.name}(${ele.qty}${ele.unitm})`))
+              })
+              return h('div', {}, array)
+            }},
+            {key: 'room', title: '包间', render: (h, params) => {
+              const row = params.row
+              if (row.room) {
+                return h('Tag', {props: {color: 'success'}}, row.roomTypem)
+              } else {
+                return h('Tag', {props: {color: 'warning'}}, '不含包间')
+              }
+            }},
+            {key: 'descr', title: '描述', render: (h, params) => {
+              const descr = params.row.descr.split('\n')
+              let array = []
+              descr.forEach(ele => {
+                array.push(h('span', {}, ele), h('br'))
+              })
+              return h('div', {}, array)
+            }},
+            {key: 'price', title: '价格', render: (h, params) => {
+              return h('span', {}, params.row.price + ' 元')
+            }}
           ],
           formArray: [
-            {key: 'type', title: '类型', type: 'radio', options: [{label:'1', name:'阳光挡'}, {label:'2', name:'黄金档'}]},
+            {key: 'type', title: '类型', type: 'radio', options: [{label:'1', name:'阳光档'}, {label:'2', name:'黄金档'}]},
             {key: 'name', title: '名称', type: 'input'},
             {key: 'goods', title: '商品', type: 'packCheckbox', options: []},
             {key: 'room', title: '包间', type: 'switchSelect', key2: 'roomType', hide2: true, options: []},
-            {key: 'time', title: '欢唱', type: 'input'},
             {key: 'price', title: '价格', type: 'input'},
             {key: 'descr', title: '描述', type: 'textarea'}
           ],
           formData: {
-            type: '1', name: '', descr: '', price: '', goods: '', room: '', time: '', roomType: '', goodsQty: {}
+            type: '1', name: '', descr: '', price: '', goods: [], room: false, time: '', roomType: '', goodsQty: {}
           },
           ruleValidate: {
             name: [{required: true, message: '不得为空', trigger: 'blur'}],
@@ -48,7 +71,7 @@ import { resolve, reject } from 'q';
           addApi: 'insertPackage',
           updApi: 'updPackage',
           delApi: 'deletePackage',
-          siftApi: 'getUnit'
+          siftApi: 'getPackage'
         }
       }
     },
@@ -72,24 +95,51 @@ import { resolve, reject } from 'q';
           this.tableOptions.formArray.splice(3, 1, {key: 'room', title: '包间', type: 'switchSelect', key2: 'roomType', options: this.options.roomTypeOptions})
         } else {
           this.tableOptions.formArray.splice(3, 1, {key: 'room', title: '包间', type: 'switchSelect', key2: 'roomType', hide2: true, options: this.options.roomTypeOptions})
-          this.tableOptions.formData.roomType = ''
         }
       },
       async edit({type, params = {}}) {
         if (!this.hasGet) {
           this.options = await this.getOptions()
           this.hasGet = true
-          this.tableOptions.formArray.splice(2, 1, {key: 'goods', title: '商品', type: 'checkbox', options: this.options.goodsOptions})
+          this.tableOptions.formArray.splice(2, 1, {key: 'goods', title: '商品', type: 'packCheckbox', options: this.options.goodsOptions})
           this.tableOptions.formArray.splice(3, 1, {key: 'room', title: '包间', type: 'switchSelect', key2: 'roomType', hide2: true, options: this.options.roomTypeOptions})
           this.options.goodsOptions.forEach(ele => {
             this.tableOptions.formData['goodsQty'][ele.id] = 1
           })
         }
         if (type === 'add') {
-          
+          this.tableOptions.formData = {
+            type: '1', name: '', descr: '', price: '', goods: [], room: false, time: '', roomType: '', goodsQty: {}
+          }
+          this.options.goodsOptions.forEach(ele => {
+            this.tableOptions.formData['goodsQty'][ele.id] = 1
+          })
         } else if (type === 'upd') {
-
+          const row = params.row
+          let obj = {
+            type: row.type + '', 
+            name: row.name, 
+            descr: row.descr,
+            price: row.price + '', 
+            room: row.room ? true : false, 
+            roomType: row.roomType + '',
+            goods: [],
+            goodsQty: {},
+            uuid: row.uuid,
+            createTime: row.createTime
+          }
+          row.goods.forEach(ele => {
+            obj.goods.push(ele.id)
+            obj.goodsQty[ele.id] = ele.qty
+          })
+          this.options.goodsOptions.forEach(ele => {
+            if (obj.goods.indexOf(ele.id) === -1) {
+              obj.goodsQty[ele.id] = 1
+            }
+          })
+          this.tableOptions.formData = obj
         }
+        this.changeSwitch(this.tableOptions.formData.room)
       }
     },
     components: {

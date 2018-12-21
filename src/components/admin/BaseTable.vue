@@ -22,7 +22,7 @@
             <Select v-if="item.type === 'select'" v-model="formData[item.key]">
               <Option v-for="option in item.options" :value="option.value" :key="option.value">{{ option.label }}</Option>
             </Select>
-            <CheckboxGroup v-if="item.type === 'packCheckbox'">
+            <CheckboxGroup v-if="item.type === 'packCheckbox'" v-model="formData[item.key]">
               <Checkbox v-for="(option, i) in item.options" :label="option.id" :key="i">
                 {{ option.name }}({{ option.price }}元)
                 <InputNumber :min="1" size="small" v-model="formData['goodsQty'][option.id]" style="width:50px"></InputNumber>

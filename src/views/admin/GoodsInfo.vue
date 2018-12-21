@@ -24,11 +24,9 @@
         tableOptions: {
           tableColumns: [
             {key: 'name', title: '名称'},
-            {key: 'price', title: '单价',
-              render: (h, params) => {
-                return h('span', {}, params.row.price + ' 元')
-              }
-            },
+            {key: 'price', title: '单价', render: (h, params) => {
+              return h('span', {}, params.row.price + ' 元')
+            }},
             {key: 'unitm', title: '单位'},
             {key: 'descr', title: '描述'},
             {
@@ -72,22 +70,24 @@
         }
       }
     },
-    created() {
-      this.getUnit()
-    },
     methods: {
       getUnit(params = {}) {
-        this.$http.post(apiUrl.getUnit, {
-          data: params
-        }).then(res => {
-          if (res.data.code === 200) {
-            let options = res.data.message
-            options.forEach(ele => {
-              ele.value = ele.id + ''
-              ele.label = ele.name
-            })
-            this.tableOptions.formArray.splice(2, 1, {key: 'unit', title: '单位', type: 'select', options})
-          }
+        return new Promise((resolve, reject) => {
+          this.$http.post(apiUrl.getUnit, {
+            data: params
+          }).then(res => {
+            if (res.data.code === 200) {
+              let options = res.data.message
+              options.forEach(ele => {
+                ele.value = ele.id + ''
+                ele.label = ele.name
+              })
+              this.tableOptions.formArray.splice(2, 1, {key: 'unit', title: '单位', type: 'select', options})
+              resolve()
+            } else {
+              reject()
+            }
+          })
         })
       },
       changeSwitch(status) {
@@ -98,7 +98,11 @@
           this.tableOptions.formData.discount = ''
         }
       },
-      edit({type, params = {}}) {
+      async edit({type, params = {}}) {
+        if (!this.hasGet) {
+          await this.getUnit()
+          this.hasGet = true
+        }
         if (type === 'add') {
           this.tableOptions.formData = {
             name: '', picture: '', price: '', vipDiscount: false, discount: '', unit: '', descr: ''
@@ -112,6 +116,7 @@
             this.changeSwitch(false)
           }
           this.tableOptions.formData.price = this.tableOptions.formData.price + ''
+          this.tableOptions.formData.unit = this.tableOptions.formData.unit + ''
         }
       }
     },
