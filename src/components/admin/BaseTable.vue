@@ -16,21 +16,41 @@
       <Form ref="submitForm" label-position="right" :label-width="tableOptions.width || 60" :model="formData" :rules="tableOptions.ruleValidate || {}">
         <template v-for="(item, i) in tableOptions.formArray">
           <FormItem :label="item.title" :prop="item.key" :key="i" v-if="!item.hide">
-            <i-input v-if="item.type === 'input'" v-model="formData[item.key]" :placeholder="item.placeholder || '请输入...'"></i-input>
+            <i-input v-if="item.type === 'input'" v-model="formData[item.key]" :placeholder="item.placeholder || '请输入...'">
+              <span v-if="item.unit" slot="append">元/小时</span>
+            </i-input>
+
             <i-input v-if="item.type === 'textarea'" v-model="formData[item.key]" type="textarea" :placeholder="item.placeholder || '请输入...'"></i-input>
+            
             <i-switch v-if="item.type === 'switch'" v-model="formData[item.key]" @on-change="changeSwitch" />
+            
             <Select v-if="item.type === 'select'" v-model="formData[item.key]">
               <Option v-for="option in item.options" :value="option.value" :key="option.value">{{ option.label }}</Option>
             </Select>
-            <CheckboxGroup v-if="item.type === 'packCheckbox'" v-model="formData[item.key]">
-              <Checkbox v-for="(option, i) in item.options" :label="option.id" :key="i">
-                {{ option.name }}({{ option.price }}元)
-                <InputNumber :min="1" size="small" v-model="formData['goodsQty'][option.id]" style="width:50px"></InputNumber>
+
+            <CheckboxGroup v-if="item.type === 'checkbox'" v-model="formData[item.key]">
+              <Checkbox v-for="(option, j) in item.options" :label="option.id" :key="j">
+                <template v-if="!item.tooltip">
+                  {{ option.name }}({{ option.price }}元)
+                </template>
+                <Tooltip v-if="item.tooltip">
+                  {{ option.name }}({{ option.price }}元)
+                  <div slot="content" style="white-space: normal">
+                    <template v-for="(descrSpan, k) in option.descr">
+                      <div :key="k">
+                        {{ descrSpan }}
+                      </div>
+                    </template>
+                  </div>
+                </Tooltip>
+                <InputNumber v-if="item.num" :min="1" size="small" v-model="formData['goodsQty'][option.id]" style="width:50px"></InputNumber>
               </Checkbox>
             </CheckboxGroup>
+
             <RadioGroup v-if="item.type === 'radio'" v-model="formData[item.key]">
               <Radio v-for="(option, i) in item.options" :label="option.label" :key="i">{{ option.name }}</Radio>
             </RadioGroup>
+
             <Row v-if="item.type === 'switchSelect'">
               <i-col span="3">
                 <i-switch v-model="formData[item.key]" @on-change="changeSwitch" />
@@ -168,6 +188,9 @@
             this.$Message.error('*号为必填项')
             return false
           }
+
+          // console.log(this.formData)
+          // return
           if (!this.updFlag) {
             this.$http.post(apiUrl[this.tableOptions.addApi], {
               data: [this.formData]

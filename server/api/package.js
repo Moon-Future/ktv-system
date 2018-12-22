@@ -45,7 +45,6 @@ router.post('/getPackage', async (ctx) => {
       return
     }
     
-    const data = ctx.request.body.data
     const count = await query(`SELECT COUNT(DISTINCT uuid) as count FROM package WHERE off != 1`)
     const result = await query(`SELECT DISTINCT uuid as uuid, p.createTime, p.type, p.name, p.room, p.roomType, r.name as roomTypem, p.price, p.descr, p.qty, g.id as goods, g.name as goodsm, u.name as unitm 
       FROM package as p 
@@ -56,13 +55,13 @@ router.post('/getPackage', async (ctx) => {
       ORDER BY p.createTime ASC`)
     let packageList = []
     let uuidMap = {}
-    result.forEach(item => {
-      if (uuidMap[item.uuid] === undefined) {
-        item.goods = [{id: item.goods, name: item.goodsm, unitm: item.unitm, qty: item.qty}]
-        packageList.push(item)
-        uuidMap[item.uuid] = packageList.length - 1
+    result.forEach(ele => {
+      if (uuidMap[ele.uuid] === undefined) {
+        ele.goods = [{id: ele.goods, name: ele.goodsm, unitm: ele.unitm, qty: ele.qty}]
+        packageList.push(ele)
+        uuidMap[ele.uuid] = packageList.length - 1
       } else {
-        packageList[uuidMap[item.uuid]].goods.push({id: item.goods, name: item.goodsm, unitm: item.unitm, qty: item.qty})
+        packageList[uuidMap[ele.uuid]].goods.push({id: ele.goods, name: ele.goodsm, unitm: ele.unitm, qty: ele.qty})
       }
     })
     ctx.body = {code: 200, message: packageList, count: count[0].count}

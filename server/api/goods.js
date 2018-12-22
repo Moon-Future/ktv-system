@@ -47,7 +47,7 @@ router.post('/getGoods', async (ctx) => {
     const pageSize = data && data.pageSize || 10
     const count = await query(`SELECT COUNT(*) as count FROM goods WHERE off != 1`)
     const goodsList = await query(`SELECT g.id, g.name, g.picture, g.price, g.descr, g.vipDiscount, g.discount,
-      u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.off != 1 ORDER BY g.createTime ASC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`)
+      u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.off != 1 ORDER BY g.createTime ASC`)
     goodsList.forEach(ele => {
       ele.vipDiscount = ele.vipDiscount === 1
     })

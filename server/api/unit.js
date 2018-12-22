@@ -45,7 +45,7 @@ router.post('/getUnit', async (ctx) => {
     const pageNo = data && data.pageNo || 1
     const pageSize = data && data.pageSize || 10
     const count = await query(`SELECT COUNT(*) as count FROM unit WHERE off != 1`)
-    const unitList = await query(`SELECT * FROM unit WHERE off != 1 ORDER BY createTime ASC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`)
+    const unitList = await query(`SELECT * FROM unit WHERE off != 1 ORDER BY createTime ASC`)
     ctx.body = {code: 200, message: unitList, count: count[0].count}
   } catch(err) {
     throw new Error(err)

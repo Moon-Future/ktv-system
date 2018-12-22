@@ -51,7 +51,7 @@
           formArray: [
             {key: 'type', title: '类型', type: 'radio', options: [{label:'1', name:'阳光档'}, {label:'2', name:'黄金档'}]},
             {key: 'name', title: '名称', type: 'input'},
-            {key: 'goods', title: '商品', type: 'packCheckbox', options: []},
+            {key: 'goods', title: '商品', type: 'checkbox', num: true, options: []},
             {key: 'room', title: '包间', type: 'switchSelect', key2: 'roomType', hide2: true, options: []},
             {key: 'price', title: '价格', type: 'input'},
             {key: 'descr', title: '描述', type: 'textarea'}
@@ -101,7 +101,7 @@
         if (!this.hasGet) {
           this.options = await this.getOptions()
           this.hasGet = true
-          this.tableOptions.formArray.splice(2, 1, {key: 'goods', title: '商品', type: 'packCheckbox', options: this.options.goodsOptions})
+          this.tableOptions.formArray.splice(2, 1, {key: 'goods', title: '商品', type: 'checkbox', num: true, options: this.options.goodsOptions})
           this.tableOptions.formArray.splice(3, 1, {key: 'room', title: '包间', type: 'switchSelect', key2: 'roomType', hide2: true, options: this.options.roomTypeOptions})
           this.options.goodsOptions.forEach(ele => {
             this.tableOptions.formData['goodsQty'][ele.id] = 1
