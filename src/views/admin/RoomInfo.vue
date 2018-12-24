@@ -30,8 +30,8 @@
                 let array = []
                 packageList.forEach(ele => {
                   array.push(h('Tooltip', [
-                    h('Tag', ele.packagem),
-                    h('div', {slot:'content'}, ele.descr)
+                    h('Tag', {props: {color: 'success'}}, ele.packagem),
+                    h('div', {slot: 'content'}, ele.descr)
                   ]))
                 })
                 return h('span', array);
