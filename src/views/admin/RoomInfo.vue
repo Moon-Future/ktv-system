@@ -108,9 +108,19 @@
           this.tableOptions.formArray.splice(4, 1, {key: 'package', title: '套餐', type: 'checkbox', tooltip: true, options: this.packageList})
         }
         if (type === 'add') {
-
+          this.tableOptions.formData = {
+            roomType: '', name: '', no: '', price: '', package: [], descr: ''
+          }
         } else if (type === 'upd') {
-          
+          const row = params.row
+          let packageList = []
+          row.package.forEach(ele => {
+            packageList.push(ele.package)
+          })
+          this.tableOptions.formData = row
+          this.tableOptions.formData.package = packageList
+          this.tableOptions.formData.price += ''
+          this.tableOptions.formData.roomType += ''
         }
       }
     },

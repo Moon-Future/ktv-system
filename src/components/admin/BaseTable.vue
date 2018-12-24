@@ -155,6 +155,7 @@
         this.updFlag = false
         this.addFlag = true
         this.$emit('edit', {type: 'add'})
+        this.$refs.submitForm.resetFields()
       },
       goUpdate(params) {
         this.updFlag = true

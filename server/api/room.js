@@ -197,11 +197,12 @@ router.post('/deleteRoomInfo', async (ctx) => {
     }
     
     const data = ctx.request.body.data
-    let ids = []
+    let uuids = []
     data.forEach(ele => {
-      ids.push(ele.id)
+      uuids.push(ele.uuid)
     })
-    await query(`UPDATE roomtype SET off = 1, updateTime = ${new Date().getTime()} WHERE id IN ( ${ids.join()} )`)
+    // await query(`UPDATE room SET off = 1, updateTime = ${new Date().getTime()} WHERE uuid IN ( '${uuids.join()}' )`)
+    await query(`DELETE FROM room WHERE uuid IN ( '${uuids.join()}' )`)
     ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {
     throw new Error(err)
@@ -217,14 +218,20 @@ router.post('/updRoomInfo', async (ctx) => {
     }
     
     const data = ctx.request.body.data
-    const check = await query(`SELECT * FROM roomtype WHERE name = '${data.name}' AND off != 1`)
-    if (check.length !== 0 && check[0].id != data.id) {
-      ctx.body = {code: 500, message: `房间类型 ${data.name} 已存在`}
-      return
+    const currentTime = new Date().getTime()
+    const roomInfo = await query(`SELECT * FROM room WHERE no = '${data.no}' AND off != 1`)
+    for (let i = 0, len = roomInfo.length; i < len; i++) {
+      if (roomInfo[i].uuid != data.uuid) {
+        ctx.body = {code: 500, message: `房间编号 ${data.no} 已存在`}
+        return
+      }
     }
-    await query(`UPDATE roomtype SET name = '${data.name}', updateTime = ${new Date().getTime()} WHERE id = ${data.id}`)
-    const result = await query(`SELECT * FROM roomtype WHERE off != 1 AND id = ${data.id}`)
-    ctx.body = {code: 200, message: '更新成功', result: result}
+    await query(`DELETE FROM room WHERE uuid = '${data.uuid}'`)
+    for (let i = 0; i < data.package.length; i++) {
+      await query(`INSERT INTO room (uuid, roomType, name, no, price, package, descr, createTime, updateTime) VALUES 
+        ('${data.uuid}', ${data.roomType}, '${data.name}', '${data.no}', ${data.price}, '${data.package[i]}', '${data.descr}', ${data.createTime}, ${currentTime})`)
+    }
+    ctx.body = {code: 200, message: '更新成功'}
   } catch(err) {
     throw new Error(err)
   }
