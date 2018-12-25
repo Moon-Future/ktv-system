@@ -80,14 +80,13 @@
         return new Promise((resolve, reject) => {
           this.$http.post(apiUrl.getOptions, {
             data: {goods: true, roomType: true}
+          }).then(res => {
+            if (res.data.code === 200) {
+              resolve(res.data.message)
+            } else {
+              reject()
+            }
           })
-            .then(res => {
-              if (res.data.code === 200) {
-                resolve(res.data.message)
-              } else {
-                reject()
-              }
-            })
         })
       },
       changeSwitch(status) {

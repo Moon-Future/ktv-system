@@ -3,7 +3,7 @@
     <div class="room-container">
       <div class="room-menu">包间</div>
       <ul class="room-list">
-        <li class="room" v-for="(room, i) in roomList" :key="i">
+        <li class="room" v-for="(room, i) in roomList" :key="i" @click="selectRoom(room.uuid)">
           {{ room.no }}
         </li>
       </ul>
@@ -12,7 +12,7 @@
       <div class="tab-wrapper">
         <Tabs v-model="activeName">
           <TabPane label="包间信息" name="first">
-            <room-detail></room-detail>
+            <room-detail :roomInfo="roomInfo"></room-detail>
           </TabPane>
           <TabPane label="商品" name="second">商品</TabPane>
         </Tabs>
@@ -28,25 +28,14 @@
     data() {
       return {
         roomList: [
-          // {name: '豪华大包', no: 1},
-          // {name: '豪华大包', no: 2},
-          // {name: '豪华大包', no: 3},
-          // {name: '豪华大包', no: 4},
-          // {name: '豪华大包', no: 5},
-          // {name: '豪华大包', no: 6},
-          // {name: '豪华大包', no: 7},
-          // {name: '豪华大包', no: 8},
-          // {name: '豪华大包', no: 9},
-          // {name: '豪华大包', no: 10},
-          // {name: '豪华大包', no: 11},
-          // {name: '豪华大包', no: 12},
-          // {name: '豪华大包', no: 13},
-          // {name: '豪华大包', no: '欢迎光临'}
+          {name: '豪华大包', no: '欢迎光临'}
         ],
-        activeName: 'first'
+        activeName: 'first',
+        roomInfo: {}
       }
     },
     created() {
+      this.roomMap = {}
       this.getRoomInfo()
     },
     methods: {
@@ -55,8 +44,15 @@
           .then(res => {
             if (res.data.code === 200) {
               this.roomList = res.data.message
+              this.roomList.forEach(ele => {
+                this.roomMap[ele.uuid] = ele
+              })
             }
           })
+      },
+      selectRoom(uuid) {
+        this.roomInfo = this.roomMap[uuid]
+        console.log(uuid, this.roomMap[uuid])
       }
     },
     components: {
@@ -97,6 +93,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        cursor: pointer;
         &:hover {
           border: 1px solid $color-deepgray;
         }

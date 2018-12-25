@@ -3,15 +3,15 @@
 
  Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 50721
+ Source Server Version : 80011
  Source Host           : localhost:3306
  Source Schema         : ktv
 
  Target Server Type    : MySQL
- Target Server Version : 50721
+ Target Server Version : 80011
  File Encoding         : 65001
 
- Date: 25/12/2018 17:57:19
+ Date: 26/12/2018 00:30:25
 */
 
 SET NAMES utf8mb4;
@@ -21,24 +21,25 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- Table structure for goods
 -- ----------------------------
 DROP TABLE IF EXISTS `goods`;
-CREATE TABLE `goods`  (
+CREATE TABLE `goods` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `picture` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `price` decimal(10, 2) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
   `unit` int(11) NOT NULL,
   `descr` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `vipDiscount` int(11) NOT NULL DEFAULT 0 COMMENT '开启会员折扣',
-  `discount` decimal(10, 2) DEFAULT NULL COMMENT '会员折扣',
+  `vipDiscount` int(11) NOT NULL DEFAULT '0' COMMENT '开启会员折扣',
+  `discount` decimal(10,2) DEFAULT NULL COMMENT '会员折扣',
   `createTime` bigint(20) NOT NULL,
   `updateTime` bigint(20) DEFAULT NULL,
-  `off` int(11) NOT NULL DEFAULT 0,
+  `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of goods
 -- ----------------------------
+BEGIN;
 INSERT INTO `goods` VALUES (1, '纯啤啤酒', NULL, 20.00, 1, '', 0, NULL, 1545710870689, NULL, 0);
 INSERT INTO `goods` VALUES (2, '冰纯啤酒', NULL, 30.00, 1, '冰火两重天！', 0, NULL, 1545710972654, NULL, 0);
 INSERT INTO `goods` VALUES (3, '雪花啤酒', NULL, 10.00, 1, '真的有雪花哦', 0, NULL, 1545711013154, NULL, 0);
@@ -55,31 +56,33 @@ INSERT INTO `goods` VALUES (13, '杏仁', NULL, 10.00, 2, '小吃', 0, NULL, 154
 INSERT INTO `goods` VALUES (14, '什锦果盘小拼', NULL, 20.00, 2, '', 0, NULL, 1545711468435, NULL, 0);
 INSERT INTO `goods` VALUES (15, '什锦果盘中拼', NULL, 50.00, 2, '', 0, NULL, 1545711489771, NULL, 0);
 INSERT INTO `goods` VALUES (16, '什锦果盘大拼', NULL, 80.00, 2, '', 0, NULL, 1545711509813, NULL, 0);
+COMMIT;
 
 -- ----------------------------
 -- Table structure for package
 -- ----------------------------
 DROP TABLE IF EXISTS `package`;
-CREATE TABLE `package`  (
+CREATE TABLE `package` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uuid` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `type` int(11) DEFAULT NULL,
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `goods` int(11) DEFAULT NULL COMMENT '商品，多个',
   `qty` int(11) DEFAULT NULL,
-  `room` int(11) NOT NULL DEFAULT 0 COMMENT '是否含包间',
+  `room` int(11) NOT NULL DEFAULT '0' COMMENT '是否含包间',
   `roomType` int(11) DEFAULT NULL,
-  `price` decimal(10, 2) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
   `descr` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `createTime` bigint(20) NOT NULL,
   `updateTime` bigint(20) DEFAULT NULL,
-  `off` int(11) NOT NULL DEFAULT 0,
+  `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of package
 -- ----------------------------
+BEGIN;
 INSERT INTO `package` VALUES (1, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 1, 12, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
 INSERT INTO `package` VALUES (2, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 2, 10, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
 INSERT INTO `package` VALUES (3, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 3, 8, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
@@ -87,68 +90,93 @@ INSERT INTO `package` VALUES (4, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤
 INSERT INTO `package` VALUES (5, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 9, 1, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
 INSERT INTO `package` VALUES (6, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 7, 1, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
 INSERT INTO `package` VALUES (7, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 14, 1, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
+INSERT INTO `package` VALUES (8, '0681b010-084c-11e9-a567-470a0f92e677', 1, '红酒套餐', 4, 1, 1, 1, 198.00, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
+INSERT INTO `package` VALUES (9, '0681b010-084c-11e9-a567-470a0f92e677', 1, '红酒套餐', 5, 2, 1, 1, 198.00, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
+INSERT INTO `package` VALUES (10, '0681b010-084c-11e9-a567-470a0f92e677', 1, '红酒套餐', 8, 1, 1, 1, 198.00, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
+INSERT INTO `package` VALUES (11, '0681b010-084c-11e9-a567-470a0f92e677', 1, '红酒套餐', 9, 1, 1, 1, 198.00, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
+INSERT INTO `package` VALUES (12, '0681b010-084c-11e9-a567-470a0f92e677', 1, '红酒套餐', 7, 1, 1, 1, 198.00, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
+INSERT INTO `package` VALUES (13, '0681b010-084c-11e9-a567-470a0f92e677', 1, '红酒套餐', 14, 1, 1, 1, 198.00, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
+COMMIT;
 
 -- ----------------------------
 -- Table structure for room
 -- ----------------------------
 DROP TABLE IF EXISTS `room`;
-CREATE TABLE `room`  (
+CREATE TABLE `room` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uuid` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `roomType` int(11) NOT NULL,
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `no` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `price` decimal(10, 2) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
   `package` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `descr` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `createTime` bigint(20) NOT NULL,
   `updateTime` bigint(20) DEFAULT NULL,
-  `off` int(11) NOT NULL DEFAULT 0,
+  `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of room
 -- ----------------------------
-INSERT INTO `room` VALUES (2, 'f4999250-0828-11e9-8b7c-f90e6ffd643f', 1, '慈宁宫', '8888', 66.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '来了，老弟', 1545730760693, 1545731371582, 0);
+BEGIN;
+INSERT INTO `room` VALUES (3, '901039f0-084c-11e9-a567-470a0f92e677', 3, '南天门', '6666', 99.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '', 1545746053903, NULL, 0);
+INSERT INTO `room` VALUES (4, 'bc31d570-084c-11e9-a567-470a0f92e677', 3, '金箍棒', '9999', 99.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '', 1545746127943, NULL, 0);
+INSERT INTO `room` VALUES (6, '074c3690-084d-11e9-a567-470a0f92e677', 2, '月仙殿', '8012', 66.00, '0681b010-084c-11e9-a567-470a0f92e677', '', 1545746253945, NULL, 0);
+INSERT INTO `room` VALUES (7, '11803670-084d-11e9-a567-470a0f92e677', 2, '景阳宫', '8013', 77.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '', 1545746271063, NULL, 0);
+INSERT INTO `room` VALUES (8, '1f69c440-084d-11e9-a567-470a0f92e677', 1, '景殿宫', '8015', 55.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '', 1545746294404, NULL, 0);
+INSERT INTO `room` VALUES (9, '3575d710-084d-11e9-a567-470a0f92e677', 1, '雪舞宫', '8016', 77.00, '0681b010-084c-11e9-a567-470a0f92e677', '', 1545746331393, NULL, 0);
+INSERT INTO `room` VALUES (10, '927b2a00-084d-11e9-a567-470a0f92e677', 1, '天赐宫', '8017', 77.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '', 1545746487456, NULL, 0);
+INSERT INTO `room` VALUES (11, 'a280ba00-084d-11e9-a567-470a0f92e677', 1, '玉华宫', '8019', 77.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '', 1545746514336, NULL, 0);
+INSERT INTO `room` VALUES (12, 'b1c962a0-084d-11e9-a567-470a0f92e677', 2, '善岚宫', '8020', 88.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '', 1545746539978, NULL, 0);
+INSERT INTO `room` VALUES (13, 'c063c9e0-084d-11e9-a567-470a0f92e677', 1, '凌妍阁', '8021', 99.00, '0681b010-084c-11e9-a567-470a0f92e677', '', 1545746564478, NULL, 0);
+INSERT INTO `room` VALUES (14, 'cc421e60-084d-11e9-a567-470a0f92e677', 1, '昭阳宫', '8022', 55.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '', 1545746584390, NULL, 0);
+INSERT INTO `room` VALUES (15, 'fb867db0-084d-11e9-a567-470a0f92e677', 2, '薰梦宫', '8023', 88.00, '0681b010-084c-11e9-a567-470a0f92e677', '', 1545746663691, NULL, 0);
+INSERT INTO `room` VALUES (16, 'f4999250-0828-11e9-8b7c-f90e6ffd643f', 1, '慈宁宫', '8011', 66.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '来了，老弟', 1545730760693, 1545753875823, 0);
+INSERT INTO `room` VALUES (17, 'f4999250-0828-11e9-8b7c-f90e6ffd643f', 1, '慈宁宫', '8011', 66.00, '0681b010-084c-11e9-a567-470a0f92e677', '来了，老弟', 1545730760693, 1545753875823, 0);
+COMMIT;
 
 -- ----------------------------
 -- Table structure for roomtype
 -- ----------------------------
 DROP TABLE IF EXISTS `roomtype`;
-CREATE TABLE `roomtype`  (
+CREATE TABLE `roomtype` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `createTime` bigint(20) NOT NULL,
   `updateTime` bigint(20) DEFAULT NULL,
-  `off` int(11) NOT NULL DEFAULT 0,
+  `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of roomtype
 -- ----------------------------
+BEGIN;
 INSERT INTO `roomtype` VALUES (1, '标准包', 1545730484185, NULL, 0);
 INSERT INTO `roomtype` VALUES (2, 'Party大包', 1545730496991, NULL, 0);
 INSERT INTO `roomtype` VALUES (3, '至尊包厢', 1545730504991, NULL, 0);
+COMMIT;
 
 -- ----------------------------
 -- Table structure for unit
 -- ----------------------------
 DROP TABLE IF EXISTS `unit`;
-CREATE TABLE `unit`  (
+CREATE TABLE `unit` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `sign` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `createTime` bigint(20) NOT NULL,
   `updateTime` bigint(20) DEFAULT NULL,
-  `off` int(11) NOT NULL DEFAULT 0,
+  `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of unit
 -- ----------------------------
+BEGIN;
 INSERT INTO `unit` VALUES (1, '瓶', 'P', 1545710760720, NULL, 0);
 INSERT INTO `unit` VALUES (2, '份', 'F', 1545710777580, NULL, 0);
 INSERT INTO `unit` VALUES (3, '支', 'Z', 1545710784784, NULL, 0);
@@ -156,5 +184,6 @@ INSERT INTO `unit` VALUES (4, '包', 'B', 1545710795928, NULL, 0);
 INSERT INTO `unit` VALUES (5, '个', 'G', 1545710803805, NULL, 0);
 INSERT INTO `unit` VALUES (6, '罐', 'GU', 1545710820680, NULL, 0);
 INSERT INTO `unit` VALUES (7, '壶', 'H', 1545710834061, NULL, 0);
+COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;

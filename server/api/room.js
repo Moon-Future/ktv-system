@@ -142,7 +142,7 @@ router.post('/getRoomInfo', async (ctx) => {
     
     const count = await query(`SELECT COUNT(DISTINCT uuid) as count FROM room WHERE off != 1`)
     const result = await query(`SELECT DISTINCT r.uuid as uuid, r.createTime, r.name, r.no, r.price, r.roomType, r.descr, r.package,
-      t.name as roomTypem, p.name as packagem, p.descr as descrPackage, p.qty, p.goods, g.name as goodsm, u.name as unitm
+      t.name as roomTypem, p.name as packagem, p.price as pricePackage, p.descr as descrPackage, p.qty, p.goods, g.name as goodsm, u.name as unitm
       FROM room as r 
       LEFT JOIN roomtype as t on r.roomType = t.id 
       LEFT JOIN package as p on r.package = p.uuid
@@ -155,17 +155,17 @@ router.post('/getRoomInfo', async (ctx) => {
     let roomPackageMap = {}
     let uuidMap = {}
     result.forEach(ele => {
-      packageGoodsMap[ele.package] = packageGoodsMap[ele.package] || []
-      packageGoodsMap[ele.package].push({goods: ele.goods, goodsm: ele.goodsm, qty: ele.qty, unitm: ele.unitm})
+      packageGoodsMap[ele.uuid + '_' + ele.package] = packageGoodsMap[ele.uuid + '_' + ele.package] || []
+      packageGoodsMap[ele.uuid + '_' + ele.package].push({goods: ele.goods, goodsm: ele.goodsm, qty: ele.qty, unitm: ele.unitm})
     })
     result.forEach(ele => {
       if (roomPackageMap[ele.uuid] === undefined) {
         roomPackageMap[ele.uuid] = {key: [ele.package], value: []}
-        roomPackageMap[ele.uuid].value.push({package: ele.package, packagem: ele.packagem, descr: ele.descrPackage, goods: packageGoodsMap[ele.package]});
+        roomPackageMap[ele.uuid].value.push({package: ele.package, packagem: ele.packagem, price: ele.pricePackage, descr: ele.descrPackage, goods: packageGoodsMap[ele.uuid + '_' + ele.package]});
       } else {
         if (roomPackageMap[ele.uuid].key.indexOf(ele.package) === -1) {
           roomPackageMap[ele.uuid].key.push(ele.package)
-          roomPackageMap[ele.uuid].value.push({package: ele.package, packagem: ele.packagem, descr: ele.descrPackage, goods: packageGoodsMap[ele.package]});
+          roomPackageMap[ele.uuid].value.push({package: ele.package, packagem: ele.packagem, price: ele.pricePackage, descr: ele.descrPackage, goods: packageGoodsMap[ele.uuid + '_' + ele.package]});
         }
       }
     })
