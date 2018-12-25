@@ -1,5 +1,6 @@
 <template>
   <div class="room-info">
+    <Button size="small" class="room-position">房间布局</Button>
     <base-table
       :tableOptions="tableOptions"
       @edit="edit">
@@ -16,9 +17,13 @@
         tableOptions: {
           packageList: [],
           tableColumns: [
-            {key: 'roomTypem', title: '类型'},
             {key: 'name', title: '名称'},
-            {key: 'no', title: '编号'},
+            {key: 'no', title: '房间号'},
+            {key: 'roomTypem', title: '类型',
+              render: (h, params) => {
+                return h('Tag', {props: {color: 'success'}}, params.row.roomTypem)
+              }
+            },
             {key: 'price', title: '价格', 
               render: (h, params) => {
                 return h('span', params.row.price + ' 元/小时')
@@ -29,9 +34,14 @@
                 const packageList = params.row.package
                 let array = []
                 packageList.forEach(ele => {
-                  array.push(h('Tooltip', [
-                    h('Tag', {props: {color: 'success'}}, ele.packagem),
-                    h('div', {slot: 'content'}, ele.descr)
+                  const descr = ele.descr.split('\n')
+                  let descrArray = []
+                  descr.forEach(ele => {
+                    descrArray.push(h('span', {}, ele), h('br'))
+                  })
+                  array.push(h('Tooltip', {props: {'max-width': '200'}}, [
+                    h('Tag', {props: {color: 'primary'}}, ele.packagem),
+                    h('div', {slot: 'content'}, descrArray)
                   ]))
                 })
                 return h('span', array);
@@ -42,7 +52,7 @@
           formArray: [
             {key: 'roomType', title: '类型', type: 'select', options: []},
             {key: 'name', title: '名称', type: 'input'},
-            {key: 'no', title: '编号', type: 'input'},
+            {key: 'no', title: '房间号', type: 'input'},
             {key: 'price', title: '价格', type: 'input', unit: true},
             {key: 'package', title: '套餐', type: 'checkbox', tooltip: true, options: []},
             {key: 'descr', title: '描述', type: 'textarea'}
@@ -131,5 +141,7 @@
 </script>
 
 <style lang="scss" scoped>
-
+  .room-position {
+    position: absolute;
+  }
 </style>

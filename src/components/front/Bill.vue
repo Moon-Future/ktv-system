@@ -19,49 +19,43 @@
         </li>
       </ul>
       <div class="account-wrapper">
-        <div class="account-money">
+        <div class="account-item">
           <span>原价</span>
           <span class="money-origin">{{ 2000 }} 元</span>
         </div>
-        <div class="account-money">
+        <div class="account-item">
           <span>折扣</span>
           <span class="money-discount" @click="openDiscount">无</span>
         </div>
-        <div class="account-money">
+        <div class="account-item">
           <span>应付金额：</span>
           <span class="money-pay">{{ 2000 }} 元</span>
         </div>
-        <div class="account-money">
+        <div class="account-item">
           <span>付款方式</span>
           <span class="money-paymethos" @click="openDiscount">支付宝</span>
         </div>
-        <div class="account-money">
+        <div class="account-item">
           <span>收银员</span>
           <span class="money-psn">陈亮</span>
         </div>
-        <div class="account-money">
+        <div class="account-item">
           <span>打单时间</span>
           <span class="money-time">2018-12-15 23:15</span>
         </div>
       </div>
       <div class="payment-wrapper">
-          <el-button type="success" size="medium">结账</el-button>
+          <Button type="success">结账</Button>
       </div>
     </div>
-    <el-dialog
+    <Modal
       title="提示"
-      :visible.sync="dialogVisible"
-      :modal-append-to-body="false"
-      width="30%">
+      v-model="dialogVisible">
       <div>
-        <el-radio v-model="radioDiscount" label="9">9折</el-radio>
-        <el-radio v-model="radioDiscount" label="8">8折</el-radio>
+        <Radio v-model="radioDiscount" label="9">9折</Radio>
+        <Radio v-model="radioDiscount" label="8">8折</Radio>
       </div>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
+    </Modal>
   </div>
 </template>
 
@@ -116,7 +110,7 @@
   .bill-icon {
     position: relative;
     z-index: 10;
-    top: -15px;
+    top: -38px;
   }
   .bill-wrapper {
     background: $color-white;
@@ -167,7 +161,7 @@
       margin-top: 10px;
       padding-top: 10px;
       border-top: 2px solid $color-gray;
-      .account-money {
+      .account-item {
         padding: 5px;
         display: flex;
         justify-content: space-between;

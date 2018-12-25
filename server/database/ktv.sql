@@ -11,7 +11,7 @@
  Target Server Version : 50721
  File Encoding         : 65001
 
- Date: 22/12/2018 17:50:16
+ Date: 25/12/2018 17:57:19
 */
 
 SET NAMES utf8mb4;
@@ -34,14 +34,27 @@ CREATE TABLE `goods`  (
   `updateTime` bigint(20) DEFAULT NULL,
   `off` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of goods
 -- ----------------------------
-INSERT INTO `goods` VALUES (1, '雪花啤酒', NULL, 10.00, 6, '', 0, NULL, 1545357074894, 1545357113111, 0);
-INSERT INTO `goods` VALUES (2, '花生', NULL, 10.00, 3, '', 0, NULL, 1545357087188, NULL, 0);
-INSERT INTO `goods` VALUES (3, '小蜜蜂', NULL, 888.00, 5, '', 0, NULL, 1545357130892, NULL, 0);
+INSERT INTO `goods` VALUES (1, '纯啤啤酒', NULL, 20.00, 1, '', 0, NULL, 1545710870689, NULL, 0);
+INSERT INTO `goods` VALUES (2, '冰纯啤酒', NULL, 30.00, 1, '冰火两重天！', 0, NULL, 1545710972654, NULL, 0);
+INSERT INTO `goods` VALUES (3, '雪花啤酒', NULL, 10.00, 1, '真的有雪花哦', 0, NULL, 1545711013154, NULL, 0);
+INSERT INTO `goods` VALUES (4, '华夏干红', NULL, 88.00, 1, '', 0, NULL, 1545711043902, NULL, 0);
+INSERT INTO `goods` VALUES (5, '雪碧', NULL, 5.00, 6, '透心凉', 0, NULL, 1545711071418, NULL, 0);
+INSERT INTO `goods` VALUES (6, '茶', NULL, 15.00, 7, '', 0, NULL, 1545711147913, NULL, 0);
+INSERT INTO `goods` VALUES (7, '爆米花', NULL, 10.00, 4, '爆！爆！爆！', 0, NULL, 1545711196951, NULL, 0);
+INSERT INTO `goods` VALUES (8, '蚕豆', NULL, 10.00, 2, '', 0, NULL, 1545711308809, NULL, 0);
+INSERT INTO `goods` VALUES (9, '瓜子', NULL, 10.00, 2, '', 0, NULL, 1545711339119, NULL, 0);
+INSERT INTO `goods` VALUES (10, '锅巴', NULL, 10.00, 2, '小吃', 0, NULL, 1545711366170, NULL, 0);
+INSERT INTO `goods` VALUES (11, '花生', NULL, 10.00, 2, '小吃', 0, NULL, 1545711380608, NULL, 0);
+INSERT INTO `goods` VALUES (12, '开心果', NULL, 10.00, 2, '小吃', 0, NULL, 1545711409836, NULL, 0);
+INSERT INTO `goods` VALUES (13, '杏仁', NULL, 10.00, 2, '小吃', 0, NULL, 1545711427555, NULL, 0);
+INSERT INTO `goods` VALUES (14, '什锦果盘小拼', NULL, 20.00, 2, '', 0, NULL, 1545711468435, NULL, 0);
+INSERT INTO `goods` VALUES (15, '什锦果盘中拼', NULL, 50.00, 2, '', 0, NULL, 1545711489771, NULL, 0);
+INSERT INTO `goods` VALUES (16, '什锦果盘大拼', NULL, 80.00, 2, '', 0, NULL, 1545711509813, NULL, 0);
 
 -- ----------------------------
 -- Table structure for package
@@ -62,20 +75,18 @@ CREATE TABLE `package`  (
   `updateTime` bigint(20) DEFAULT NULL,
   `off` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 134 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of package
 -- ----------------------------
-INSERT INTO `package` VALUES (117, 'f97fed40-04f5-11e9-bed3-f33b5b7838f0', 2, '红酒套餐', 2, 30, 1, 3, 588.00, '至尊包厢，豪华套餐', 1545379011091, NULL, 0);
-INSERT INTO `package` VALUES (118, 'f97fed40-04f5-11e9-bed3-f33b5b7838f0', 2, '红酒套餐', 3, 3, 1, 3, 588.00, '至尊包厢，豪华套餐', 1545379011091, NULL, 0);
-INSERT INTO `package` VALUES (124, 'dde9c250-04ef-11e9-8f7b-2ded32e8ac26', 1, '啤酒套餐', 1, 20, 1, 2, 300.00, '啤酒套餐666', 1545376387829, 1545381924664, 0);
-INSERT INTO `package` VALUES (125, 'dde9c250-04ef-11e9-8f7b-2ded32e8ac26', 1, '啤酒套餐', 2, 10, 1, 2, 300.00, '啤酒套餐666', 1545376387829, 1545381924664, 0);
-INSERT INTO `package` VALUES (126, 'dde9c250-04ef-11e9-8f7b-2ded32e8ac26', 1, '啤酒套餐', 3, 1, 1, 2, 300.00, '啤酒套餐666', 1545376387829, 1545381924664, 0);
-INSERT INTO `package` VALUES (130, '0d802650-04fd-11e9-b8a8-7beaaf9d1385', 1, '玉米', 1, 1, 0, NULL, 50.00, '玉米', 1545382051125, NULL, 0);
-INSERT INTO `package` VALUES (131, '5750a250-04fd-11e9-ac09-4b564784a111', 1, '豪华套餐', 1, 1, 0, NULL, 300.00, '1、雪花啤酒20瓶\n2、小吃（花生1份，水果拼盘10盘）', 1545382174965, NULL, 0);
-INSERT INTO `package` VALUES (132, '5750a250-04fd-11e9-ac09-4b564784a111', 1, '豪华套餐', 2, 1, 0, NULL, 300.00, '1、雪花啤酒20瓶\n2、小吃（花生1份，水果拼盘10盘）', 1545382174965, NULL, 0);
-INSERT INTO `package` VALUES (133, '5750a250-04fd-11e9-ac09-4b564784a111', 1, '豪华套餐', 3, 1, 0, NULL, 300.00, '1、雪花啤酒20瓶\n2、小吃（花生1份，水果拼盘10盘）', 1545382174965, NULL, 0);
+INSERT INTO `package` VALUES (1, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 1, 12, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
+INSERT INTO `package` VALUES (2, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 2, 10, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
+INSERT INTO `package` VALUES (3, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 3, 8, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
+INSERT INTO `package` VALUES (4, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 8, 1, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
+INSERT INTO `package` VALUES (5, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 9, 1, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
+INSERT INTO `package` VALUES (6, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 7, 1, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
+INSERT INTO `package` VALUES (7, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', 1, '啤酒套餐', 14, 1, 1, 1, 198.00, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
 
 -- ----------------------------
 -- Table structure for room
@@ -94,13 +105,12 @@ CREATE TABLE `room`  (
   `updateTime` bigint(20) DEFAULT NULL,
   `off` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of room
 -- ----------------------------
-INSERT INTO `room` VALUES (4, '2faefe80-059e-11e9-8180-8f5344447a18', 2, '半导体和', '8888', 666.00, 'dde9c250-04ef-11e9-8f7b-2ded32e8ac26', '', 1545451257447, NULL, 0);
-INSERT INTO `room` VALUES (5, '2faefe80-059e-11e9-8180-8f5344447a18', 2, '半导体和', '8888', 666.00, 'f97fed40-04f5-11e9-bed3-f33b5b7838f0', '', 1545451257447, NULL, 0);
+INSERT INTO `room` VALUES (2, 'f4999250-0828-11e9-8b7c-f90e6ffd643f', 1, '慈宁宫', '8888', 66.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '来了，老弟', 1545730760693, 1545731371582, 0);
 
 -- ----------------------------
 -- Table structure for roomtype
@@ -118,9 +128,9 @@ CREATE TABLE `roomtype`  (
 -- ----------------------------
 -- Records of roomtype
 -- ----------------------------
-INSERT INTO `roomtype` VALUES (1, '标准包', 1545357012721, NULL, 0);
-INSERT INTO `roomtype` VALUES (2, 'Party大包', 1545357023341, NULL, 0);
-INSERT INTO `roomtype` VALUES (3, '至尊包厢', 1545357036212, NULL, 0);
+INSERT INTO `roomtype` VALUES (1, '标准包', 1545730484185, NULL, 0);
+INSERT INTO `roomtype` VALUES (2, 'Party大包', 1545730496991, NULL, 0);
+INSERT INTO `roomtype` VALUES (3, '至尊包厢', 1545730504991, NULL, 0);
 
 -- ----------------------------
 -- Table structure for unit
@@ -134,16 +144,17 @@ CREATE TABLE `unit`  (
   `updateTime` bigint(20) DEFAULT NULL,
   `off` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of unit
 -- ----------------------------
-INSERT INTO `unit` VALUES (1, '间', 'J', 1545356965475, NULL, 0);
-INSERT INTO `unit` VALUES (2, '包', 'B', 1545356975012, NULL, 0);
-INSERT INTO `unit` VALUES (3, '份', 'F', 1545356981164, NULL, 0);
-INSERT INTO `unit` VALUES (4, '盘', 'P', 1545356991279, NULL, 0);
-INSERT INTO `unit` VALUES (5, '个', 'G', 1545356999529, NULL, 0);
-INSERT INTO `unit` VALUES (6, '瓶', '', 1545357105069, NULL, 0);
+INSERT INTO `unit` VALUES (1, '瓶', 'P', 1545710760720, NULL, 0);
+INSERT INTO `unit` VALUES (2, '份', 'F', 1545710777580, NULL, 0);
+INSERT INTO `unit` VALUES (3, '支', 'Z', 1545710784784, NULL, 0);
+INSERT INTO `unit` VALUES (4, '包', 'B', 1545710795928, NULL, 0);
+INSERT INTO `unit` VALUES (5, '个', 'G', 1545710803805, NULL, 0);
+INSERT INTO `unit` VALUES (6, '罐', 'GU', 1545710820680, NULL, 0);
+INSERT INTO `unit` VALUES (7, '壶', 'H', 1545710834061, NULL, 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
