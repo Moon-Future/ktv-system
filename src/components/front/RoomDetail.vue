@@ -14,14 +14,14 @@
             <Card 
               v-for="(item, i) in roomInfo.package" 
               class="card-item" 
-              :class="{active: item.selected}"
+              :class="{active: activeIndex === i}"
               :key="i" 
-              @click.native="selectPackage(roomInfo.package, i)">
+              @click.native="selectPackage(i)">
               <p slot="title">{{ item.packagem }}</p>
               <p slot="extra" class="card-price">{{ item.price }} 元</p>
               <p v-for="(descr, j) in item.descr.split('\n')" :key="j">{{ descr }}</p>
               <icon-font 
-                v-show="item.selected" 
+                v-show="activeIndex === i" 
                 icon="icon-selected" 
                 fontSize="32" 
                 class="card-selected">
@@ -53,15 +53,13 @@
           {title: '房间类型', field: 'roomTypem'},
           {title: '价格', field: 'price', after: '元/小时'},
           {title: '状态', field: 'status'},
-        ]
+        ],
+        activeIndex: -1
       }
     },
     methods: {
-      selectPackage(array, index) {
-        array.forEach((ele, i) => {
-          ele.selected = index === i ? true : false
-        })
-        this.roomInfo.package = array
+      selectPackage(index) {
+        this.activeIndex = this.activeIndex === index ? -1 : index
       }
     },
     components: {
@@ -91,6 +89,7 @@
     .card-item {
       width: 200px;
       margin-right: 10px;
+      cursor: pointer;
       &.active {
         border: 1px solid $color-green;
       }
