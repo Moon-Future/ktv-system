@@ -11,7 +11,7 @@
  Target Server Version : 80011
  File Encoding         : 65001
 
- Date: 26/12/2018 00:30:25
+ Date: 26/12/2018 23:31:01
 */
 
 SET NAMES utf8mb4;
@@ -77,7 +77,7 @@ CREATE TABLE `package` (
   `updateTime` bigint(20) DEFAULT NULL,
   `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of package
@@ -96,6 +96,14 @@ INSERT INTO `package` VALUES (10, '0681b010-084c-11e9-a567-470a0f92e677', 1, '�
 INSERT INTO `package` VALUES (11, '0681b010-084c-11e9-a567-470a0f92e677', 1, '红酒套餐', 9, 1, 1, 1, 198.00, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
 INSERT INTO `package` VALUES (12, '0681b010-084c-11e9-a567-470a0f92e677', 1, '红酒套餐', 7, 1, 1, 1, 198.00, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
 INSERT INTO `package` VALUES (13, '0681b010-084c-11e9-a567-470a0f92e677', 1, '红酒套餐', 14, 1, 1, 1, 198.00, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
+INSERT INTO `package` VALUES (14, 'a233b920-0916-11e9-a23c-619a8e35a34d', 1, '小吃套餐', 13, 1, 0, NULL, 99.00, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
+INSERT INTO `package` VALUES (15, 'a233b920-0916-11e9-a23c-619a8e35a34d', 1, '小吃套餐', 10, 1, 0, NULL, 99.00, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
+INSERT INTO `package` VALUES (16, 'a233b920-0916-11e9-a23c-619a8e35a34d', 1, '小吃套餐', 11, 1, 0, NULL, 99.00, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
+INSERT INTO `package` VALUES (17, 'a233b920-0916-11e9-a23c-619a8e35a34d', 1, '小吃套餐', 8, 1, 0, NULL, 99.00, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
+INSERT INTO `package` VALUES (18, 'a233b920-0916-11e9-a23c-619a8e35a34d', 1, '小吃套餐', 9, 1, 0, NULL, 99.00, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
+INSERT INTO `package` VALUES (19, 'a233b920-0916-11e9-a23c-619a8e35a34d', 1, '小吃套餐', 12, 1, 0, NULL, 99.00, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
+INSERT INTO `package` VALUES (20, 'a233b920-0916-11e9-a23c-619a8e35a34d', 1, '小吃套餐', 6, 1, 0, NULL, 99.00, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
+INSERT INTO `package` VALUES (21, 'db02e000-0916-11e9-a23c-619a8e35a34d', 2, '水果套餐', 16, 5, 0, NULL, 188.00, '什锦果盘大拼5盘', 1545832937984, NULL, 0);
 COMMIT;
 
 -- ----------------------------
@@ -115,7 +123,7 @@ CREATE TABLE `room` (
   `updateTime` bigint(20) DEFAULT NULL,
   `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of room
@@ -133,9 +141,28 @@ INSERT INTO `room` VALUES (12, 'b1c962a0-084d-11e9-a567-470a0f92e677', 2, '善�
 INSERT INTO `room` VALUES (13, 'c063c9e0-084d-11e9-a567-470a0f92e677', 1, '凌妍阁', '8021', 99.00, '0681b010-084c-11e9-a567-470a0f92e677', '', 1545746564478, NULL, 0);
 INSERT INTO `room` VALUES (14, 'cc421e60-084d-11e9-a567-470a0f92e677', 1, '昭阳宫', '8022', 55.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '', 1545746584390, NULL, 0);
 INSERT INTO `room` VALUES (15, 'fb867db0-084d-11e9-a567-470a0f92e677', 2, '薰梦宫', '8023', 88.00, '0681b010-084c-11e9-a567-470a0f92e677', '', 1545746663691, NULL, 0);
-INSERT INTO `room` VALUES (16, 'f4999250-0828-11e9-8b7c-f90e6ffd643f', 1, '慈宁宫', '8011', 66.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '来了，老弟', 1545730760693, 1545753875823, 0);
-INSERT INTO `room` VALUES (17, 'f4999250-0828-11e9-8b7c-f90e6ffd643f', 1, '慈宁宫', '8011', 66.00, '0681b010-084c-11e9-a567-470a0f92e677', '来了，老弟', 1545730760693, 1545753875823, 0);
+INSERT INTO `room` VALUES (21, 'f4999250-0828-11e9-8b7c-f90e6ffd643f', 1, '慈宁宫', '8011', 66.00, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '来了，老弟', 1545730760693, 1545832949021, 0);
+INSERT INTO `room` VALUES (22, 'f4999250-0828-11e9-8b7c-f90e6ffd643f', 1, '慈宁宫', '8011', 66.00, '0681b010-084c-11e9-a567-470a0f92e677', '来了，老弟', 1545730760693, 1545832949021, 0);
+INSERT INTO `room` VALUES (23, 'f4999250-0828-11e9-8b7c-f90e6ffd643f', 1, '慈宁宫', '8011', 66.00, 'a233b920-0916-11e9-a23c-619a8e35a34d', '来了，老弟', 1545730760693, 1545832949021, 0);
+INSERT INTO `room` VALUES (24, 'f4999250-0828-11e9-8b7c-f90e6ffd643f', 1, '慈宁宫', '8011', 66.00, 'db02e000-0916-11e9-a23c-619a8e35a34d', '来了，老弟', 1545730760693, 1545832949021, 0);
 COMMIT;
+
+-- ----------------------------
+-- Table structure for roomorder
+-- ----------------------------
+DROP TABLE IF EXISTS `roomorder`;
+CREATE TABLE `roomorder` (
+  `id` int(11) NOT NULL,
+  `room` varchar(50) NOT NULL,
+  `status` int(11) DEFAULT '0',
+  `package` varchar(50) DEFAULT NULL,
+  `goods` varchar(255) DEFAULT NULL,
+  `startTime` bigint(20) DEFAULT NULL,
+  `cust` varchar(50) DEFAULT NULL,
+  `createTime` bigint(20) NOT NULL,
+  `off` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for roomtype

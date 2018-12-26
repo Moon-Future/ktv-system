@@ -95,8 +95,6 @@ router.post('/updRoomType', async (ctx) => {
   }
 })
 
-
-
 router.post('/insertRoomInfo', async (ctx) => {
   try {
     const checkResult = checkRoot(ctx)

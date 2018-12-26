@@ -25,24 +25,9 @@ const apiUrl = {
   deletePackage: '/api/package/deletePackage',
   updPackage: '/api/package/updPackage',
 
-  insertInventoryIn: '//api/inventory/insertInventoryIn',
-  deleteInventoryIn: '//api/inventory/deleteInventoryIn',
-  updInventoryIn: '//api/inventory/updInventoryIn',
-  getInventoryList: '//api/inventory/getInventoryList',
-  getInventoryOut: '//api/inventory/getInventoryOut',
-
-  saveDelivery: '/api/delivery/saveDelivery',
-  getDeliveryHistory: '/api/delivery/getDeliveryHistory',
-  deleteDelivery: '/api/delivery/deleteDelivery',
-
-  register: '/api/user/register',
-  login: '/api/user/login',
-  logout: '/api/user/logout',
-  getSession: '/api/user/getSession',
-
   insertOrder: '/api/order/insertOrder',
   getOrder: '/api/order/getOrder',
-  getOrderHistory: '/api/order/getOrderHistory',
+  deleteOrder: '/api/order/deleteOrder',
   updOrder: '/api/order/updOrder'
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div class="room-detail">
     <Row>
-      <i-col span="18">
+      <i-col span="18" class="left-wrapper">
         <ul class="title-wrapper">
           <li class="title-item" v-for="(item, i) in titleArray" :key="i">
             <span>{{ item.title }}：</span>
@@ -12,16 +12,16 @@
           <h1>可选套餐</h1>
           <div class="card-wrapper">
             <Card 
-              v-for="(item, i) in roomInfo.package" 
+              v-for="(item, j) in roomInfo.package" 
               class="card-item" 
-              :class="{active: activeIndex === i}"
-              :key="i" 
-              @click.native="selectPackage(i)">
+              :class="{active: activeIndex === j}"
+              :key="j" 
+              @click.native="selectPackage(item, j)">
               <p slot="title">{{ item.packagem }}</p>
               <p slot="extra" class="card-price">{{ item.price }} 元</p>
-              <p v-for="(descr, j) in item.descr.split('\n')" :key="j">{{ descr }}</p>
+              <p v-for="(descr, k) in item.descr.split('\n')" :key="k">{{ descr }}</p>
               <icon-font 
-                v-show="activeIndex === i" 
+                v-show="activeIndex === j" 
                 icon="icon-selected" 
                 fontSize="32" 
                 class="card-selected">
@@ -30,8 +30,8 @@
           </div>
         </div>
       </i-col>
-      <i-col span="6">
-        zaina
+      <i-col span="6" class="right-wrapper">
+        <Button type="success" style="width:100%" @click="placeOrder">开单</Button>
       </i-col>
     </Row>
   </div>
@@ -39,6 +39,7 @@
 
 <script>
   import IconFont from '@/components/IconFont'
+  import apiUrl from '@/serviceAPI.config.js'
   export default {
     props: {
       roomInfo: {
@@ -54,12 +55,49 @@
           {title: '价格', field: 'price', after: '元/小时'},
           {title: '状态', field: 'status'},
         ],
-        activeIndex: -1
+        maxLen: 3,
+        activeIndex: -1,
+        orderInfo: {}
       }
     },
+    computed: {
+      // packageList() {
+      //   const packageArray = this.roomInfo.package
+      //   let array = []
+      //   let result = []
+      //   packageArray.forEach((ele, i) => {
+      //     array.push(ele)
+      //     if (array.length === this.maxLen || i === packageArray.length - 1) {
+      //       result.push(array)
+      //       array = []
+      //     }
+      //   });
+      //   return result
+      // }
+    },
     methods: {
-      selectPackage(index) {
+      selectPackage(item, index) {
         this.activeIndex = this.activeIndex === index ? -1 : index
+      },
+      placeOrder() {
+        const packageUuid = this.activeIndex === -1 ? '' : this.roomInfo.package[activeIndex]
+        const startTime = new Date().getTime()
+        this.$http.post(apiUrl.insertOrder, {
+          data: {no: this.roomInfo.no, packageUuid, startTime}
+        }).then(res => {
+          
+        })
+      }
+    },
+    watch: {
+      roomInfo() {
+        this.$http.post(apiUrl.getOrder, {
+          data: {no: this.roomInfo.no}
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.orderInfo = this.res.data.message[0]
+          }
+        })
       }
     },
     components: {
@@ -74,6 +112,12 @@
   .room-detail {
     text-align: left;
   }
+  .left-wrapper {
+    border-right: 2px solid $color-gray;
+  }
+  .right-wrapper {
+    padding: 0 3px;
+  }
   .title-wrapper {
     display: flex;
     .title-item {
@@ -86,9 +130,11 @@
   }
   .card-wrapper {
     display: flex;
+    flex-wrap: wrap;
     .card-item {
       width: 200px;
       margin-right: 10px;
+      margin-bottom: 10px;
       cursor: pointer;
       &.active {
         border: 1px solid $color-green;
@@ -108,7 +154,7 @@
     }
     .card-selected {
       position: absolute;
-      top: 0;
+      bottom: 0;
       right: 0;
     }
   }

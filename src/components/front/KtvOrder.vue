@@ -52,7 +52,6 @@
       },
       selectRoom(uuid) {
         this.roomInfo = this.roomMap[uuid]
-        console.log(uuid, this.roomMap[uuid])
       }
     },
     components: {
