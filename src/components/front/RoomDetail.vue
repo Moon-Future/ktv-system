@@ -11,10 +11,21 @@
         <div class="package-list">
           <h1>可选套餐</h1>
           <div class="card-wrapper">
-            <Card v-for="(item, i) in roomInfo.package" :key="i" class="card-item">
-              <p slot="title"><Radio value="true" class="card-title">{{ item.packagem }}</Radio></p>
+            <Card 
+              v-for="(item, i) in roomInfo.package" 
+              class="card-item" 
+              :class="{active: item.selected}"
+              :key="i" 
+              @click.native="selectPackage(roomInfo.package, i)">
+              <p slot="title">{{ item.packagem }}</p>
               <p slot="extra" class="card-price">{{ item.price }} 元</p>
               <p v-for="(descr, j) in item.descr.split('\n')" :key="j">{{ descr }}</p>
+              <icon-font 
+                v-show="item.selected" 
+                icon="icon-selected" 
+                fontSize="32" 
+                class="card-selected">
+              </icon-font>
             </Card>
           </div>
         </div>
@@ -27,6 +38,7 @@
 </template>
 
 <script>
+  import IconFont from '@/components/IconFont'
   export default {
     props: {
       roomInfo: {
@@ -43,6 +55,17 @@
           {title: '状态', field: 'status'},
         ]
       }
+    },
+    methods: {
+      selectPackage(array, index) {
+        array.forEach((ele, i) => {
+          ele.selected = index === i ? true : false
+        })
+        this.roomInfo.package = array
+      }
+    },
+    components: {
+      IconFont
     }
   }
 </script>
@@ -68,13 +91,26 @@
     .card-item {
       width: 200px;
       margin-right: 10px;
+      &.active {
+        border: 1px solid $color-green;
+      }
+      &:hover {
+        border: 1px solid $color-green;
+      }
     }
     .card-title {
       font-size: 14px;
       font-weight: 700;
+      height: 30px;
     }
     .card-price {
       font-size: 14px;
+      color: $color-deeporigin;
+    }
+    .card-selected {
+      position: absolute;
+      top: 0;
+      right: 0;
     }
   }
 </style>
