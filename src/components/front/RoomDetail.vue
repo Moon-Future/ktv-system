@@ -55,6 +55,7 @@
           {title: '价格', field: 'price', after: '元/小时'},
           {title: '状态', field: 'status'},
         ],
+        custInfo: {},
         maxLen: 3,
         activeIndex: -1,
         orderInfo: {}
