@@ -139,7 +139,7 @@ router.post('/getRoomInfo', async (ctx) => {
     }
     
     const count = await query(`SELECT COUNT(DISTINCT uuid) as count FROM room WHERE off != 1`)
-    const result = await query(`SELECT DISTINCT r.uuid as uuid, r.createTime, r.name, r.no, r.price, r.roomType, r.descr, r.package,
+    const result = await query(`SELECT DISTINCT r.uuid as uuid, r.createTime, r.name, r.no, r.price, r.roomType, r.descr, r.package, r.status,
       t.name as roomTypem, p.name as packagem, p.price as pricePackage, p.descr as descrPackage, p.qty, p.goods, g.name as goodsm, u.name as unitm
       FROM room as r 
       LEFT JOIN roomtype as t on r.roomType = t.id 

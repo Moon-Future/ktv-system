@@ -3,7 +3,11 @@
     <div class="room-container">
       <div class="room-menu">包间</div>
       <ul class="room-list">
-        <li class="room" v-for="(room, i) in roomList" :key="i" @click="selectRoom(room.uuid)">
+        <li class="room"
+          :class="{'active-room': activeRoom === room.no, 'busy-room': room.status == '1'}"
+          v-for="(room, i) in roomList" 
+          :key="i" 
+          @click="selectRoom(room)">
           {{ room.no }}
         </li>
       </ul>
@@ -31,6 +35,7 @@
           {name: '豪华大包', no: '欢迎光临'}
         ],
         activeName: 'first',
+        activeRoom: '0',
         roomInfo: {}
       }
     },
@@ -50,8 +55,9 @@
             }
           })
       },
-      selectRoom(uuid) {
-        this.roomInfo = this.roomMap[uuid]
+      selectRoom(room) {
+        this.roomInfo = this.roomMap[room.uuid]
+        this.activeRoom = room.no
       }
     },
     components: {
@@ -93,8 +99,19 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        &.active-room {
+          border: 1px solid $color-green;
+          font-size: 16px;
+          font-weight: bold;
+        }
+        &.busy-room {
+          background: $color-red;
+          color: $color-white;
+        }
         &:hover {
-          border: 1px solid $color-deepgray;
+          border: 1px solid $color-green;
+          font-size: 16px;
+          font-weight: bold;
         }
       }
     }

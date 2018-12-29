@@ -31,7 +31,14 @@
         </div>
       </i-col>
       <i-col span="6" class="right-wrapper">
-        <Button type="success" style="width:100%" @click="placeOrder">开单</Button>
+        <ul class="cust-info">
+          <li class="cust-item" v-for="(item, i) in custMap" :key="i">
+            <span class="cust-title">{{ item }}：</span>
+            <a href="javascript:;" v-if="i === 'vip' && !orderInfo[i]">登陆</a>
+            <span v-else>{{ orderInfo[i] }}</span>
+          </li>
+        </ul>
+        <Button type="primary" style="width:100%" @click="placeOrder">开单</Button>
       </i-col>
     </Row>
   </div>
@@ -55,36 +62,21 @@
           {title: '价格', field: 'price', after: '元/小时'},
           {title: '状态', field: 'status'},
         ],
-        custInfo: {},
+        custMap: {vip: '会员', balance: '余额', time: '时间'},
         maxLen: 3,
         activeIndex: -1,
         orderInfo: {}
       }
-    },
-    computed: {
-      // packageList() {
-      //   const packageArray = this.roomInfo.package
-      //   let array = []
-      //   let result = []
-      //   packageArray.forEach((ele, i) => {
-      //     array.push(ele)
-      //     if (array.length === this.maxLen || i === packageArray.length - 1) {
-      //       result.push(array)
-      //       array = []
-      //     }
-      //   });
-      //   return result
-      // }
     },
     methods: {
       selectPackage(item, index) {
         this.activeIndex = this.activeIndex === index ? -1 : index
       },
       placeOrder() {
-        const packageUuid = this.activeIndex === -1 ? '' : this.roomInfo.package[activeIndex]
+        const packageUuid = this.activeIndex === -1 ? '' : this.roomInfo.package[this.activeIndex].package
         const startTime = new Date().getTime()
         this.$http.post(apiUrl.insertOrder, {
-          data: {no: this.roomInfo.no, packageUuid, startTime}
+          data: {no: this.roomInfo.no, package: packageUuid, startTime}
         }).then(res => {
           
         })
@@ -96,7 +88,7 @@
           data: {no: this.roomInfo.no}
         }).then(res => {
           if (res.data.code === 200) {
-            this.orderInfo = this.res.data.message[0]
+            this.orderInfo = res.data.message[0] || {}
           }
         })
       }
@@ -157,6 +149,12 @@
       position: absolute;
       bottom: 0;
       right: 0;
+    }
+  }
+  
+  .cust-info {
+    .cust-item {
+      font-size: 16px;
     }
   }
 </style>

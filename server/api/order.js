@@ -10,7 +10,6 @@ router.post('/insertOrder', async (ctx) => {
       ctx.body = checkResult
       return
     }
-
     const data = ctx.request.body.data
     ctx.body = {code: 200, message: '新增成功'}
   } catch(err) {
