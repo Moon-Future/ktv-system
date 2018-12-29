@@ -74,7 +74,7 @@
 
 <script>
   import { deepClone } from '@/common/js/util'
-  import apiUrl from '@/serviceAPI.config.js'
+  import { apiUrl } from '@/serviceAPI.config.js'
   export default {
     props: {
       tableOptions: {

@@ -23,7 +23,7 @@
 
 <script>
   import RoomDetail from '@/components/front/RoomDetail'
-  import apiUrl from '@/serviceAPI.config.js'
+  import { apiUrl } from '@/serviceAPI.config.js'
   export default {
     data() {
       return {

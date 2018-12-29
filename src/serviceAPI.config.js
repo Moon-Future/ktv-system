@@ -1,4 +1,4 @@
-const apiUrl = {
+export const apiUrl = {
   insertGoods: '/api/goods/insertGoods',
   getGoods: '/api/goods/getGoods',
   deleteGoods: '/api/goods/deleteGoods',
@@ -30,5 +30,3 @@ const apiUrl = {
   deleteOrder: '/api/order/deleteOrder',
   updOrder: '/api/order/updOrder'
 }
-
-module.exports = apiUrl

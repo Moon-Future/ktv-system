@@ -10,7 +10,7 @@
 
 <script>
   import BaseTable from '@/components/admin/BaseTable'
-  import apiUrl from '@/serviceAPI.config.js'
+  import { apiUrl } from '@/serviceAPI.config.js'
   export default {
     data() {
       return {

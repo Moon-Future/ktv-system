@@ -10,7 +10,7 @@
 
 <script>
   import BaseTable from '@/components/admin/BaseTable'
-  import apiUrl from '@/serviceAPI.config.js'
+  import { apiUrl } from '@/serviceAPI.config.js'
   const validateDiscount = (rule, value, callback) => {
     if (!/^\d+(\.{0,1}\d{1,2}){0,1}$/.test(value) || value < 0 || value > 1) {
       callback(new Error('只能为 0 ~ 1 的数字且最多两位小数'));

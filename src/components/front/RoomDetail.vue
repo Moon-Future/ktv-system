@@ -39,7 +39,7 @@
 
 <script>
   import IconFont from '@/components/IconFont'
-  import apiUrl from '@/serviceAPI.config.js'
+  import { apiUrl } from '@/serviceAPI.config.js'
   export default {
     props: {
       roomInfo: {
