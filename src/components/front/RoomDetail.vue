@@ -11,7 +11,7 @@
         <div class="package-list">
           <h1>可选套餐</h1>
           <div class="card-wrapper">
-            <Card 
+            <Card
               v-for="(item, j) in roomInfo.package" 
               class="card-item" 
               :class="{active: activeIndex === j}"
@@ -47,6 +47,7 @@
 <script>
   import IconFont from '@/components/IconFont'
   import { apiUrl } from '@/serviceAPI.config.js'
+  import { mapGetters, mapMutations } from 'vuex'
   export default {
     props: {
       roomInfo: {
@@ -68,6 +69,11 @@
         orderInfo: {}
       }
     },
+    computed: {
+      ...mapGetters([
+        'roomSelected'
+      ])
+    },
     methods: {
       selectPackage(item, index) {
         this.activeIndex = this.activeIndex === index ? -1 : index
@@ -82,15 +88,16 @@
         })
       }
     },
+    filters: {
+      // status(field, roomInfo) {
+      //   if (field === 'status') {
+      //     return roomInfo.status == 0 ? '空闲' : '使用中'
+      //   }
+      // }
+    },
     watch: {
       roomInfo() {
-        this.$http.post(apiUrl.getOrder, {
-          data: {no: this.roomInfo.no}
-        }).then(res => {
-          if (res.data.code === 200) {
-            this.orderInfo = res.data.message[0] || {}
-          }
-        })
+        this.activeIndex = -1
       }
     },
     components: {
@@ -106,7 +113,7 @@
     text-align: left;
   }
   .left-wrapper {
-    border-right: 2px solid $color-gray;
+    // border-right: 2px solid $color-gray;
   }
   .right-wrapper {
     padding: 0 3px;

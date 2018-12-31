@@ -18,7 +18,9 @@
           <TabPane label="包间信息" name="first">
             <room-detail :roomInfo="roomInfo"></room-detail>
           </TabPane>
-          <TabPane label="商品" name="second">商品</TabPane>
+          <TabPane label="商品" name="second">
+            <goods-detail></goods-detail>
+          </TabPane>
         </Tabs>
       </div>
     </div>
@@ -27,7 +29,9 @@
 
 <script>
   import RoomDetail from '@/components/front/RoomDetail'
+  import GoodsDetail from '@/components/front/GoodsDetail'
   import { apiUrl } from '@/serviceAPI.config.js'
+  import { mapMutations } from 'vuex'
   export default {
     data() {
       return {
@@ -45,23 +49,41 @@
     },
     methods: {
       getRoomInfo() {
-        this.$http.post(apiUrl.getRoomInfo)
-          .then(res => {
-            if (res.data.code === 200) {
-              this.roomList = res.data.message
-              this.roomList.forEach(ele => {
-                this.roomMap[ele.uuid] = ele
-              })
-            }
-          })
+        this.$http.post(apiUrl.getRoomInfo).then(res => {
+          if (res.data.code === 200) {
+            this.roomList = res.data.message
+            this.roomList.forEach(ele => {
+              this.roomMap[ele.uuid] = ele
+            })
+          }
+        })
       },
       selectRoom(room) {
         this.roomInfo = this.roomMap[room.uuid]
         this.activeRoom = room.no
-      }
+        this.$http.post(apiUrl.getOrder, {
+          data: {no: this.roomInfo.no}
+        }).then(res => {
+          if (res.data.code === 200) {
+            const message = res.data.message
+            this.setOrdInfo(res.data.message[0] || {})
+            if (message.length === 0) {
+              this.roomInfo.status = 0
+            } else {
+              this.roomInfo.status = message[0].status
+            }
+            this.setRoomSelected(this.roomInfo)
+          }
+        })
+      },
+      ...mapMutations({
+        setRoomSelected: 'SET_ROOM_SELECTED',
+        setOrdInfo: 'SET_ORDINFO'
+      }),
     },
     components: {
-      RoomDetail
+      RoomDetail,
+      GoodsDetail
     }
   }
 </script>
