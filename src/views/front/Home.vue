@@ -61,7 +61,7 @@
   .right-container {
     position: fixed;
     right: 0;
-    width: 26%;
+    width: 11cm;
     height: 100%;
     padding: 10px;
     box-sizing: border-box;

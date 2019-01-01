@@ -1,7 +1,14 @@
+@import '@/common/css/variable.scss';
+
 .operate-item:hover {
   cursor: pointer;
   text-decoration: underline;
 }
 .operate-divide {
   margin: 0 5px;
+}
+
+.good-info input {
+  font-size: 24px;
+  color: $color-red;
 }

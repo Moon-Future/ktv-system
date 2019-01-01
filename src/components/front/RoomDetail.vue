@@ -1,46 +1,34 @@
 <template>
   <div class="room-detail">
-    <Row>
-      <i-col span="18" class="left-wrapper">
-        <ul class="title-wrapper">
-          <li class="title-item" v-for="(item, i) in titleArray" :key="i">
-            <span>{{ item.title }}：</span>
-            <span class="title-content">{{ roomInfo[item.field] }} {{ item.after }}</span>
-          </li>
-        </ul>
-        <div class="package-list">
-          <h1>可选套餐</h1>
-          <div class="card-wrapper">
-            <Card
-              v-for="(item, j) in roomInfo.package" 
-              class="card-item" 
-              :class="{active: activeIndex === j}"
-              :key="j" 
-              @click.native="selectPackage(item, j)">
-              <p slot="title">{{ item.packagem }}</p>
-              <p slot="extra" class="card-price">{{ item.price }} 元</p>
-              <p v-for="(descr, k) in item.descr.split('\n')" :key="k">{{ descr }}</p>
-              <icon-font 
-                v-show="activeIndex === j" 
-                icon="icon-selected" 
-                fontSize="32" 
-                class="card-selected">
-              </icon-font>
-            </Card>
-          </div>
+    <div class="left-wrapper">
+      <ul class="title-wrapper">
+        <li class="title-item" v-for="(item, i) in titleArray" :key="i">
+          <span>{{ item.title }}：</span>
+          <span class="title-content">{{ roomInfo[item.field] | status({field: item.field, roomInfo: roomInfo}) }} {{ item.after }}</span>
+        </li>
+      </ul>
+      <div class="package-list">
+        <h1>可选套餐</h1>
+        <div class="card-wrapper">
+          <Card
+            v-for="(item, j) in roomInfo.package" 
+            class="card-item" 
+            :class="{active: activeIndex === j || packageSelected.package == item.package}"
+            :key="j" 
+            @click.native="selectPackage(item, j)">
+            <p slot="title">{{ item.packagem }}</p>
+            <p slot="extra" class="card-price">{{ item.price }} 元</p>
+            <p v-for="(descr, k) in item.descr.split('\n')" :key="k">{{ descr }}</p>
+            <icon-font 
+              v-show="activeIndex === j || packageSelected.package == item.package" 
+              icon="icon-selected" 
+              fontSize="32" 
+              class="card-selected">
+            </icon-font>
+          </Card>
         </div>
-      </i-col>
-      <i-col span="6" class="right-wrapper">
-        <ul class="cust-info">
-          <li class="cust-item" v-for="(item, i) in custMap" :key="i">
-            <span class="cust-title">{{ item }}：</span>
-            <a href="javascript:;" v-if="i === 'vip' && !orderInfo[i]">登陆</a>
-            <span v-else>{{ orderInfo[i] }}</span>
-          </li>
-        </ul>
-        <Button type="primary" style="width:100%" @click="placeOrder">开单</Button>
-      </i-col>
-    </Row>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -71,32 +59,47 @@
     },
     computed: {
       ...mapGetters([
-        'roomSelected'
+        'packageSelected',
+        'roomSelected',
+        'ordInfo'
       ])
     },
     methods: {
       selectPackage(item, index) {
+        if (this.roomSelected.status == 1) {
+          this.$Modal.confirm({
+            title: '确认更换套餐？',
+            content: '订单已下，确认是否更换套餐？',
+            onOk: () => {
+              this.activeIndex = this.activeIndex === index ? -1 : index
+              this.setOrdInfo({data: item, type: 'package'})
+              this.$http.post(apiUrl.updOrder, {
+                data: {ordInfo: this.ordInfo, type: 'package'}
+              }).then(res => {
+
+              })
+            },
+          })
+          return
+        }
+        this.setOrdInfo({data: this.activeIndex === index ? {} : item, type: 'package'})
         this.activeIndex = this.activeIndex === index ? -1 : index
       },
-      placeOrder() {
-        const packageUuid = this.activeIndex === -1 ? '' : this.roomInfo.package[this.activeIndex].package
-        const startTime = new Date().getTime()
-        this.$http.post(apiUrl.insertOrder, {
-          data: {no: this.roomInfo.no, package: packageUuid, startTime}
-        }).then(res => {
-          
-        })
-      }
+      ...mapMutations({
+        setOrdInfo: 'SET_ORDINFO'
+      })
     },
     filters: {
-      // status(field, roomInfo) {
-      //   if (field === 'status') {
-      //     return roomInfo.status == 0 ? '空闲' : '使用中'
-      //   }
-      // }
+      status(value, {field, roomInfo}) {
+        if (field === 'status') {
+          return roomInfo.status == 0 ? '空闲' : '使用中'
+        } else {
+          return value
+        }
+      }
     },
     watch: {
-      roomInfo() {
+      roomSelected() {
         this.activeIndex = -1
       }
     },
@@ -111,12 +114,6 @@
 
   .room-detail {
     text-align: left;
-  }
-  .left-wrapper {
-    // border-right: 2px solid $color-gray;
-  }
-  .right-wrapper {
-    padding: 0 3px;
   }
   .title-wrapper {
     display: flex;
@@ -137,10 +134,10 @@
       margin-bottom: 10px;
       cursor: pointer;
       &.active {
-        border: 1px solid $color-green;
+        border: 1px solid $color-red;
       }
       &:hover {
-        border: 1px solid $color-green;
+        border: 1px solid $color-red;
       }
     }
     .card-title {
@@ -150,18 +147,13 @@
     }
     .card-price {
       font-size: 14px;
-      color: $color-deeporigin;
+      font-weight: bold;
+      color: $color-red;
     }
     .card-selected {
       position: absolute;
       bottom: 0;
       right: 0;
-    }
-  }
-  
-  .cust-info {
-    .cust-item {
-      font-size: 16px;
     }
   }
 </style>

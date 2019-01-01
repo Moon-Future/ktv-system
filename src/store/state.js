@@ -1,6 +1,4 @@
 const state = {
-  goodsSelectedList: [],
-  packageSelected: {},
   roomSelected: {},
   ordInfo: {}
 }

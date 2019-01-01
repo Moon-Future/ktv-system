@@ -1,30 +1,37 @@
 import * as types from './mutation-types'
+import Vue from 'vue'
+import { stat } from 'fs';
 
 const mutations = {
-  [types.SET_GOODS_SELECTED](state, opts) {
-    const roomNo = opts.no
-    const goods = opts.data
-    const flag = opts.flag
-    if (flag) {
-      Array.isArray(goods) === true ? state.goodsSelectedList = goods : state.goodsSelectedList.push(goods)
-    } else {
-      for (let i = 0, len = state.goodsSelectedList.length; i < len; i++) {
-        if (goods.id === state.goodsSelectedList[i].id) {
-          state.goodsSelectedList.splice(i, 1)
-          break;
-        }
-      }
-    }
-  },
-  [types.SET_PACKAGE_SELECTED](state, packageSelected) {
-    state.packageSelected = packageSelected
-  },
   [types.SET_ROOM_SELECTED](state, roomSelected) {
     state.roomSelected = roomSelected
   },
   [types.SET_ORDINFO](state, opts) {
-    const ordInfo = opts.ordInfo
-    state.ordInfo = ordInfo
+    const data = opts.data
+    const type = opts.type
+
+    switch(type) {
+      case 'ordInfo': 
+        state.ordInfo = data;
+        break;
+      case 'packageMap': 
+        Vue.set(state.ordInfo, 'package', data)
+        break;
+      case 'goods': 
+        const flag = opts.flag
+        if (!state.ordInfo.goods) {
+          Vue.set(state.ordInfo, 'goods', {})
+        }
+        if (state.ordInfo.goods[data.id] && !flag) {
+          Vue.delete(state.ordInfo.goods, data.id)
+        } else {
+          Vue.set(state.ordInfo.goods, data.id, data)
+        }
+        break;
+      case 'payMethod': 
+        Vue.set(state.ordInfo, 'payMethod', data)
+        break;
+    }
   }
 }
 

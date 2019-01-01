@@ -19,7 +19,7 @@
             <room-detail :roomInfo="roomInfo"></room-detail>
           </TabPane>
           <TabPane label="商品" name="second">
-            <goods-detail></goods-detail>
+            <goods-detail :roomInfo="roomInfo"></goods-detail>
           </TabPane>
         </Tabs>
       </div>
@@ -36,7 +36,7 @@
     data() {
       return {
         roomList: [
-          {name: '豪华大包', no: '欢迎光临'}
+          // {name: '豪华大包', no: '欢迎光临'}
         ],
         activeName: 'first',
         activeRoom: '0',
@@ -61,12 +61,13 @@
       selectRoom(room) {
         this.roomInfo = this.roomMap[room.uuid]
         this.activeRoom = room.no
+        this.activeName = 'first'
         this.$http.post(apiUrl.getOrder, {
           data: {no: this.roomInfo.no}
         }).then(res => {
           if (res.data.code === 200) {
             const message = res.data.message
-            this.setOrdInfo(res.data.message[0] || {})
+            this.setOrdInfo({data: res.data.message[0] || {no: room.no, status: 0}, type: 'ordInfo'})
             if (message.length === 0) {
               this.roomInfo.status = 0
             } else {
@@ -108,6 +109,7 @@
       width: 100%;
       display: flex;
       flex-wrap: wrap;
+      font-size: 16px;
       .room {
         width: 11%;
         min-width: 11%;
@@ -115,31 +117,26 @@
         height: 100px;
         box-sizing: border-box;
         border: 1px solid $color-gray;
+        background: $color-gray;
         margin: 10px;
         flex: 1;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        &.active-room {
-          border: 1px solid $color-green;
-          font-size: 16px;
-          font-weight: bold;
-        }
         &.busy-room {
           background: $color-red;
           color: $color-white;
         }
+        &.active-room {
+          font-size: 32px;
+          font-weight: bold;
+        }
         &:hover {
-          border: 1px solid $color-green;
-          font-size: 16px;
+          font-size: 32px;
           font-weight: bold;
         }
       }
     }
-  }
-  .ktv-detail {
-    // border-top: 1px solid $color-gray;
-    // padding: 5px 0;
   }
 </style>

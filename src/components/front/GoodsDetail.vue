@@ -1,14 +1,14 @@
 <template>
   <div class="goods-wrapper">
     <div class="goods-item">
-      <Card class="card-item" :class="{active: goods.active}" v-for="(goods, i) in goodsList" :key="i" @click.native="selectGoods(goods, i, $event)">
+      <Card class="card-item" :class="{active: goodsMap[goods.id] || goodsSelected[goods.id]}" v-for="(goods, i) in goodsList" :key="i" @click.native="selectGoods(goods, $event)">
         <p slot="title">{{ goods.name }}</p>
         <p slot="extra" class="card-price">{{ goods.price }} 元</p>
         <div class="good-info">
-          <InputNumber :min="1" size="small" v-model="goods.qty"></InputNumber>
+          <InputNumber :min="1" v-model="goods.qty" @on-change="change(goods, i)"></InputNumber>
         </div>
         <icon-font 
-          v-show="goods.active" 
+          v-show="goodsMap[goods.id] || goodsSelected[goods.id]" 
           icon="icon-selected" 
           fontSize="32" 
           class="card-selected">
@@ -24,14 +24,22 @@
   import { apiUrl } from '@/serviceAPI.config.js'
   import { mapGetters, mapMutations } from 'vuex'
   export default {
+    props: {
+      roomInfo: {
+        type: Object,
+        default: null
+      }
+    },
     data() {
       return {
-        goodsList: []
+        goodsList: [],
+        goodsMap: {}
       }
     },
     computed: {
       ...mapGetters([
-        'goodsSelectedList',
+        'goodsSelected',
+        'ordInfo',
         'roomSelected'
       ])
     },
@@ -44,10 +52,13 @@
           .then(res => {
             if (res.data.code === 200) {
               this.goodsList = res.data.message
+              this.goodsList.forEach(ele => {
+                ele.qty = 1
+              })
             }
           })
       },
-      selectGoods(goods, index, e) {
+      selectGoods(goods, e) {
         const array = [
           'ivu-input-number-input', 
           'ivu-input-number-handler-up-inner ivu-icon ivu-icon-ios-arrow-up', 
@@ -56,17 +67,43 @@
         if (array.indexOf(e.target.className) !== -1) {
           return false
         }
-        if (goods.active) {
-          this.setGoodsSelected({data: deepClone(goods), flag: false})
-          this.$set(goods, 'active', false)
+        if (this.goodsMap[goods.id]) {
+          this.setOrdInfo({data: deepClone(goods), flag: false, type: 'goods'})
+          this.$set(this.goodsMap, goods.id, false)
         } else {
-          this.setGoodsSelected({data: deepClone(goods), flag: true})
-          this.$set(goods, 'active', true)
+          this.setOrdInfo({data: deepClone(goods), flag: true, type: 'goods'})
+          this.$set(this.goodsMap, goods.id, true)
+        }
+        if (this.roomSelected.status == 1) {
+          this.updOrder()
         }
       },
+      change(goods) {
+        if (this.ordInfo && this.ordInfo.goods && this.ordInfo.goods[goods.id]) {
+          this.setOrdInfo({data: deepClone(goods), flag: true, type: 'goods'})
+          if (this.roomSelected.status == 1) {
+            this.updOrder()
+          }
+        }
+      },
+      updOrder() {
+        this.$http.post(apiUrl.updOrder, {
+          data: {ordInfo: this.ordInfo, type: 'goods'}
+        }).then(res => {
+
+        })
+      },
       ...mapMutations({
-        setGoodsSelected: 'SET_GOODS_SELECTED'
+        setOrdInfo: 'SET_ORDINFO'
       }),
+    },
+    watch: {
+      roomSelected() {
+        this.goodsMap = {}
+        this.goodsList.forEach((ele, i) => {
+          ele.qty = this.goodsSelected && this.goodsSelected[ele.id] && Number(this.goodsSelected[ele.id].qty) || 1
+        })
+      }
     },
     components: {
       IconFont
@@ -88,14 +125,15 @@
       margin: 10px;
       cursor: pointer;
       &.active {
-        border: 1px solid $color-green;
+        border: 1px solid $color-red;
       }
       &:hover {
-        border: 1px solid $color-green;
+        border: 1px solid $color-red;
       }
       .card-price {
+        color: $color-red;
         font-size: 14px;
-        color: $color-deeporigin;
+        font-weight: bold;
       }
       .good-info {
         display: flex;

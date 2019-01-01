@@ -18,11 +18,16 @@
           <span>单价</span>
         </li>
         <li>
-          <span>{{ packageSelected.name }}</span>
-          <span>{{ packageSelected.name ? 'x1' : '' }}</span>
+          <span>{{ packageSelected.packagem }}</span>
+          <span>{{ packageSelected.packagem ? 'x1' : '' }}</span>
           <span>{{ packageSelected.price }}</span>
         </li>
-        <li v-for="(good, i) in goodsSelectedList" :key="i">
+        <li v-for="(goods, i) in packageSelected.goods" :key="i">
+          <span>{{ goods.goodsm }}</span>
+          <span>x{{ goods.qty || 1 }}</span>
+          <span>{{ 0 }}</span>
+        </li>
+        <li v-for="(good, i) in goodsSelected" :key="`${i}_${good.name}`">
           <span>{{ good.name }}</span>
           <span>x{{ good.qty || 1 }}</span>
           <span>{{ good.price }}</span>
@@ -31,19 +36,28 @@
       <div class="account-wrapper">
         <div class="account-item" v-for="(item, i) in accountList" :key="i">
           <span>{{ item.title }}</span>
-          <span :class="item.class" v-if="i === 0 || i === 2">{{ totalPrice }} 元</span>
+          <span :class="item.class" v-if="item.key == 'origin' || item.key == 'pay'">{{ totalPrice }} 元</span>
+          <span :class="item.class" v-if="item.key == 'discount'"><input /> 元</span>
+          <span :class="item.class" v-if="item.key == 'paymethos'" @click="openModal">
+            <span>{{ payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].title || '选择支付方式' }}</span>
+            <icon-font v-show="payMethodMap[ordInfo.payMethod]" :icon="payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].icon" fontSize="12"></icon-font>
+          </span>
         </div>
       </div>
-      <div class="payment-wrapper">
-          <Button type="success">结账</Button>
+      <div class="button-wrapper">
+        <Button type="primary" :disabled="ordInfo.status == 1" @click="placeOrder">{{ ordInfo.status == 1 ? '已开单' : '开单' }}</Button>
+        <Button type="success">结账</Button>
       </div>
     </div>
     <Modal
-      title="提示"
-      v-model="dialogVisible">
-      <div>
-        <Radio v-model="radioDiscount" label="9">9折</Radio>
-        <Radio v-model="radioDiscount" label="8">8折</Radio>
+      v-model="modalVisible"
+      :footer-hide="true"
+      title="选择支付方式">
+      <div class="payment-wrapper">
+        <div class="payment-item" v-for="(item, i) in payMethodMap" :key="i" @click="selectPayMethod(item, i)">
+          <icon-font :icon="item.icon" fontSize="64"></icon-font>
+          <span>{{ item.title }}</span>
+        </div>
       </div>
     </Modal>
   </div>
@@ -51,7 +65,8 @@
 
 <script>
   import IconFont from '@/components/IconFont'
-  import { mapGetters } from 'vuex'
+  import { apiUrl } from '@/serviceAPI.config.js'
+  import { mapGetters, mapMutations } from 'vuex'
   export default {
     data() {
       return {
@@ -70,28 +85,56 @@
           {key: 'psn', title: '收银员', class: 'money-psn'},
           {key: 'time', title: '打单时间', class: 'money-time'}
         ],
-        dialogVisible: false,
-        radioDiscount: '1'
+        radioDiscount: '1',
+        modalVisible: false,
+        payMethodMap: {
+          1: {icon: 'icon-big-Pay', title: '支付宝支付'},
+          2: {icon: 'icon-weixinzhifu', title: '微信支付'},
+          3: {icon: 'icon-zhifupingtai-yinlian', title: '刷卡支付'},
+          4: {icon: 'icon-cash_payment', title: '现金支付'}
+        }
       }
     },
     computed: {
       totalPrice() {
         let price = 0
-        this.goodsSelectedList.forEach(ele => {
-          price += Number(ele.price)
-        })
+        for (let key in this.goodsSelected) {
+          price += Number(this.goodsSelected[key].price) * Number(this.goodsSelected[key].qty)
+        }
+        price += Number(this.packageSelected.price || 0)
         return price
       },
       ...mapGetters([
-        'goodsSelectedList',
+        'goodsSelected',
         'packageSelected',
         'roomSelected',
         'ordInfo'
       ])
     },
     methods: {
-      openDiscount() {
-        this.dialogVisible = true
+      placeOrder() {
+        console.log(this.ordInfo)
+        // const startTime = new Date().getTime()
+        // this.$http.post(apiUrl.insertOrder, {
+        //   data: {ordInfo: this.ordInfo, startTime}
+        // }).then(res => {
+
+        // })
+      },
+      openModal() {
+        this.modalVisible = true
+      },
+      selectPayMethod(item, key) {
+        this.modalVisible = false
+        this.setOrdInfo({data: key, type: 'payMethod'})
+      },
+      ...mapMutations({
+        setOrdInfo: 'SET_ORDINFO'
+      })
+    },
+    wacth: {
+      roomSelected() {
+
       }
     },
     components: {
@@ -116,6 +159,7 @@
     top: -38px;
   }
   .bill-wrapper {
+    width: 10cm;
     background: $color-white;
     position: absolute;
     left: 10px;
@@ -168,6 +212,14 @@
         padding: 5px;
         display: flex;
         justify-content: space-between;
+        align-items: center;
+        input {
+          width: 30px;
+          border: none;
+          outline: none;
+          border-bottom: 1px solid $color-black;
+          text-align: center;
+        }
         .money-origin {
           color: $color-blue;
           font-weight: bold;
@@ -175,23 +227,40 @@
         .money-discount {
           color: $color-green;
           font-weight: bold;
-          text-decoration: underline;
-          cursor: pointer;
         }
         .money-pay {
           color: $color-origin;
           font-weight: bold;
         }
         .money-paymethos {
-          text-decoration: underline;
           cursor: pointer;
+          span {
+            margin-right: 5px;
+            color: $color-blue;
+          }
         }
       }
     }
-    .payment-wrapper {
+    .button-wrapper {
       margin-top: 30px;
       button {
         width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+  }
+  .payment-wrapper {
+    display: flex;
+    justify-content: space-around;
+    .payment-item {
+      display: flex;
+      flex-flow: column;
+      align-items: center;
+      cursor: pointer;
+      &:hover {
+        span {
+          font-weight: bold;
+        }
       }
     }
   }
