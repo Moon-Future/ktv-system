@@ -2,7 +2,8 @@
   <div class="vip-container">
     <base-table
       :tableOptions="tableOptions"
-      @edit="edit">
+      @edit="edit"
+      @recharge="recharge">
     </base-table>
   </div>
 </template>
@@ -43,12 +44,14 @@
             ],
             verifyCode: [{required: true, message: '不得为空', trigger: 'blur'}]
           },
+          vip: true,
           width: 60,
           addApi: 'registerVip',
           updApi: 'updVip',
           delApi: 'deleteVip',
           siftApi: 'getVip'
-        }
+        },
+        rechargeMoney: ''
       }
     },
     methods: {
@@ -60,6 +63,29 @@
         } else if (type === 'upd') {
           this.tableOptions.formData = params.row
         }
+      },
+      recharge({params}) {
+        console.log(params)
+        this.$Modal.confirm({
+          render: (h) => {
+            return h('Input', {
+              props: {
+                value: this.rechargeMoney,
+                min: 0,
+                suffix: 'logo-yen',
+                placeholder: '输入充值金额'
+              },
+              style: {
+                width: '100%'
+              },
+              on: {
+                input: (val) => {
+                  this.rechargeMoney = val;
+                }
+              }
+            })
+          }
+        })
       }
     },
     components: {

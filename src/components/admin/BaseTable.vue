@@ -118,10 +118,10 @@
                 class: {'operate-item' : true},
                 on: {
                   click: () => {
-                    this.goUpdate(params)
+                    this.tableOptions.vip ? this.recharge(params) : this.goUpdate(params)
                   }
                 }
-              }, '更新'),
+              }, this.tableOptions.vip ? '充值' : '更新'),
               h('span', {class: {'operate-divide' : true}}, '|'),
               h('span', {
                 class: {'operate-item' : true},
@@ -198,6 +198,9 @@
         this.updFlag = true
         this.addFlag = true
         this.$emit('edit', {type: 'upd', params: deepClone(params)})
+      },
+      recharge(params) {
+        this.$emit('recharge', {params: deepClone(params)})
       },
       goDelete(params) {
         this.$Modal.confirm({
