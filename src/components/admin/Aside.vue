@@ -67,6 +67,11 @@
             icon: 'icon-shezhi',
             index: '/admin/baseinfo/roominfo',
             title: '基本设置'
+          },
+          {
+            icon: 'icon-vip-active',
+            index: '/admin/vip',
+            title: '会员管理'
           }
         ]
       }

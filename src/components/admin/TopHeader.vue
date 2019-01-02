@@ -11,6 +11,7 @@
       <div class="user-info">
         <span>KTV</span>
       </div>
+      <Button type="primary" size="small" @click="backToFront">返回收银页面</Button>
       <Button size="small">退出</Button>
     </div>
   </div>
@@ -37,6 +38,11 @@
         this.currentTime = dateFormat(new Date(), 'hh:mm:ss')
       }, 1000)
     },
+    methods: {
+      backToFront() {
+        this.$router.push({path: '/'})
+      }
+    }
   }
 </script>
 
@@ -55,6 +61,9 @@
     display: flex;
     align-items: center;
     .user-info {
+      margin-right: 10px;
+    }
+    Button {
       margin-right: 10px;
     }
   }

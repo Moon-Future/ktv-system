@@ -50,6 +50,11 @@ export default new Router({
               component: () => import('@/views/admin/UnitInfo.vue'),
             }
           ]
+        },
+        {
+          path: 'vip',
+          name: 'vip',
+          component: () => import('@/views/admin/Vip.vue')
         }
       ]
     }

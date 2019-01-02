@@ -7,27 +7,48 @@
           <span class="title-content">{{ roomInfo[item.field] | status({field: item.field, roomInfo: roomInfo}) }} {{ item.after }}</span>
         </li>
       </ul>
-      <div class="package-list">
-        <h1>可选套餐</h1>
-        <div class="card-wrapper">
-          <Card
-            v-for="(item, j) in roomInfo.package" 
-            class="card-item" 
-            :class="{active: activeIndex === j || packageSelected.package == item.package}"
-            :key="j" 
-            @click.native="selectPackage(item, j)">
-            <p slot="title">{{ item.packagem }}</p>
-            <p slot="extra" class="card-price">{{ item.price }} 元</p>
-            <p v-for="(descr, k) in item.descr.split('\n')" :key="k">{{ descr }}</p>
-            <icon-font 
-              v-show="activeIndex === j || packageSelected.package == item.package" 
-              icon="icon-selected" 
-              fontSize="32" 
-              class="card-selected">
-            </icon-font>
-          </Card>
-        </div>
-      </div>
+      <Tabs type="card">
+        <TabPane label="阳光档套餐(13:30 ~ 17:00)">
+          <div class="card-wrapper">
+            <Card
+              v-for="(item, j) in roomInfo.package" 
+              class="card-item" 
+              :class="{active: activeIndex === j || packageSelected.package == item.package}"
+              :key="j" 
+              @click.native="selectPackage(item, j)">
+              <p slot="title">{{ item.packagem }}</p>
+              <p slot="extra" class="card-price">{{ item.price }} 元</p>
+              <p v-for="(descr, k) in item.descr.split('\n')" :key="k">{{ descr }}</p>
+              <icon-font 
+                v-show="activeIndex === j || packageSelected.package == item.package" 
+                icon="icon-selected" 
+                fontSize="32" 
+                class="card-selected">
+              </icon-font>
+            </Card>
+          </div>
+        </TabPane>
+        <TabPane label="黄金档档套餐(17:00 ~ 24:00)">
+          <div class="card-wrapper">
+            <Card
+              v-for="(item, j) in roomInfo.package" 
+              class="card-item" 
+              :class="{active: activeIndex === j || packageSelected.package == item.package}"
+              :key="j" 
+              @click.native="selectPackage(item, j)">
+              <p slot="title">{{ item.packagem }}</p>
+              <p slot="extra" class="card-price">{{ item.price }} 元</p>
+              <p v-for="(descr, k) in item.descr.split('\n')" :key="k">{{ descr }}</p>
+              <icon-font 
+                v-show="activeIndex === j || packageSelected.package == item.package" 
+                icon="icon-selected" 
+                fontSize="32" 
+                class="card-selected">
+              </icon-font>
+            </Card>
+          </div>
+        </TabPane>
+      </Tabs>
     </div>
   </div>
 </template>

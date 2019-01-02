@@ -4,7 +4,13 @@
         <img :src="avatar" alt="">
       </div>
       <ul class="menu-wrapper">
-        <router-link tag="li" :to="item.to" v-for="(item, i) in menuList" :class="[i === activeIndex ? 'active' : '']" :key="i" @click="changeIndex(i)">
+        <router-link 
+          tag="li" 
+          :to="item.to" 
+          v-for="(item, i) in menuList" 
+          :class="{active: i === activeIndex, setup: item.index === '3'}" 
+          :key="i" 
+          @click="changeIndex(i)">
           <icon-font :icon="i === activeIndex ? `${item.icon}-active` : item.icon" fontSize="22"></icon-font>
           <p>{{ item.text }}</p>
         </router-link>
@@ -21,7 +27,7 @@
         menuList: [
           {icon: 'icon-money-bag', text: '收银台', index: '1', to: '/home'},
           {icon: 'icon-vip', text: '会员', index: '2', to: '/vip'},
-          {icon: 'icon-vip', text: '设置', index: '3', to: '/admin'}
+          {icon: 'icon-shezhi', text: '设置', index: '3', to: '/admin'}
         ],
         activeIndex: 0
       }
@@ -68,6 +74,11 @@
         p {
           font-weight: bold;
         }
+      }
+      &.setup {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
       }
     }
   }

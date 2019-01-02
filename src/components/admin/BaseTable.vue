@@ -18,6 +18,9 @@
           <FormItem :label="item.title" :prop="item.key" :key="i" v-if="!item.hide">
             <i-input v-if="item.type === 'input'" v-model="formData[item.key]" :placeholder="item.placeholder || '请输入...'">
               <span v-if="item.unit" slot="append">元/小时</span>
+              <Button v-if="item.verifyCode" slot="append" @click="sendVerifyCode">
+                {{ verifyCodeBtn + (typeof verifyCodeBtn === 'number' ? ' s' : '')  }}
+              </Button>
             </i-input>
 
             <i-input v-if="item.type === 'textarea'" v-model="formData[item.key]" type="textarea" :placeholder="item.placeholder || '请输入...'"></i-input>
@@ -84,6 +87,7 @@
     },
     mounted() {
       this.getData()
+      this.sendTimer = null
     },
     data() {
       return {
@@ -97,7 +101,9 @@
           position: 'static'
         },
         tableData: [],
-        total: ''
+        total: '',
+        verifyCodeBtn: '发送验证码',
+        sending: false
       }
     },
     computed: {
@@ -136,6 +142,37 @@
       }
     },
     methods: {
+      sendVerifyCode() {
+        const phone = this.formData.phone
+        if (phone === '' || !/^1[34578]\d{9}$/.test(phone)) {
+          this.$Message.error('手机号码有误')
+          return
+        }
+        if (this.sending) {
+          this.$Message.error('请稍后再发送')
+          return
+        }
+        this.sending = true
+        this.$http.post(apiUrl.sendVerifyCode, {
+          data: {phone}
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.$Message.success(res.data.message)
+            this.verifyCodeBtn = 60
+            this.sendTimer = setInterval(() => {
+              this.verifyCodeBtn -= 1
+              if (this.verifyCodeBtn <= 0) {
+                this.verifyCodeBtn = '发送验证码'
+                this.sending = false
+                clearInterval(this.sendTimer)
+              }
+            }, 1000)
+          } else {
+            this.sending = false
+            this.$Message.error(res.data.message)
+          }
+        })
+      },
       getData(params = {}) {
         this.loading = true
         this.$http.post(apiUrl[this.tableOptions.siftApi], {
@@ -189,7 +226,6 @@
             this.$Message.error('*号为必填项')
             return false
           }
-
           // console.log(this.formData)
           // return
           if (!this.updFlag) {

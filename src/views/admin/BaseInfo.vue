@@ -1,14 +1,6 @@
 <template>
   <div class="baseinfo-container">
     <div class="menu-wrapper">
-      <!-- <ul class="menu-ui">
-        <router-link
-          v-for="(item, i) in menuItem"
-          tag="li"
-          :to="item.to"
-          :class="{active: activeName === i}"
-          :key="i">{{ item.title }}</router-link>
-      </ul> -->
       <Menu class="menu-ui" mode="horizontal" :active-name="activeName">
         <template v-for="(menu, i) in menuItem">
           <menu-item v-if="!menu.submenu" :name="menu.name" :key="i" @click.native="goPage(menu.to)">{{ menu.title }}</menu-item>

@@ -28,5 +28,9 @@ export const apiUrl = {
   insertOrder: '/api/order/insertOrder',
   getOrder: '/api/order/getOrder',
   deleteOrder: '/api/order/deleteOrder',
-  updOrder: '/api/order/updOrder'
+  updOrder: '/api/order/updOrder',
+
+  sendVerifyCode: '/api/user/sendVerifyCode',
+  registerVip: '/api/user/registerVip',
+  getVip: '/api/user/getVip'
 }
