@@ -3,10 +3,24 @@
     <div class="login-wrapper">
       <h1>登录</h1>
       <div class="form-wrapper">
-        <Form ref="submitForm" label-position="left" :label-width="50" :model="formData" :rules="ruleValidate">
+        <RadioGroup v-show="registerFlag" v-model="userType" class="radio-group">
+          <Radio label="0">
+              <span>收银员</span>
+          </Radio>
+          <Radio label="1">
+              <span>管理员</span>
+          </Radio>
+        </RadioGroup>
+        <Form ref="loginForm" label-position="right" :label-width="60" :model="formData" :rules="ruleValidate">
           <template v-for="(item, i) in formArray">
-            <FormItem :label="item.title" :prop="item.key" :key="i">
-              <i-input v-model="formData[item.key]" :placeholder="item.placeholder || '请输入...'"></i-input>
+            <FormItem :label="item.title" :prop="item.key" :key="i" v-show="registerFlag || (item.key !== 'rePassword' && item.key !== 'code' && item.key !== 'name')">
+              <i-input 
+                v-if="!registerFlag && item.key === 'password'"
+                v-model="formData[item.key]" 
+                :type="item.type || 'text'" 
+                :placeholder="item.placeholder || '请输入...'"
+                @keyup.enter.native="login"></i-input>
+              <i-input v-else v-model="formData[item.key]" :type="item.type || 'text'" :placeholder="item.placeholder || '请输入...'"></i-input>
             </FormItem>
           </template>
         </Form>
@@ -24,9 +38,6 @@
             :class="subWait && registerFlag ? 'subWait' : ''" 
             @click="register">注册</Button>
         </div>
-        <div class="tool-button" v-show="!registerFlag">
-          <Button type="warning" @click="goHome">返回主页</Button>
-        </div>
         <div class="tool-button" v-show="registerFlag">
           <Button type="primary" @click="back">返回</Button>
         </div>
@@ -43,15 +54,17 @@
     data() {
       return {
         formArray: [
-          {key: 'name', title: '账号', placeholder: '输入账号'},
+          {key: 'account', title: '账号', placeholder: '输入账号'},
           {key: 'password', title: '密码', type: 'password', placeholder: '输入密码'},
-          {key: 'rePassword', title: '密码', type: 'rePassword', placeholder: '确认密码'}
+          {key: 'rePassword', title: '密码', type: 'password', placeholder: '确认密码'},
+          {key: 'name', title: '姓名', placeholder: '输入姓名'},
+          {key: 'code', title: '验证码', type: 'password', placeholder: '输入验证码'}
         ],
         formData: {
-          name: '', password: '', rePassword: ''
+          account: '', password: '', rePassword: '', name: ''
         },
         ruleValidate: {
-          name: [
+          account: [
             {required: true, message: '请输入昵称', trigger: 'blur'}
           ],
           password: [
@@ -59,23 +72,31 @@
           ],
           rePassword: [
             {required: true, message: '两次输入密码不同', trigger: 'blur'}
+          ],
+          code: [
+            {required: true, message: '请输入验证码', trigger: 'blur'}
+          ],
+          name: [
+            {required: true, message: '请输入姓名', trigger: 'blur'}
           ]
         },
         registerFlag: false,
         subWait: false,
-        checked: false,
-        password: '',
-        cookieInfo: {}
+        cookieInfo: {},
+        userType: '0'
       }
     },
-    beforeCreate() {
-      // this.$http.post(apiUrl.getSession).then(res => {
-      //   if (res.data.code === 200) {
-      //     this.$router.push('/admin/selfinfo')
-      //   }
-      // })
+    created() {
+      this.getSession()
     },
     methods: {
+      getSession() {
+        this.$http.post(apiUrl.getSession).then(res => {
+          if (res.data.code === 200) {
+            res.data.message.type == '0' ? this.$router.push({path: '/'}) : this.$router.push({path: '/admin/baseinfo/roominfo'})
+          }
+        })
+      },
       register() {
         if (!this.registerFlag) {
           this.registerFlag = true
@@ -87,36 +108,38 @@
         }
         this.$refs.loginForm.validate((valid) => {
           if (!valid) {
-            this.$message.error('请补充完整数据')
+            this.$Message.error('请补充完整数据')
             return
           }
-          if (this.form.password !== this.form.rePassword) {
-            this.$message.error('两次输入密码不同')
+          if (this.formData.password !== this.formData.rePassword) {
+            this.$Message.error('两次输入密码不同')
             return
           }
           this.subWait = true
           this.$http.post(apiUrl.register, {
             data: {
-              email: this.form.email,
-              password: crypto.createHash('sha1').update(this.form.password.trim()).digest('hex'),
-              name: this.form.name,
-              website: this.form.website
+              name: this.formData.name,
+              account: this.formData.account,
+              password: crypto.createHash('sha1').update(this.formData.password.trim()).digest('hex'),
+              code: this.formData.code,
+              userType: this.userType
             }
           }).then(res => {
             this.subWait = false
             if (res.data.code === 200) {
-              this.$message.success(res.data.message)
+              this.$Message.success(res.data.message)
               this.registerFlag = false
-              this.form.password = ''
-              this.form.rePassword = ''
-              this.form.name = ''
-              this.form.website = ''
+              this.formData.password = ''
+              this.formData.rePassword = ''
+              this.formData.code = ''
+              this.formData.name = ''
+              this.userType = '0'
             } else {
-              this.$message.error(res.data.message)
+              this.$Message.error(res.data.message)
             }
           }).catch(err => {
             this.subWait = false
-            this.$message.error('服务器君傲娇啦😭')
+            this.$Message.error('服务器君傲娇啦😭')
           })
         })
       },
@@ -124,27 +147,27 @@
         if (this.subWait) {
           return
         }
-        if (this.form.email === '' || this.form.password === '') {
-          this.$message.error('请输入邮箱和密码')
+        if (this.formData.account === '' || this.formData.password === '') {
+          this.$Message.error('请输入邮箱和密码')
           return
         }
         this.subWait = true
         this.$http.post(apiUrl.login, {
           data: {
-            email: this.form.email,
-            password: crypto.createHash('sha1').update(this.form.password.trim()).digest('hex')
+            account: this.formData.account,
+            password: crypto.createHash('sha1').update(this.formData.password.trim()).digest('hex')
           }
         }).then(res => {
           this.subWait = false
           if (res.data.code === 200) {
-            this.$message.success(res.data.message)
-            this.$router.push('/admin/selfinfo')
+            this.$Message.success(res.data.message)
+            res.data.userInfo.type == '0' ? this.$router.push({path: '/'}) : this.$router.push({path: '/admin/baseinfo/roominfo'})
           } else {
-            this.$message.error(res.data.message)
+            this.$Message.error(res.data.message)
           }
         }).catch(err => {
           this.subWait = false
-          this.$message.error('服务器君傲娇啦😭')
+          this.$Message.error('服务器君傲娇啦😭')
         })
       },
       back() {
@@ -154,13 +177,8 @@
         this.registerFlag = false
         this.clear()
       },
-      goHome() {
-        this.$router.push('/')
-      },
       clear() {
         this.$refs.loginForm.resetFields()
-        this.form.email = ''
-        this.form.password = ''
       }
     },
     components: {
@@ -178,24 +196,9 @@
     align-items: center;
     height: 100%;
     background: $color-gray;
-    .avatar-wrapper {
-      width: 100px;
-      height: 100px;
-      margin-right: 50px;
-      cursor: pointer;
-      position: relative;
-      img {
-        width: 100%;
-        border-radius: 50%;
-      }
-      .click-msg {
-        position: absolute;
-        top: 50px;
-        color: $color-white;
-        font-size: 12px;
-        text-align: center;
-        width: 100%;
-      }
+    .radio-group {
+      text-align: left;
+      margin-bottom: 10px;
     }
     .login-wrapper {
       width: 350px;
@@ -203,6 +206,7 @@
       border: 1px solid $color-gray;
       box-shadow: 0 0 1px $color-gray;
       background-color: $color-white;
+      border-radius: 5px;
       h1 {
         font-weight: bold;
         padding: 10px 0;

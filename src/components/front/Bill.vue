@@ -8,7 +8,8 @@
       <ul class="ord-info">
         <li v-for="(ord, i) in ordList" :key="i">
           <span>{{ ord.title }}：</span>
-          <span>{{ ord.value }}</span>
+          <span v-if="ord.key === 'vip' && ordInfo.room && !ordInfo[ord.key]" class="order-vip" @click="loginVip">登陆</span>
+          <span v-else>{{ ordInfo[ord.key] | filterTime(ord.key) }}</span>
         </li>
       </ul>
       <ul class="goods-list">
@@ -42,6 +43,7 @@
             <span>{{ payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].title || '选择支付方式' }}</span>
             <icon-font v-show="payMethodMap[ordInfo.payMethod]" :icon="payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].icon" fontSize="12"></icon-font>
           </span>
+          <span :class="item.class" v-if="item.key == 'user'">{{ userInfo.name }}</span>
         </div>
       </div>
       <div class="button-wrapper">
@@ -60,29 +62,47 @@
         </div>
       </div>
     </Modal>
+    <Modal
+      v-model="modalVip"
+      title="会员登陆"
+      :footer-hide="true">
+      <Form ref="formVip" :model="vipFormData" :rules="ruleValidate" label-position="left" :label-width="60">
+        <FormItem prop="phone" label="手机号">
+          <i-input type="text" v-model="vipFormData.phone"></i-input>
+        </FormItem>
+        <FormItem prop="verifyCode" label="验证码">
+          <i-input v-model="vipFormData.verifyCode"></i-input>
+        </FormItem>
+      </Form>
+      <div class="modal-button">
+        <Button class="modal-cancel" @click="cancelVip">取消</Button>
+        <Button type="primary" class="modal-ok" @click="okVip">确定</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
   import IconFont from '@/components/IconFont'
+  import { dateFormat } from '@/common/js/util'
   import { apiUrl } from '@/serviceAPI.config.js'
   import { mapGetters, mapMutations } from 'vuex'
   export default {
     data() {
       return {
         ordList: [
-          {key: '', title: '账单号', value: 'YYH8726617'},
-          {key: '', title: '包间号', value: 1},
-          {key: '', title: '下单时间', value: '2018-12-14 20:00'},
-          {key: '', title: '会员', value: '15888888888'},
-          {key: '', title: '余额', value: '8008'}
+          {key: 'ordNun', title: '账单号'},
+          {key: 'room', title: '包间号'},
+          {key: 'startTime', title: '下单时间'},
+          {key: 'vip', title: '会员'},
+          {key: 'balance', title: '余额'}
         ],
         accountList: [
           {key: 'origin', title: '原价', class: 'money-origin'},
           {key: 'discount', title: '折扣', class: 'money-discount'},
           {key: 'pay', title: '应付金额', class: 'money-pay'},
           {key: 'paymethos', title: '付款方式', class: 'money-paymethos'},
-          {key: 'psn', title: '收银员', class: 'money-psn'},
+          {key: 'user', title: '收银员', class: 'money-user'},
           {key: 'time', title: '打单时间', class: 'money-time'}
         ],
         radioDiscount: '1',
@@ -92,6 +112,15 @@
           2: {icon: 'icon-weixinzhifu', title: '微信支付'},
           3: {icon: 'icon-zhifupingtai-yinlian', title: '刷卡支付'},
           4: {icon: 'icon-cash_payment', title: '现金支付'}
+        },
+        modalVip: false,
+        vipFormData: {phone: '', verifyCode: ''},
+        ruleValidate: {
+          phone: [
+            {required: true, message: '不得为空', trigger: 'blur'},
+            {pattern: /^1[34578]\d{9}$/, message: '手机号码有误', trigger: 'blur'}
+          ],
+          verifyCode: [{required: true, message: '不得为空', trigger: 'blur'}]
         }
       }
     },
@@ -108,10 +137,20 @@
         'goodsSelected',
         'packageSelected',
         'roomSelected',
-        'ordInfo'
+        'ordInfo',
+        'userInfo'
       ])
     },
     methods: {
+      loginVip() {
+        this.modalVip = true
+      },
+      cancelVip() {
+        this.modalVip = false
+      },
+      okVip() {
+
+      },
       placeOrder() {
         console.log(this.ordInfo)
         // const startTime = new Date().getTime()
@@ -132,9 +171,12 @@
         setOrdInfo: 'SET_ORDINFO'
       })
     },
-    wacth: {
-      roomSelected() {
-
+    filters: {
+      filterTime(value, key) {
+        if (key === 'startTime' && value) {
+          return dateFormat(value, 'yyyy-MM-dd hh:mm')
+        } 
+        return value
       }
     },
     components: {
@@ -202,6 +244,13 @@
       border-bottom: 2px dashed $color-gray;
       span {
         font-weight: bold;
+      }
+      .order-vip {
+        color: $color-blue;
+        cursor: pointer;
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
     .account-wrapper {

@@ -12,13 +12,15 @@
         <span>KTV</span>
       </div>
       <Button type="primary" size="small" @click="backToFront">返回收银页面</Button>
-      <Button size="small">退出</Button>
+      <Button size="small" @click="logout">退出</Button>
     </div>
   </div>
 </template>
 
 <script>
   import { dateFormat } from '@/common/js/util'
+  import { apiUrl } from '@/serviceAPI.config.js'
+  import { mapMutations } from 'vuex'
   const datMap = {
     0: '星期天', 1: '星期一', 2: '星期二', 3: '星期三', 4: '星期四', 5: '星期五', 6: '星期六', 
   }
@@ -41,7 +43,20 @@
     methods: {
       backToFront() {
         this.$router.push({path: '/'})
-      }
+      },
+      logout() {
+        this.$http.post(apiUrl.logout).then(res => {
+          if (res.data.code === 200) {
+            this.setUserInfo({})
+            this.$router.push({path: '/login'})
+          }
+        }).catch(err => {
+          this.$Message.error('服务器君傲娇啦😭')
+        })
+      },
+      ...mapMutations({
+        setUserInfo: 'SET_USERINGO'
+      })
     }
   }
 </script>

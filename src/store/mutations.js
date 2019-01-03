@@ -32,7 +32,11 @@ const mutations = {
         Vue.set(state.ordInfo, 'payMethod', data)
         break;
     }
-  }
+  },
+
+  [types.SET_USERINGO](state, userInfo) {
+    state.userInfo = userInfo
+  },
 }
 
 export default mutations

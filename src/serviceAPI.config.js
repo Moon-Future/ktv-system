@@ -30,9 +30,14 @@ export const apiUrl = {
   deleteOrder: '/api/order/deleteOrder',
   updOrder: '/api/order/updOrder',
 
-  sendVerifyCode: '/api/user/sendVerifyCode',
-  registerVip: '/api/user/registerVip',
-  getVip: '/api/user/getVip',
-  recharge: '/api/user/recharge',
-  getRechargeRecord: '/api/user/getRechargeRecord'
+  sendVerifyCode: '/api/vip/sendVerifyCode',
+  registerVip: '/api/vip/registerVip',
+  getVip: '/api/vip/getVip',
+  recharge: '/api/vip/recharge',
+  getRechargeRecord: '/api/vip/getRechargeRecord',
+
+  register: '/api/user/register',
+  login: '/api/user/login',
+  logout: '/api/user/logout',
+  getSession: '/api/user/getSession'
 }

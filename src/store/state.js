@@ -1,6 +1,7 @@
 const state = {
   roomSelected: {},
-  ordInfo: {}
+  ordInfo: {},
+  userInfo: {}
 }
 
 export default state

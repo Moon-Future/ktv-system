@@ -31,7 +31,7 @@
   import RoomDetail from '@/components/front/RoomDetail'
   import GoodsDetail from '@/components/front/GoodsDetail'
   import { apiUrl } from '@/serviceAPI.config.js'
-  import { mapMutations } from 'vuex'
+  import { mapGetters, mapMutations } from 'vuex'
   export default {
     data() {
       return {
@@ -46,6 +46,9 @@
     created() {
       this.roomMap = {}
       this.getRoomInfo()
+    },
+    computed: {
+      ...mapGetters(['userInfo'])
     },
     methods: {
       getRoomInfo() {

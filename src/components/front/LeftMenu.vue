@@ -1,5 +1,6 @@
 <template>
     <div class="menu-container">
+      <Button class="user-logout" type="primary" size="small" @click="logout">退出</Button>
       <div class="user-avatar">
         <img :src="avatar" alt="">
       </div>
@@ -20,6 +21,8 @@
 
 <script>
   import IconFont from '@/components/IconFont'
+  import { apiUrl } from '@/serviceAPI.config.js'
+  import { mapMutations } from 'vuex'
   export default {
     data() {
       return {
@@ -27,7 +30,7 @@
         menuList: [
           {icon: 'icon-money-bag', text: '收银台', index: '1', to: '/home'},
           {icon: 'icon-vip', text: '会员', index: '2', to: '/vip'},
-          {icon: 'icon-shezhi', text: '设置', index: '3', to: '/admin'}
+          {icon: 'icon-shezhi', text: '设置', index: '3', to: '/admin/baseinfo/roominfo'}
         ],
         activeIndex: 0
       }
@@ -35,7 +38,20 @@
     methods: {
       changeIndex(index) {
         this.activeIndex = index
-      }
+      },
+      logout() {
+        this.$http.post(apiUrl.logout).then(res => {
+          if (res.data.code === 200) {
+            this.setUserInfo({})
+            this.$router.push({path: '/login'})
+          }
+        }).catch(err => {
+          this.$Message.error('服务器君傲娇啦😭')
+        })
+      },
+      ...mapMutations({
+        setUserInfo: 'SET_USERINGO'
+      })
     },
     components: {
       IconFont
@@ -51,6 +67,10 @@
     color: $color-deepgray;
     width: 100%;
     height: 100%;
+  }
+  .user-logout {
+    margin-top: 20px;
+    background: $color-shallowblack;
   }
   .user-avatar {
     img {

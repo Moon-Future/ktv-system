@@ -12,6 +12,9 @@
   import Aside from '@/components/admin/Aside'
   import TopHeader from '@/components/admin/TopHeader'
   export default {
+    created() {
+      
+    },
     components: {
       Aside,
       TopHeader

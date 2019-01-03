@@ -5,3 +5,5 @@ export const packageSelected = state => state.ordInfo && state.ordInfo.package |
 export const roomSelected = state => state.roomSelected
 
 export const ordInfo = state => state.ordInfo
+
+export const userInfo = state => state.userInfo
