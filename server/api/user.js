@@ -90,6 +90,39 @@ router.post('/logout', async (ctx) => {
   }
 })
 
+router.post('/recharge', async (ctx) => {
+  try {
+    const data = ctx.request.body.data
+    const phone = data.phone
+    const rechargeMoney = data.rechargeMoney
+    const result = await query(`SELECT * FROM vip WHERE phone = '${phone}' AND off != 1`)
+    if (result.length === 0) {
+      ctx.body = {code: 500, message: '账户不存在'}
+      return 
+    }
+    await query(`UPDATE vip SET balance = ${Number(result[0].balance + Number(rechargeMoney))},
+      record = ${Number(result[0].record + 1)}
+      WHERE phone = '${phone}' AND off != 1;
+      INSERT into rechargerecord (phone, money, time) VALUES ('${phone}', ${rechargeMoney}, ${new Date().getTime()})
+    `)
+    
+    ctx.body = {code: 200, message: '充值成功'}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.post('/getRechargeRecord', async (ctx) => {
+  try {
+    const data = ctx.request.body.data
+    const phone = data.phone
+    const result = await query(`SELECT * FROM rechargerecord WHERE phone = '${phone}' AND off != 1`)
+    ctx.body = {code: 200, message: result}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
 router.post('/getSession', async (ctx) => {
   try {
     const userInfo = ctx.session.userInfo

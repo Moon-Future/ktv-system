@@ -32,5 +32,7 @@ export const apiUrl = {
 
   sendVerifyCode: '/api/user/sendVerifyCode',
   registerVip: '/api/user/registerVip',
-  getVip: '/api/user/getVip'
+  getVip: '/api/user/getVip',
+  recharge: '/api/user/recharge',
+  getRechargeRecord: '/api/user/getRechargeRecord'
 }

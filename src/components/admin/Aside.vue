@@ -72,6 +72,11 @@
             icon: 'icon-vip-active',
             index: '/admin/vip',
             title: '会员管理'
+          },
+          {
+            icon: 'icon-user',
+            index: '/admin/user',
+            title: '账户管理'
           }
         ]
       }

@@ -122,7 +122,8 @@
                   }
                 }
               }, this.tableOptions.vip ? '充值' : '更新'),
-              h('span', {class: {'operate-divide' : true}}, '|'),
+              this.tableOptions.vip ? '' : h('span', {class: {'operate-divide' : true}}, '|'),
+              this.tableOptions.vip ? '' : 
               h('span', {
                 class: {'operate-item' : true},
                 on: {
@@ -200,7 +201,7 @@
         this.$emit('edit', {type: 'upd', params: deepClone(params)})
       },
       recharge(params) {
-        this.$emit('recharge', {params: deepClone(params)})
+        this.$emit('recharge', {params: params})
       },
       goDelete(params) {
         this.$Modal.confirm({

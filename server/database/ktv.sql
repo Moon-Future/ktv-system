@@ -11,7 +11,7 @@
  Target Server Version : 50721
  File Encoding         : 65001
 
- Date: 02/01/2019 20:37:23
+ Date: 03/01/2019 18:28:32
 */
 
 SET NAMES utf8mb4;
@@ -101,6 +101,38 @@ INSERT INTO `package` VALUES (18, 'a233b920-0916-11e9-a23c-619a8e35a34d', 1, '�
 INSERT INTO `package` VALUES (19, 'a233b920-0916-11e9-a23c-619a8e35a34d', 1, '小吃套餐', 12, 1, 0, NULL, 99.00, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
 INSERT INTO `package` VALUES (20, 'a233b920-0916-11e9-a23c-619a8e35a34d', 1, '小吃套餐', 6, 1, 0, NULL, 99.00, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
 INSERT INTO `package` VALUES (21, 'db02e000-0916-11e9-a23c-619a8e35a34d', 2, '水果套餐', 16, 5, 0, NULL, 188.00, '什锦果盘大拼5盘', 1545832937984, NULL, 0);
+
+-- ----------------------------
+-- Table structure for rechargerecord
+-- ----------------------------
+DROP TABLE IF EXISTS `rechargerecord`;
+CREATE TABLE `rechargerecord`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `phone` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `money` decimal(10, 2) NOT NULL,
+  `time` bigint(20) NOT NULL,
+  `off` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of rechargerecord
+-- ----------------------------
+INSERT INTO `rechargerecord` VALUES (1, '15920055057', 500.00, 1546495924925, 0);
+INSERT INTO `rechargerecord` VALUES (2, '15920055057', 350.00, 1546495946976, 0);
+INSERT INTO `rechargerecord` VALUES (3, '13888888888', 150.00, 1546495991224, 0);
+INSERT INTO `rechargerecord` VALUES (4, '15920055057', 66.00, 1546505550352, 0);
+INSERT INTO `rechargerecord` VALUES (5, '15920055057', 89.00, 1546505732081, 0);
+INSERT INTO `rechargerecord` VALUES (6, '15920055057', 66.00, 1546505739449, 0);
+INSERT INTO `rechargerecord` VALUES (7, '15920055057', 300.00, 1546505742950, 0);
+INSERT INTO `rechargerecord` VALUES (8, '15920055057', 1000.00, 1546505747784, 0);
+INSERT INTO `rechargerecord` VALUES (9, '15920055057', 58.00, 1546505774797, 0);
+INSERT INTO `rechargerecord` VALUES (10, '15920055057', 888.00, 1546505778472, 0);
+INSERT INTO `rechargerecord` VALUES (11, '15920055057', 990.00, 1546505781402, 0);
+INSERT INTO `rechargerecord` VALUES (12, '15920055057', 50.00, 1546505785616, 0);
+INSERT INTO `rechargerecord` VALUES (13, '15920055057', 200.00, 1546505788936, 0);
+INSERT INTO `rechargerecord` VALUES (14, '15920055057', 100.00, 1546505792998, 0);
+INSERT INTO `rechargerecord` VALUES (15, '15920055057', 600.00, 1546505806763, 0);
 
 -- ----------------------------
 -- Table structure for room
@@ -212,6 +244,22 @@ INSERT INTO `unit` VALUES (6, '罐', 'GU', 1545710820680, NULL, 0);
 INSERT INTO `unit` VALUES (7, '壶', 'H', 1545710834061, NULL, 0);
 
 -- ----------------------------
+-- Table structure for user
+-- ----------------------------
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `password` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `type` int(11) NOT NULL DEFAULT 0 COMMENT '类型 0：收银；1：管理',
+  `root` int(11) NOT NULL DEFAULT 0,
+  `status` int(11) NOT NULL DEFAULT 0 COMMENT '是否已登录（收银）',
+  `createTime` bigint(20) NOT NULL,
+  `off` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
 -- Table structure for vip
 -- ----------------------------
 DROP TABLE IF EXISTS `vip`;
@@ -225,13 +273,15 @@ CREATE TABLE `vip`  (
   `totalMoney` decimal(10, 2) DEFAULT NULL COMMENT '累计消费金额',
   `createTime` bigint(20) DEFAULT NULL,
   `status` int(11) DEFAULT NULL COMMENT '是否已登录，正在包间中',
+  `record` int(11) NOT NULL DEFAULT 0 COMMENT '充值次数',
   `off` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of vip
 -- ----------------------------
-INSERT INTO `vip` VALUES (1, '15920055057', 0.00, NULL, NULL, NULL, NULL, 1546431572199, NULL, 0);
+INSERT INTO `vip` VALUES (1, '15920055057', 5257.00, NULL, NULL, NULL, NULL, 1546431572199, NULL, 14, 0);
+INSERT INTO `vip` VALUES (2, '13888888888', 150.00, NULL, NULL, NULL, NULL, 1546495981560, NULL, 1, 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

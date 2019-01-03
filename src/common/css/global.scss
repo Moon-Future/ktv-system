@@ -12,3 +12,10 @@
   font-size: 24px;
   color: $color-red;
 }
+
+.record-time {
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+}
