@@ -11,6 +11,7 @@
 
 <script>
   import BaseTable from '@/components/admin/BaseTable'
+  import { packageType } from '@/common/js/const'
   import { apiUrl } from '@/serviceAPI.config.js'
   export default {
     data() {
@@ -35,7 +36,17 @@
               return h('div', {}, array)
             }},
             {key: 'price', title: '价格', render: (h, params) => {
-              return h('span', {}, params.row.price + ' 元')
+              const row = params.row
+              let array = []
+              let array1 = []
+              let array2 = []
+              if (row.type1 == '1') {
+                array.push(h('Tag', {props: {color: 'gold'}}, `阳光档 ${row.price1} 元`))
+              }
+              if (row.type2 == '1') {
+                array.push(h('Tag', {props: {color: 'volcano'}}, `黄金档 ${row.price2} 元`))
+              }
+              return h('div', {}, array)
             }}
           ],
           formArray: [
@@ -51,11 +62,7 @@
           transferData: [],
           ruleValidate: {
             name: [{required: true, message: '不得为空', trigger: 'blur'}],
-            descr: [{required: true, message: '不得为空', trigger: 'blur'}],
-            price1: [
-              {required: true, message: '不得为空', trigger: 'blur'},
-              {pattern: /^\d+(\.{0,1}\d{1,2}){0,1}$/, message: '必须为正数，最多两位小数', trigger: 'blur'}
-            ]
+            descr: [{required: true, message: '不得为空', trigger: 'blur'}]
           },
           addApi: 'insertPackage',
           updApi: 'updPackage',
