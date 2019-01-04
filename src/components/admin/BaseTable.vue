@@ -31,7 +31,7 @@
               <Option v-for="option in item.options" :value="option.value" :key="option.value">{{ option.label }}</Option>
             </Select>
 
-            <CheckboxGroup v-if="item.type === 'checkbox'" v-model="formData[item.key]">
+            <CheckboxGroup v-if="item.type === 'checkbox'" v-model="formData[item.key]" @on-change="changeGoods">
               <Checkbox v-for="(option, j) in item.options" :label="option.id" :key="j">
                 <template v-if="!item.tooltip">
                   {{ option.name }}({{ option.price }}元)
@@ -64,6 +64,21 @@
                 </Select>
               </i-col>
             </Row>
+
+            <CheckboxGroup v-model="formData[item.key3]" v-if="item.type === 'checkboxInput'">
+                <Checkbox v-for="(type, i) in packageType" :label="type.label" :key="i">
+                  {{ type.name }}
+                  <InputNumber v-if="type.label == '1'" v-model="formData[item.key1]"></InputNumber>
+                  <InputNumber v-else v-model="formData[item.key2]"></InputNumber>
+                </Checkbox>
+            </CheckboxGroup>
+
+            <Transfer
+              v-if="item.type === 'transfer'"
+              :data="tableOptions.transferData"
+              :target-keys="formData[item.key]"
+              :titles="['商品', '任选其一']"
+              @on-change="transferChange"></Transfer>
           </FormItem>
         </template>
       </Form>
@@ -76,6 +91,7 @@
 </template>
 
 <script>
+  import { packageType } from '@/common/js/const'
   import { deepClone } from '@/common/js/util'
   import { apiUrl } from '@/serviceAPI.config.js'
   export default {
@@ -91,6 +107,7 @@
     },
     data() {
       return {
+        packageType: packageType,
         loading: false,
         addFlag: false,
         updFlag: false,
@@ -143,6 +160,24 @@
       }
     },
     methods: {
+      changeGoods(selectedList) {
+        const goodsList = this.tableOptions.formArray[1].options
+        let goodsMap = {}
+        let transferData = []
+        this.transferData = []
+        goodsList.forEach(ele => {
+          goodsMap[ele.id] = ele
+        })
+        selectedList.forEach(ele => {
+          let obj = deepClone(goodsMap[ele])
+          obj.key = obj.id
+          transferData.push(obj)
+        })
+        this.$emit('changeGoods', {transferData})
+      },
+      transferChange(targetKeys) {
+        this.$emit('transfer', {targetKeys})
+      },
       sendVerifyCode() {
         const phone = this.formData.phone
         if (phone === '' || !/^1[34578]\d{9}$/.test(phone)) {
@@ -192,6 +227,7 @@
       goAdd() {
         this.updFlag = false
         this.addFlag = true
+        this.transferData = []
         this.$emit('edit', {type: 'add'})
         this.$refs.submitForm.resetFields()
       },
@@ -228,6 +264,10 @@
         this.$refs.submitForm.validate((valid) => {
           if (!valid) {
             this.$Message.error('*号为必填项')
+            return false
+          }
+          if (this.formData.group && this.formData.group.length === 0) {
+            this.$Message.error('请选择价格档')
             return false
           }
           // console.log(this.formData)

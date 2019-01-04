@@ -15,21 +15,14 @@ router.post('/insertPackage', async (ctx) => {
     const data = ctx.request.body.data
     for (let i = 0 , len = data.length; i < len; i++) {
       const item = data[i]
-      const currentTime = new Date().getTime()
-      const goodsArray = item.goods
-      const qtyMap = item.goodsQty
+      const createTime = new Date().getTime()
+      const type = item.type.join(',')
+      const price1 = item.price1
+      const price2 = item.price2
       const uuid = uuidv1()
-      if (goodsArray.length === 0) {
-        await query(`INSERT INTO package (uuid, type, name, room, roomType, price, descr, createTime) VALUES
-          ('${uuid}', ${item.type}, '${item.name}', ${item.room ? 1 : 0}, ${item.room ? item.roomType : null}, ${item.price}, '${item.descr}', ${currentTime})`)
-      } else {
-        for (let j = 0; j < goodsArray.length; j++) {
-          const goods = goodsArray[j]
-          const qty = qtyMap[goods]
-          await query(`INSERT INTO package (uuid, type, name, goods, qty, room, roomType, price, descr, createTime) VALUES
-            ('${uuid}', ${item.type}, '${item.name}', ${goods}, ${qty}, ${item.room ? 1 : 0}, ${item.room ? item.roomType : null}, ${item.price}, '${item.descr}', ${currentTime})`)
-        }
-      }
+      await query(`INSERT INTO package (uuid, name, goods, qty, group, type, price1, price2, descr, createTime) VALUES
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+        [uuid, item.name, item.goods.join(','), item.goodsQty.joib(','), item.group.joib(','), type, price1, price2, item.descr, createTime])
     }
     ctx.body = {code: 200, message: '新增成功'}
   } catch(err) {

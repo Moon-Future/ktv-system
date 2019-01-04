@@ -32,10 +32,7 @@
           if (res.data.code === 200) {
             this.setUserInfo(res.data.message)
           } else {
-            this.$Message.info({
-                content: res.data.message,
-                duration: 1000
-            });
+            this.$Message.info(res.data.message)
             this.$router.push({path: '/login'})
           }
         }).catch(err => {
