@@ -266,7 +266,7 @@
             this.$Message.error('*号为必填项')
             return false
           }
-          if (this.formData.group && this.formData.group.length === 0) {
+          if (this.formData.type && this.formData.type.length === 0) {
             this.$Message.error('请选择价格档')
             return false
           }

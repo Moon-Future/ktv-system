@@ -97,6 +97,7 @@
           this.tableOptions.formData = {
             type: [], name: '', descr: '', price1: 0, price2: 0, goods: [], goodsQty: {}, group: []
           }
+          this.tableOptions.transferData = []
           this.options.goodsOptions.forEach(ele => {
             this.tableOptions.formData['goodsQty'][ele.id] = 1
           })

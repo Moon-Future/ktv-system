@@ -11,7 +11,7 @@
  Target Server Version : 50721
  File Encoding         : 65001
 
- Date: 04/01/2019 18:43:28
+ Date: 04/01/2019 20:31:21
 */
 
 SET NAMES utf8mb4;
@@ -64,43 +64,33 @@ CREATE TABLE `package`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uuid` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
   `name` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `goods` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '商品，多个',
-  `qty` varbinary(50) DEFAULT NULL,
-  `group` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '多选一',
-  `type` int(11) DEFAULT NULL COMMENT '价格档 1：阳光档 2：黄金档',
+  `goods` int(11) DEFAULT NULL COMMENT '商品',
+  `qty` int(11) DEFAULT NULL,
+  `grp` varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `type1` int(11) DEFAULT NULL COMMENT '价格档 1：阳光档 2：黄金档',
   `price1` decimal(10, 2) DEFAULT NULL COMMENT '阳光档价格',
+  `type2` int(11) DEFAULT NULL COMMENT '2：黄金档',
   `price2` decimal(10, 2) DEFAULT NULL COMMENT '黄金档价格',
-  `descr` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `createTime` bigint(20) NOT NULL,
+  `descr` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `createTime` bigint(20) DEFAULT NULL,
   `updateTime` bigint(20) DEFAULT NULL,
   `off` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 22 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of package
 -- ----------------------------
-INSERT INTO `package` VALUES (1, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '啤酒套餐', '1', 0x3132, NULL, 1, NULL, NULL, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
-INSERT INTO `package` VALUES (2, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '啤酒套餐', '2', 0x3130, NULL, 1, NULL, NULL, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
-INSERT INTO `package` VALUES (3, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '啤酒套餐', '3', 0x38, NULL, 1, NULL, NULL, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
-INSERT INTO `package` VALUES (4, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '啤酒套餐', '8', 0x31, NULL, 1, NULL, NULL, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
-INSERT INTO `package` VALUES (5, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '啤酒套餐', '9', 0x31, NULL, 1, NULL, NULL, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
-INSERT INTO `package` VALUES (6, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '啤酒套餐', '7', 0x31, NULL, 1, NULL, NULL, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
-INSERT INTO `package` VALUES (7, 'c60940c0-0828-11e9-8b7c-f90e6ffd643f', '啤酒套餐', '14', 0x31, NULL, 1, NULL, NULL, '1、纯啤啤酒12瓶\n2、冰纯啤酒10瓶\n3、雪花啤酒8瓶\n4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545730682423, NULL, 0);
-INSERT INTO `package` VALUES (8, '0681b010-084c-11e9-a567-470a0f92e677', '红酒套餐', '4', 0x31, NULL, 1, NULL, NULL, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
-INSERT INTO `package` VALUES (9, '0681b010-084c-11e9-a567-470a0f92e677', '红酒套餐', '5', 0x32, NULL, 1, NULL, NULL, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
-INSERT INTO `package` VALUES (10, '0681b010-084c-11e9-a567-470a0f92e677', '红酒套餐', '8', 0x31, NULL, 1, NULL, NULL, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
-INSERT INTO `package` VALUES (11, '0681b010-084c-11e9-a567-470a0f92e677', '红酒套餐', '9', 0x31, NULL, 1, NULL, NULL, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
-INSERT INTO `package` VALUES (12, '0681b010-084c-11e9-a567-470a0f92e677', '红酒套餐', '7', 0x31, NULL, 1, NULL, NULL, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
-INSERT INTO `package` VALUES (13, '0681b010-084c-11e9-a567-470a0f92e677', '红酒套餐', '14', 0x31, NULL, 1, NULL, NULL, '1、华夏干红1支加雪碧2罐\n2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个', 1545745823121, NULL, 0);
-INSERT INTO `package` VALUES (14, 'a233b920-0916-11e9-a23c-619a8e35a34d', '小吃套餐', '13', 0x31, NULL, 1, NULL, NULL, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
-INSERT INTO `package` VALUES (15, 'a233b920-0916-11e9-a23c-619a8e35a34d', '小吃套餐', '10', 0x31, NULL, 1, NULL, NULL, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
-INSERT INTO `package` VALUES (16, 'a233b920-0916-11e9-a23c-619a8e35a34d', '小吃套餐', '11', 0x31, NULL, 1, NULL, NULL, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
-INSERT INTO `package` VALUES (17, 'a233b920-0916-11e9-a23c-619a8e35a34d', '小吃套餐', '8', 0x31, NULL, 1, NULL, NULL, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
-INSERT INTO `package` VALUES (18, 'a233b920-0916-11e9-a23c-619a8e35a34d', '小吃套餐', '9', 0x31, NULL, 1, NULL, NULL, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
-INSERT INTO `package` VALUES (19, 'a233b920-0916-11e9-a23c-619a8e35a34d', '小吃套餐', '12', 0x31, NULL, 1, NULL, NULL, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
-INSERT INTO `package` VALUES (20, 'a233b920-0916-11e9-a23c-619a8e35a34d', '小吃套餐', '6', 0x31, NULL, 1, NULL, NULL, '1、小吃6份\n2、茶一壶', 1545832842673, NULL, 0);
-INSERT INTO `package` VALUES (21, 'db02e000-0916-11e9-a23c-619a8e35a34d', '水果套餐', '16', 0x35, NULL, 2, NULL, NULL, '什锦果盘大拼5盘', 1545832937984, NULL, 0);
+INSERT INTO `package` VALUES (3, '2577e7c0-101a-11e9-bba2-ffba713e8a63', '干唱', NULL, NULL, NULL, 1, 888.00, 0, 0.00, '如果', 1546604009531, NULL, 0);
+INSERT INTO `package` VALUES (4, '6da03200-101a-11e9-bf9b-45205bf5387d', '啤酒', 4, 1, '', 1, 55.00, 1, 66.00, '会员', 1546604130591, NULL, 0);
+INSERT INTO `package` VALUES (5, '6da03200-101a-11e9-bf9b-45205bf5387d', '啤酒', 9, 1, '', 1, 55.00, 1, 66.00, '会员', 1546604130591, NULL, 0);
+INSERT INTO `package` VALUES (6, '6da03200-101a-11e9-bf9b-45205bf5387d', '啤酒', 5, 1, '', 1, 55.00, 1, 66.00, '会员', 1546604130591, NULL, 0);
+INSERT INTO `package` VALUES (7, '82ce8f00-101a-11e9-bf9b-45205bf5387d', '红酒', 1, 1, '1,2,3', 0, 0.00, 1, 999.00, '皇太后', 1546604166128, NULL, 0);
+INSERT INTO `package` VALUES (8, '82ce8f00-101a-11e9-bf9b-45205bf5387d', '红酒', 2, 1, '1,2,3', 0, 0.00, 1, 999.00, '皇太后', 1546604166128, NULL, 0);
+INSERT INTO `package` VALUES (9, '82ce8f00-101a-11e9-bf9b-45205bf5387d', '红酒', 3, 1, '1,2,3', 0, 0.00, 1, 999.00, '皇太后', 1546604166128, NULL, 0);
+INSERT INTO `package` VALUES (10, '82ce8f00-101a-11e9-bf9b-45205bf5387d', '红酒', 5, 1, '1,2,3', 0, 0.00, 1, 999.00, '皇太后', 1546604166128, NULL, 0);
+INSERT INTO `package` VALUES (11, '82ce8f00-101a-11e9-bf9b-45205bf5387d', '红酒', 9, 1, '1,2,3', 0, 0.00, 1, 999.00, '皇太后', 1546604166128, NULL, 0);
+INSERT INTO `package` VALUES (12, '82ce8f00-101a-11e9-bf9b-45205bf5387d', '红酒', 13, 1, '1,2,3', 0, 0.00, 1, 999.00, '皇太后', 1546604166128, NULL, 0);
 
 -- ----------------------------
 -- Table structure for rechargerecord

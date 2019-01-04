@@ -4,6 +4,22 @@ const query = require('../database/init')
 const checkRoot = require('./root')
 const uuidv1 = require('uuid/v1')
 
+/**
+  1、纯啤啤酒12瓶
+  2、冰纯啤酒10瓶
+  3、雪花啤酒8瓶
+  4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个
+
+  1、华夏干红1支加雪碧2罐
+  2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个
+
+  1、小吃6份
+  2、茶一壶
+
+  什锦果盘大拼5盘
+
+ */
+
 router.post('/insertPackage', async (ctx) => {
   try {
     const checkResult = checkRoot(ctx)
@@ -16,13 +32,25 @@ router.post('/insertPackage', async (ctx) => {
     for (let i = 0 , len = data.length; i < len; i++) {
       const item = data[i]
       const createTime = new Date().getTime()
-      const type = item.type.join(',')
+      const type1 = item.type.indexOf('1') === -1 ? 0 : 1
       const price1 = item.price1
+      const type2 = item.type.indexOf('2') === -1 ? 0 : 1
       const price2 = item.price2
       const uuid = uuidv1()
-      await query(`INSERT INTO package (uuid, name, goods, qty, group, type, price1, price2, descr, createTime) VALUES
-        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
-        [uuid, item.name, item.goods.join(','), item.goodsQty.joib(','), item.group.joib(','), type, price1, price2, item.descr, createTime])
+      const goods = item.goods
+
+      if (goods.length === 0) {
+        await query(`INSERT INTO package (uuid, name, type1, type2, price1, price2, descr, createTime) VALUES
+        (?, ?, ?, ?, ?, ?, ?, ?)`, 
+        [uuid, item.name, type1, type2, price1, price2, item.descr, createTime])
+      } else {
+        for (let i = 0, len = goods.length; i < len; i++) {
+          const qty = item.goodsQty[goods[i]]
+          await query(`INSERT INTO package (uuid, name, goods, qty, grp, type1, type2, price1, price2, descr, createTime) VALUES
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+            [uuid, item.name, goods[i], qty, item.group.join(','), type1, type2, price1, price2, item.descr, createTime])
+        }
+      }
     }
     ctx.body = {code: 200, message: '新增成功'}
   } catch(err) {
@@ -39,9 +67,8 @@ router.post('/getPackage', async (ctx) => {
     }
     
     const count = await query(`SELECT COUNT(DISTINCT uuid) as count FROM package WHERE off != 1`)
-    const result = await query(`SELECT DISTINCT uuid as uuid, p.createTime, p.type, p.name, p.room, p.roomType, r.name as roomTypem, p.price, p.descr, p.qty, g.id as goods, g.name as goodsm, u.name as unitm 
+    const result = await query(`SELECT DISTINCT uuid as uuid, p.createTime, p.name, p.type1, p.price1, p.type2, p.price2, p.descr, p.grp, p.qty, g.id as goods, g.name as goodsm, u.name as unitm 
       FROM package as p 
-      LEFT JOIN roomtype as r on p.roomType = r.id 
       LEFT JOIN goods as g on p.goods = g.id 
       LEFT JOIN unit as u on g.unit = u.id 
       WHERE p.off != 1
@@ -50,11 +77,16 @@ router.post('/getPackage', async (ctx) => {
     let uuidMap = {}
     result.forEach(ele => {
       if (uuidMap[ele.uuid] === undefined) {
-        ele.goods = [{id: ele.goods, name: ele.goodsm, unitm: ele.unitm, qty: ele.qty}]
+        ele.goods = ele.goods != null && ele.goods != '' ? [{id: ele.goods, name: ele.goodsm, unitm: ele.unitm, qty: ele.qty}] : []
+        delete ele.qty
+        delete ele.goodsm
+        delete ele.unitm
         packageList.push(ele)
         uuidMap[ele.uuid] = packageList.length - 1
       } else {
-        packageList[uuidMap[ele.uuid]].goods.push({id: ele.goods, name: ele.goodsm, unitm: ele.unitm, qty: ele.qty})
+        if (ele.goods != null && ele.goods != '') {
+          packageList[uuidMap[ele.uuid]].goods.push({id: ele.goods, name: ele.goodsm, unitm: ele.unitm, qty: ele.qty})
+        }
       }
     })
     ctx.body = {code: 200, message: packageList, count: count[0].count}
