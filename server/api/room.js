@@ -109,21 +109,30 @@ router.post('/insertRoomInfo', async (ctx) => {
       const item = data[i]
       const currentTime = new Date().getTime()
       const package = item.package.length === 0 ? [''] : item.package
+      const position = item.position || ''
       const uuid = uuidv1()
-      const roomInfo = await query(`SELECT * FROM room WHERE no = '${item.no}' AND off != 1`)
+      let roomInfo
+      if (position == '') {
+        roomInfo = await query(`SELECT * FROM room WHERE no = ? AND off != 1`, [item.no])
+      } else {
+        roomInfo = await query(`SELECT * FROM room WHERE no = ? or position = ? AND off != 1`, [item.no, position])
+      }
       if (roomInfo.length !== 0) {
         result.push(item.no)
         continue
       }
+
       for (let j = 0; j < package.length; j++) {
-        await query(`INSERT INTO room (uuid, roomType, name, no, price, package, descr, createTime) VALUES 
-          ('${uuid}', ${item.roomType}, '${item.name}', '${item.no}', ${item.price}, '${package[j]}', '${item.descr}', ${currentTime})`)
+        await query(`INSERT INTO room (uuid, roomType, name, no, package, descr, position, createTime) VALUES 
+          (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [uuid, item.roomType, item.name, item.no, package[j], item.descr, position, currentTime]
+        )
       }
     }
     if (result.length === 0) {
       ctx.body = {code: 200, message: '新增成功'}
     } else {
-      ctx.body = {code: 200, message: `房间编号 ${result.join(', ')} 已存在`, repeat: true}
+      ctx.body = {code: 500, message: '房间编号或位置已存在', repeat: true}
     }
   } catch(err) {
     throw new Error(err)
@@ -139,8 +148,9 @@ router.post('/getRoomInfo', async (ctx) => {
     }
     
     const count = await query(`SELECT COUNT(DISTINCT uuid) as count FROM room WHERE off != 1`)
-    const result = await query(`SELECT DISTINCT r.uuid as uuid, r.createTime, r.name, r.no, r.price, r.roomType, r.descr, r.package, r.status,
-      t.name as roomTypem, p.name as packagem, p.price as pricePackage, p.descr as descrPackage, p.qty, p.goods, g.name as goodsm, u.name as unitm
+    const result = await query(`SELECT DISTINCT r.uuid as uuid, r.createTime, r.name, r.no, r.roomType, r.descr, r.package, r.status, r.position,
+      t.name as roomTypem, p.name as packagem, p.type1, p.type2, p.price1, p.price2, p.descr as descrPackage, p.qty, 
+      p.goods, g.name as goodsm, u.name as unitm
       FROM room as r 
       LEFT JOIN roomtype as t on r.roomType = t.id 
       LEFT JOIN package as p on r.package = p.uuid
@@ -153,17 +163,23 @@ router.post('/getRoomInfo', async (ctx) => {
     let roomPackageMap = {}
     let uuidMap = {}
     result.forEach(ele => {
-      packageGoodsMap[ele.uuid + '_' + ele.package] = packageGoodsMap[ele.uuid + '_' + ele.package] || []
-      packageGoodsMap[ele.uuid + '_' + ele.package].push({goods: ele.goods, goodsm: ele.goodsm, qty: ele.qty, unitm: ele.unitm})
+      if (ele.package) {
+        packageGoodsMap[ele.uuid + '_' + ele.package] = packageGoodsMap[ele.uuid + '_' + ele.package] || []
+        packageGoodsMap[ele.uuid + '_' + ele.package].push({goods: ele.goods, goodsm: ele.goodsm, qty: ele.qty, unitm: ele.unitm})
+      }
     })
     result.forEach(ele => {
       if (roomPackageMap[ele.uuid] === undefined) {
         roomPackageMap[ele.uuid] = {key: [ele.package], value: []}
-        roomPackageMap[ele.uuid].value.push({package: ele.package, packagem: ele.packagem, price: ele.pricePackage, descr: ele.descrPackage, goods: packageGoodsMap[ele.uuid + '_' + ele.package]});
+        if (ele.package) {
+          roomPackageMap[ele.uuid].value.push({package: ele.package, packagem: ele.packagem, type1: ele.type1, type2: ele.type2, price1: ele.price1, price2: ele.price2, descr: ele.descrPackage, goods: packageGoodsMap[ele.uuid + '_' + ele.package]});
+        }
       } else {
         if (roomPackageMap[ele.uuid].key.indexOf(ele.package) === -1) {
           roomPackageMap[ele.uuid].key.push(ele.package)
-          roomPackageMap[ele.uuid].value.push({package: ele.package, packagem: ele.packagem, price: ele.pricePackage, descr: ele.descrPackage, goods: packageGoodsMap[ele.uuid + '_' + ele.package]});
+          if (ele.package) {
+            roomPackageMap[ele.uuid].value.push({package: ele.package, packagem: ele.packagem, type1: ele.type1, type2: ele.type2, price1: ele.price1, price2: ele.price2, descr: ele.descrPackage, goods: packageGoodsMap[ele.uuid + '_' + ele.package]});
+          }
         }
       }
     })
@@ -176,6 +192,10 @@ router.post('/getRoomInfo', async (ctx) => {
         delete ele.descrPackage
         delete ele.qty
         delete ele.unitm
+        delete ele.price1
+        delete ele.price2
+        delete ele.type1
+        delete ele.type2
         roomInfoList.push(ele)
         uuidMap[ele.uuid] = true
       }
@@ -199,7 +219,6 @@ router.post('/deleteRoomInfo', async (ctx) => {
     data.forEach(ele => {
       uuids.push(ele.uuid)
     })
-    // await query(`UPDATE room SET off = 1, updateTime = ${new Date().getTime()} WHERE uuid IN ( '${uuids.join()}' )`)
     await query(`DELETE FROM room WHERE uuid IN ( '${uuids.join()}' )`)
     ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {
@@ -217,17 +236,26 @@ router.post('/updRoomInfo', async (ctx) => {
     
     const data = ctx.request.body.data
     const currentTime = new Date().getTime()
-    const roomInfo = await query(`SELECT * FROM room WHERE no = '${data.no}' AND off != 1`)
+    const position = data.position || ''
+    let roomInfo
+    if (position == '') {
+      roomInfo = await query(`SELECT * FROM room WHERE no = ? AND off != 1`, [data.no])
+    } else {
+      roomInfo = await query(`SELECT * FROM room WHERE no = ? or position = ? AND off != 1`, [data.no, position])
+    }
     for (let i = 0, len = roomInfo.length; i < len; i++) {
       if (roomInfo[i].uuid != data.uuid) {
-        ctx.body = {code: 500, message: `房间编号 ${data.no} 已存在`}
+        ctx.body = {code: 500, message: '房间编号或位置已存在'}
         return
       }
     }
+    const package = data.package.length === 0 ? [''] : data.package
     await query(`DELETE FROM room WHERE uuid = '${data.uuid}'`)
-    for (let i = 0; i < data.package.length; i++) {
-      await query(`INSERT INTO room (uuid, roomType, name, no, price, package, descr, createTime, updateTime) VALUES 
-        ('${data.uuid}', ${data.roomType}, '${data.name}', '${data.no}', ${data.price}, '${data.package[i]}', '${data.descr}', ${data.createTime}, ${currentTime})`)
+    for (let i = 0; i < package.length; i++) {
+      await query(`INSERT INTO room (uuid, roomType, name, no, package, descr, position, createTime, updateTime) VALUES 
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [data.uuid, data.roomType, data.name, data.no, package[i], data.descr, position, data.createTime, currentTime]
+      )
     }
     ctx.body = {code: 200, message: '更新成功'}
   } catch(err) {

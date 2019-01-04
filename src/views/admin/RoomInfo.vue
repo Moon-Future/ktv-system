@@ -10,6 +10,7 @@
 
 <script>
   import BaseTable from '@/components/admin/BaseTable'
+  import { roomPosition } from '@/common/js/const'
   import { apiUrl } from '@/serviceAPI.config.js'
   export default {
     data() {
@@ -17,16 +18,11 @@
         tableOptions: {
           packageList: [],
           tableColumns: [
-            {key: 'name', title: '名称'},
             {key: 'no', title: '房间号'},
+            {key: 'name', title: '名称'},
             {key: 'roomTypem', title: '类型',
               render: (h, params) => {
                 return h('Tag', {props: {color: 'success'}}, params.row.roomTypem)
-              }
-            },
-            {key: 'price', title: '价格', 
-              render: (h, params) => {
-                return h('span', params.row.price + ' 元/小时')
               }
             },
             {key: 'package', title: '套餐',
@@ -47,27 +43,33 @@
                 return h('span', array);
               }
             },
-            {key: 'descr', title: '描述'}
+            {key: 'descr', title: '描述'},
+            {key: 'position', title: '位置', render: (h, params) => {
+              let posm = ''
+              for (let i = 0, len = roomPosition.length; i < len; i++) {
+                if (params.row.position == roomPosition[i].value) {
+                  posm = roomPosition[i].label
+                  break
+                }
+              }
+              return h('span', posm)
+            }},
           ],
           formArray: [
             {key: 'roomType', title: '类型', type: 'select', options: []},
-            {key: 'name', title: '名称', type: 'input'},
             {key: 'no', title: '房间号', type: 'input'},
-            {key: 'price', title: '价格', type: 'input', unit: true},
+            {key: 'name', title: '名称', type: 'input'},
             {key: 'package', title: '套餐', type: 'checkbox', tooltip: true, options: []},
-            {key: 'descr', title: '描述', type: 'textarea'}
+            {key: 'descr', title: '描述', type: 'textarea'},
+            {key: 'position', title: '位置', type: 'select', options: roomPosition},
           ],
           formData: {
-            roomType: '', name: '', no: '', price: '', package: [], descr: ''
+            roomType: '', name: '', no: '', package: [], descr: '', position: ''
           },
           ruleValidate: {
             roomType: [{required: true, message: '不得为空', trigger: 'blur'}],
             name: [{required: true, message: '不得为空', trigger: 'blur'}],
-            no: [{required: true, message: '不得为空', trigger: 'blur'}],
-            price: [
-              {required: true, message: '不得为空', trigger: 'blur'},
-              {pattern: /^\d+(\.{0,1}\d{1,2}){0,1}$/, message: '必须为正数，最多两位小数', trigger: 'blur'}
-            ],
+            no: [{required: true, message: '不得为空', trigger: 'blur'}]
           },
           addApi: 'insertRoomInfo',
           updApi: 'updRoomInfo',
@@ -115,11 +117,11 @@
           })
           this.hasGet = true
           this.tableOptions.formArray.splice(0, 1, {key: 'roomType', title: '类型', type: 'select', options: this.roomType})
-          this.tableOptions.formArray.splice(4, 1, {key: 'package', title: '套餐', type: 'checkbox', tooltip: true, options: this.packageList})
+          this.tableOptions.formArray.splice(3, 1, {key: 'package', title: '套餐', type: 'checkbox', tooltip: true, options: this.packageList})
         }
         if (type === 'add') {
           this.tableOptions.formData = {
-            roomType: '', name: '', no: '', price: '', package: [], descr: ''
+            roomType: '', name: '', no: '', package: [], descr: '', position: ''
           }
         } else if (type === 'upd') {
           const row = params.row

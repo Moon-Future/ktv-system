@@ -5,7 +5,25 @@
       <ul class="room-list">
         <li class="room"
           :class="{'active-room': activeRoom === room.no, 'busy-room': room.status == '1'}"
-          v-for="(room, i) in roomList" 
+          v-for="(room, i) in roomListLine1" 
+          :key="i" 
+          @click="selectRoom(room)">
+          {{ room.no }}
+        </li>
+      </ul>
+      <ul class="room-list">
+        <li class="room"
+          :class="{'active-room': activeRoom === room.no, 'busy-room': room.status == '1'}"
+          v-for="(room, i) in roomListLine2" 
+          :key="i" 
+          @click="selectRoom(room)">
+          {{ room.no }}
+        </li>
+      </ul>
+      <ul class="room-list">
+        <li class="room"
+          :class="{'active-room': activeRoom === room.no, 'busy-room': room.status == '1'}"
+          v-for="(room, i) in roomListLine3" 
           :key="i" 
           @click="selectRoom(room)">
           {{ room.no }}
@@ -38,6 +56,9 @@
         roomList: [
           // {name: '豪华大包', no: '欢迎光临'}
         ],
+        roomListLine1: [],
+        roomListLine2: [],
+        roomListLine3: [],
         activeName: 'first',
         activeRoom: '0',
         roomInfo: {}
@@ -57,7 +78,20 @@
             this.roomList = res.data.message
             this.roomList.forEach(ele => {
               this.roomMap[ele.uuid] = ele
+              const position = ele.position
+              if (!position) {
+                this.roomListLine3.push(ele)
+              } else {
+                const row = position.split('_')[0]
+                const col = position.split('_')[1]
+                if (row == '1') {
+                  this.roomListLine1.splice(col, 1, ele)
+                } else {
+                  this.roomListLine2.splice(col, 1, ele)
+                }
+              }
             })
+
           }
         })
       },

@@ -27,17 +27,17 @@
             
             <i-switch v-if="item.type === 'switch'" v-model="formData[item.key]" @on-change="changeSwitch" />
             
-            <Select v-if="item.type === 'select'" v-model="formData[item.key]">
+            <Select v-if="item.type === 'select'" v-model="formData[item.key]" clearable>
               <Option v-for="option in item.options" :value="option.value" :key="option.value">{{ option.label }}</Option>
             </Select>
 
             <CheckboxGroup v-if="item.type === 'checkbox'" v-model="formData[item.key]" @on-change="changeGoods">
               <Checkbox v-for="(option, j) in item.options" :label="option.id" :key="j">
                 <template v-if="!item.tooltip">
-                  {{ option.name }}({{ option.price }}元)
+                  {{ option.name }}
                 </template>
                 <Tooltip v-if="item.tooltip">
-                  {{ option.name }}({{ option.price }}元)
+                  {{ option.name }}
                   <div slot="content" style="white-space: normal">
                     <template v-for="(descrSpan, k) in option.descr">
                       <div :key="k">
@@ -161,19 +161,21 @@
     },
     methods: {
       changeGoods(selectedList) {
-        const goodsList = this.tableOptions.formArray[1].options
-        let goodsMap = {}
-        let transferData = []
-        this.transferData = []
-        goodsList.forEach(ele => {
-          goodsMap[ele.id] = ele
-        })
-        selectedList.forEach(ele => {
-          let obj = deepClone(goodsMap[ele])
-          obj.key = obj.id
-          transferData.push(obj)
-        })
-        this.$emit('changeGoods', {transferData})
+        if (this.tableOptions.transferData) {
+          const goodsList = this.tableOptions.formArray[1].options
+          let goodsMap = {}
+          let transferData = []
+          this.transferData = []
+          goodsList.forEach(ele => {
+            goodsMap[ele.id] = ele
+          })
+          selectedList.forEach(ele => {
+            let obj = deepClone(goodsMap[ele])
+            obj.key = obj.id
+            transferData.push(obj)
+          })
+          this.$emit('changeGoods', {transferData})
+        }
       },
       transferChange(targetKeys) {
         this.$emit('transfer', {targetKeys})

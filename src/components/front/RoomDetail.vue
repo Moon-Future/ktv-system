@@ -69,7 +69,7 @@
         titleArray: [
           {title: '房间编号', field: 'no'},
           {title: '房间类型', field: 'roomTypem'},
-          {title: '价格', field: 'price', after: '元/小时'},
+          // {title: '价格', field: 'price', after: '元/小时'},
           {title: '状态', field: 'status'},
         ],
         custMap: {vip: '会员', balance: '余额', time: '时间'},

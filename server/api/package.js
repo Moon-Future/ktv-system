@@ -127,17 +127,21 @@ router.post('/updPackage', async (ctx) => {
     const item = data
     const createTime = item.createTime
     const updateTime = new Date().getTime()
-    const goodsArray = item.goods
-    const qtyMap = item.goodsQty
-    if (goodsArray.length === 0) {
-      await query(`INSERT INTO package (uuid, type, name, room, roomType, price, descr, createTime, updateTime) VALUES
-        ('${uuid}', ${item.type}, '${item.name}', ${item.room ? 1 : 0}, ${item.room ? item.roomType : null}, ${item.price}, '${item.descr}', ${createTime}, ${updateTime})`)
+    const type1 = item.type.indexOf('1') === -1 ? 0 : 1
+    const price1 = item.price1
+    const type2 = item.type.indexOf('2') === -1 ? 0 : 1
+    const price2 = item.price2
+    const goods = item.goods
+    if (goods.length === 0) {
+      await query(`INSERT INTO package (uuid, name, type1, type2, price1, price2, descr, createTime, updateTime) VALUES
+      (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+      [uuid, item.name, type1, type2, price1, price2, item.descr, createTime, updateTime])
     } else {
-      for (let j = 0; j < goodsArray.length; j++) {
-        const goods = goodsArray[j]
-        const qty = qtyMap[goods]
-        await query(`INSERT INTO package (uuid, type, name, goods, qty, room, roomType, price, descr, createTime, updateTime) VALUES
-          ('${uuid}', ${item.type}, '${item.name}', ${goods}, ${qty}, ${item.room ? 1 : 0}, ${item.room ? item.roomType : null}, ${item.price}, '${item.descr}', ${createTime}, ${updateTime})`)
+      for (let i = 0, len = goods.length; i < len; i++) {
+        const qty = item.goodsQty[goods[i]]
+        await query(`INSERT INTO package (uuid, name, goods, qty, grp, type1, type2, price1, price2, descr, createTime, updateTime) VALUES
+          (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+          [uuid, item.name, goods[i], qty, item.group.join(','), type1, type2, price1, price2, item.descr, createTime, updateTime])
       }
     }
     ctx.body = {code: 200, message: '更新成功'}

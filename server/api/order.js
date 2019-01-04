@@ -41,12 +41,14 @@ router.post('/getOrder', async (ctx) => {
     const ordInfo = await query(`SELECT * FROM roomorder WHERE room = '${data.no}' AND off = 0`)
     if (ordInfo.length !== 0) {
       let packageMap = {}
-      const packageList = await query(`SELECT p.descr, p.name as packagem, p.uuid as package, p.price, p.qty, g.id as goods, g.name as goodsm, u.name as unitm
+      const packageList = await query(`SELECT p.descr, p.name as packagem, p.uuid as package, p.type1, p.type2, p.price1, p.price2, p.qty, g.id as goods, g.name as goodsm, u.name as unitm
         FROM package as p 
         LEFT JOIN goods as g on p.goods = g.id
         LEFT JOIN unit as u on g.unit = u.id
         WHERE p.uuid = '${ordInfo[0].package}'`)
-      packageMap = {descr: packageList[0].descr, package: packageList[0].package, packagem: packageList[0].packagem, price: packageList[0].price, goods: []}
+        console.log(packageList)
+      packageMap = {descr: packageList[0].descr, package: packageList[0].package, packagem: packageList[0].packagem, 
+        type1: packageList[0].type1, type2: packageList[0].type2, price1: packageList[0].price1, price2: packageList[0].price2, goods: []}
       packageList.forEach(ele => {
         packageMap.goods.push({goods: ele.goods, goodsm: ele.goodsm, qty: ele.qty, unitm: ele.unitm})
       })
