@@ -149,7 +149,7 @@ router.post('/getRoomInfo', async (ctx) => {
     
     const count = await query(`SELECT COUNT(DISTINCT uuid) as count FROM room WHERE off != 1`)
     const result = await query(`SELECT DISTINCT r.uuid as uuid, r.createTime, r.name, r.no, r.roomType, r.descr, r.package, r.status, r.position,
-      t.name as roomTypem, p.name as packagem, p.type1, p.type2, p.price1, p.price2, p.descr as descrPackage, p.qty, 
+      t.name as roomTypem, p.name as packagem, p.type1, p.type2, p.price1, p.price2, p.descr as descrPackage, p.qty, p.grp,
       p.goods, g.name as goodsm, u.name as unitm
       FROM room as r 
       LEFT JOIN roomtype as t on r.roomType = t.id 
@@ -172,13 +172,13 @@ router.post('/getRoomInfo', async (ctx) => {
       if (roomPackageMap[ele.uuid] === undefined) {
         roomPackageMap[ele.uuid] = {key: [ele.package], value: []}
         if (ele.package) {
-          roomPackageMap[ele.uuid].value.push({package: ele.package, packagem: ele.packagem, type1: ele.type1, type2: ele.type2, price1: ele.price1, price2: ele.price2, descr: ele.descrPackage, goods: packageGoodsMap[ele.uuid + '_' + ele.package]});
+          roomPackageMap[ele.uuid].value.push({package: ele.package, packagem: ele.packagem, grp: ele.grp, type1: ele.type1, type2: ele.type2, price1: ele.price1, price2: ele.price2, descr: ele.descrPackage, goods: packageGoodsMap[ele.uuid + '_' + ele.package]});
         }
       } else {
         if (roomPackageMap[ele.uuid].key.indexOf(ele.package) === -1) {
           roomPackageMap[ele.uuid].key.push(ele.package)
           if (ele.package) {
-            roomPackageMap[ele.uuid].value.push({package: ele.package, packagem: ele.packagem, type1: ele.type1, type2: ele.type2, price1: ele.price1, price2: ele.price2, descr: ele.descrPackage, goods: packageGoodsMap[ele.uuid + '_' + ele.package]});
+            roomPackageMap[ele.uuid].value.push({package: ele.package, packagem: ele.packagem, grp: ele.grp, type1: ele.type1, type2: ele.type2, price1: ele.price1, price2: ele.price2, descr: ele.descrPackage, goods: packageGoodsMap[ele.uuid + '_' + ele.package]});
           }
         }
       }
@@ -196,6 +196,7 @@ router.post('/getRoomInfo', async (ctx) => {
         delete ele.price2
         delete ele.type1
         delete ele.type2
+        delete ele.grp
         roomInfoList.push(ele)
         uuidMap[ele.uuid] = true
       }

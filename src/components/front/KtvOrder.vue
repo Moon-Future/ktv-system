@@ -8,6 +8,7 @@
           v-for="(room, i) in roomListLine1" 
           :key="i" 
           @click="selectRoom(room)">
+          <div class="room-type">{{ room.roomTypem }}</div>
           {{ room.no }}
         </li>
       </ul>
@@ -17,6 +18,7 @@
           v-for="(room, i) in roomListLine2" 
           :key="i" 
           @click="selectRoom(room)">
+          <div class="room-type">{{ room.roomTypem }}</div>
           {{ room.no }}
         </li>
       </ul>
@@ -104,7 +106,7 @@
         }).then(res => {
           if (res.data.code === 200) {
             const message = res.data.message
-            this.setOrdInfo({data: res.data.message[0] || {no: room.no, status: 0}, type: 'ordInfo'})
+            this.setOrdInfo({data: res.data.message[0] || {room: room.no, status: 0}, type: 'ordInfo'})
             if (message.length === 0) {
               this.roomInfo.status = 0
             } else {
@@ -161,6 +163,15 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
+        position: relative;
+        .room-type {
+          position: absolute;
+          top: 0;
+          right: 0;
+          font-size: 12px;
+          padding: 5px;
+          color: $color-red;
+        }
         &.busy-room {
           background: $color-red;
           color: $color-white;

@@ -19,11 +19,11 @@
           <span>单价</span>
         </li>
         <li>
-          <span>{{ packageSelected.packagem }}</span>
+          <span>{{ packageSelected.packagem }}({{ packageSelected.type == '1' ? '阳光档' : '黄金档' }})</span>
           <span>{{ packageSelected.packagem ? 'x1' : '' }}</span>
-          <span>{{ packageSelected.price }}</span>
+          <span>{{ packageSelected.type == '1' ? packageSelected.price1 : packageSelected.price2 }}</span>
         </li>
-        <li v-for="(goods, i) in packageSelected.goods" :key="i">
+        <li v-for="(goods, i) in packageGoods" :key="i">
           <span>{{ goods.goodsm }}</span>
           <span>x{{ goods.qty || 1 }}</span>
           <span>{{ 0 }}</span>
@@ -37,8 +37,9 @@
       <div class="account-wrapper">
         <div class="account-item" v-for="(item, i) in accountList" :key="i">
           <span>{{ item.title }}</span>
-          <span :class="item.class" v-if="item.key == 'origin' || item.key == 'pay'">{{ totalPrice }} 元</span>
-          <span :class="item.class" v-if="item.key == 'discount'"><input /> 元</span>
+          <span :class="item.class" v-if="item.key == 'origin'">{{ totalPrice }} 元</span>
+          <span :class="item.class" v-if="item.key == 'discount'"><input v-model="discountMoney" @input="changeDiscount" /> 元</span>
+          <span :class="item.class" v-if="item.key == 'pay'">{{ payPrice }} 元</span>
           <span :class="item.class" v-if="item.key == 'paymethos'" @click="openModal">
             <span>{{ payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].title || '选择支付方式' }}</span>
             <icon-font v-show="payMethodMap[ordInfo.payMethod]" :icon="payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].icon" fontSize="12"></icon-font>
@@ -71,12 +72,16 @@
           <i-input type="text" v-model="vipFormData.phone"></i-input>
         </FormItem>
         <FormItem prop="verifyCode" label="验证码">
-          <i-input v-model="vipFormData.verifyCode"></i-input>
+          <i-input v-model="vipFormData.verifyCode">
+            <Button slot="append" @click="sendVerifyCode">
+              {{ verifyCodeBtn + (typeof verifyCodeBtn === 'number' ? ' s' : '')  }}
+            </Button>
+          </i-input>
         </FormItem>
       </Form>
-      <div class="modal-button">
-        <Button class="modal-cancel" @click="cancelVip">取消</Button>
-        <Button type="primary" class="modal-ok" @click="okVip">确定</Button>
+      <div class="vip-button">
+        <Button class="vip-cancel" @click="cancelVip">取消</Button>
+        <Button type="primary" class="vip-ok" @click="okVip">确定</Button>
       </div>
     </Modal>
   </div>
@@ -121,17 +126,44 @@
             {pattern: /^1[34578]\d{9}$/, message: '手机号码有误', trigger: 'blur'}
           ],
           verifyCode: [{required: true, message: '不得为空', trigger: 'blur'}]
-        }
+        },
+        discountMoney: 0,
+        verifyCodeBtn: '发送验证码'
       }
     },
     computed: {
       totalPrice() {
         let price = 0
+        const packagePrice = this.packageSelected.type == '1' ? this.packageSelected.price1 : this.packageSelected.price2
         for (let key in this.goodsSelected) {
           price += Number(this.goodsSelected[key].price) * Number(this.goodsSelected[key].qty)
         }
-        price += Number(this.packageSelected.price || 0)
+        price += Number(packagePrice || 0)
         return price
+      },
+      payPrice() {
+        return this.totalPrice - this.discountMoney
+      },
+      packageGoods() {
+        if (!this.packageSelected || !this.packageSelected.package) {
+          return []
+        }
+        let array = []
+        const grp = this.packageSelected.grp.split(',')
+        const grpSelected = this.packageSelected.grpSelected
+        if (grp.length === 0) {
+          return []
+        }
+        this.packageSelected.goods.forEach(ele => {
+          if (grp.indexOf(ele.goods + '') === -1) {
+            array.push(ele)
+          } else {
+            if (ele.goods == grpSelected) {
+              array.push(ele)
+            }
+          }
+        })
+        return array
       },
       ...mapGetters([
         'goodsSelected',
@@ -142,6 +174,37 @@
       ])
     },
     methods: {
+      sendVerifyCode() {
+        const phone = this.formData.phone
+        if (phone === '' || !/^1[34578]\d{9}$/.test(phone)) {
+          this.$Message.error('手机号码有误')
+          return
+        }
+        if (this.sending) {
+          this.$Message.error('请稍后再发送')
+          return
+        }
+        this.sending = true
+        this.$http.post(apiUrl.sendVerifyCode, {
+          data: {phone}
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.$Message.success(res.data.message)
+            this.verifyCodeBtn = 60
+            this.sendTimer = setInterval(() => {
+              this.verifyCodeBtn -= 1
+              if (this.verifyCodeBtn <= 0) {
+                this.verifyCodeBtn = '发送验证码'
+                this.sending = false
+                clearInterval(this.sendTimer)
+              }
+            }, 1000)
+          } else {
+            this.sending = false
+            this.$Message.error(res.data.message)
+          }
+        })
+      },
       loginVip() {
         this.modalVip = true
       },
@@ -150,6 +213,15 @@
       },
       okVip() {
 
+      },
+      changeDiscount() {
+        this.discountMoney = this.discountMoney.replace(/[^0-9]/, '')
+        if (this.discountMoney[0] == '0') {
+          this.discountMoney = this.discountMoney.substr(1)
+        }
+        if (this.discountMoney > this.totalPrice) {
+          this.discountMoney = this.totalPrice
+        }
       },
       placeOrder() {
         console.log(this.ordInfo)
@@ -177,6 +249,11 @@
           return dateFormat(value, 'yyyy-MM-dd hh:mm')
         } 
         return value
+      }
+    },
+    watch: {
+      roomSelected() {
+        this.discountMoney = this.ordInfo.discountMoney || 0
       }
     },
     components: {
@@ -311,6 +388,12 @@
           font-weight: bold;
         }
       }
+    }
+  }
+  .vip-button {
+    text-align: right;
+    .vip-ok {
+      margin-left: 10px;
     }
   }
 </style>

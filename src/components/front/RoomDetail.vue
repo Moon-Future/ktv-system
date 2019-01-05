@@ -7,20 +7,20 @@
           <span class="title-content">{{ roomInfo[item.field] | status({field: item.field, roomInfo: roomInfo}) }} {{ item.after }}</span>
         </li>
       </ul>
-      <Tabs type="card">
-        <TabPane label="阳光档套餐(13:30 ~ 17:00)">
+      <Tabs type="card" v-model="packageType">
+        <TabPane label="阳光档套餐(13:30 ~ 17:00)" name="1">
           <div class="card-wrapper">
             <Card
-              v-for="(item, j) in roomInfo.package" 
+              v-for="(item, j) in packageList1" 
               class="card-item" 
-              :class="{active: activeIndex === j || packageSelected.package == item.package}"
+              :class="{active: (activeItem.type == '1' && activeItem.package == item.package) || (packageSelected.type == '1' && packageSelected.package == item.package)}"
               :key="j" 
-              @click.native="selectPackage(item, j)">
+              @click.native="clickPackage(item, j)">
               <p slot="title">{{ item.packagem }}</p>
-              <p slot="extra" class="card-price">{{ item.price }} 元</p>
+              <p slot="extra" class="card-price">{{ item.price1 }} 元</p>
               <p v-for="(descr, k) in item.descr.split('\n')" :key="k">{{ descr }}</p>
               <icon-font 
-                v-show="activeIndex === j || packageSelected.package == item.package" 
+                v-show="(activeItem.type == '1' && activeItem.package == item.package) || (packageSelected.type == '1' && packageSelected.package == item.package)" 
                 icon="icon-selected" 
                 fontSize="32" 
                 class="card-selected">
@@ -28,19 +28,19 @@
             </Card>
           </div>
         </TabPane>
-        <TabPane label="黄金档档套餐(17:00 ~ 24:00)">
+        <TabPane label="黄金档档套餐(17:00 ~ 24:00)" name='2'>
           <div class="card-wrapper">
             <Card
-              v-for="(item, j) in roomInfo.package" 
+              v-for="(item, j) in packageList2" 
               class="card-item" 
-              :class="{active: activeIndex === j || packageSelected.package == item.package}"
+              :class="{active: (activeItem.type == '2' && activeItem.package == item.package) || (packageSelected.type == '2' && packageSelected.package == item.package)}"
               :key="j" 
-              @click.native="selectPackage(item, j)">
+              @click.native="clickPackage(item, j)">
               <p slot="title">{{ item.packagem }}</p>
-              <p slot="extra" class="card-price">{{ item.price }} 元</p>
+              <p slot="extra" class="card-price">{{ item.price2 }} 元</p>
               <p v-for="(descr, k) in item.descr.split('\n')" :key="k">{{ descr }}</p>
               <icon-font 
-                v-show="activeIndex === j || packageSelected.package == item.package" 
+                v-show="(activeItem.type == '2' && activeItem.package == item.package) || (packageSelected.type == '2' && packageSelected.package == item.package)" 
                 icon="icon-selected" 
                 fontSize="32" 
                 class="card-selected">
@@ -50,11 +50,27 @@
         </TabPane>
       </Tabs>
     </div>
+    <Modal
+      v-model="modalFlag"
+      :title="modalTitle"
+      :footer-hide="true">
+      <CheckboxGroup v-model="goodsListSelected" class="goods-list">
+        <Checkbox class="goods-list-item" v-for="(item, i) in goodsList" :label="item.goods" disabled :key="i">{{ item.goodsm }}({{ item.qty }}{{ item.unitm }})</Checkbox>
+      </CheckboxGroup>
+      <RadioGroup v-model="packageItem.grpSelected">
+        <Radio class="goods-list-item" v-for="(item, i) in goodsListGrp" :label="item.goods" :key="i">{{ item.goodsm }}({{ item.qty }}{{ item.unitm }})</Radio>
+      </RadioGroup>
+      <div class="modal-operate">
+        <Button @click="modalFlag = false">取消</Button>
+        <Button type="primary" @click="selectPackage">确认</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
   import IconFont from '@/components/IconFont'
+  import { deepClone } from '@/common/js/util'
   import { apiUrl } from '@/serviceAPI.config.js'
   import { mapGetters, mapMutations } from 'vuex'
   export default {
@@ -74,11 +90,43 @@
         ],
         custMap: {vip: '会员', balance: '余额', time: '时间'},
         maxLen: 3,
-        activeIndex: -1,
-        orderInfo: {}
+        orderInfo: {},
+        activeItem: {},
+        packageType: '1',
+        packageItem: {},
+        modalFlag: false,
+        goodsList: [],
+        goodsListSelected: [],
+        goodsListGrp: [],
+        grpSelected: '',
+        modalTitle: '套餐商品'
       }
     },
     computed: {
+      packageList1() {
+        if (!this.roomInfo || !this.roomInfo.package) {
+          return []
+        }
+        let packageList = []
+        this.roomInfo.package.forEach(ele => {
+          if (ele.type1 == '1') {
+            packageList.push(ele)
+          }
+        });
+        return packageList
+      },
+      packageList2() {
+        if (!this.roomInfo || !this.roomInfo.package) {
+          return []
+        }
+        let packageList = []
+        this.roomInfo.package.forEach(ele => {
+          if (ele.type2 == '1') {
+            packageList.push(ele)
+          }
+        });
+        return packageList
+      },
       ...mapGetters([
         'packageSelected',
         'roomSelected',
@@ -86,13 +134,31 @@
       ])
     },
     methods: {
-      selectPackage(item, index) {
+      clickPackage(item, index) {
+        item.grpSelected = item.grpSelected || ''
+        this.packageItem = item
+        const grp = item.grp.split(',')
+        this.modalTitle = `套餐商品（${item.packagem}）`
+        this.modalFlag = true
+        this.goodsList = []
+        this.goodsListGrp = []
+        item.goods.forEach(ele => {
+          if (grp.indexOf(ele.goods + '') === -1) {
+            this.goodsList.push(ele)
+            this.goodsListSelected.push(ele.goods)
+          } else {
+            this.goodsListGrp.push(ele)
+          }
+        })
+      },
+      selectPackage() {
         if (this.roomSelected.status == 1) {
           this.$Modal.confirm({
             title: '确认更换套餐？',
             content: '订单已下，确认是否更换套餐？',
             onOk: () => {
-              this.activeIndex = this.activeIndex === index ? -1 : index
+              let item = deepClone(this.packageItem)
+              item.type = this.packageType
               this.setOrdInfo({data: item, type: 'package'})
               this.$http.post(apiUrl.updOrder, {
                 data: {ordInfo: this.ordInfo, type: 'package'}
@@ -103,8 +169,10 @@
           })
           return
         }
-        this.setOrdInfo({data: this.activeIndex === index ? {} : item, type: 'package'})
-        this.activeIndex = this.activeIndex === index ? -1 : index
+        this.modalFlag = false
+        this.activeItem = deepClone(this.packageItem)
+        this.activeItem.type = this.packageType
+        this.setOrdInfo({data: this.activeItem, type: 'packageMap'})
       },
       ...mapMutations({
         setOrdInfo: 'SET_ORDINFO'
@@ -121,7 +189,7 @@
     },
     watch: {
       roomSelected() {
-        this.activeIndex = -1
+        this.activeItem = {}
       }
     },
     components: {
@@ -175,6 +243,22 @@
       position: absolute;
       bottom: 0;
       right: 0;
+    }
+  }
+  .goods-list {
+    display: flex;
+    flex-flow: column;
+  }
+  .goods-list-item {
+    padding: 5px 0;
+    font-size: 16px;
+  }
+  .modal-operate {
+    text-align: right;
+    border-top: 1px solid $color-gray;
+    padding-top: 10px;
+    button {
+      margin-left: 10px;
     }
   }
 </style>
