@@ -90,7 +90,6 @@
         ],
         custMap: {vip: '会员', balance: '余额', time: '时间'},
         maxLen: 3,
-        orderInfo: {},
         activeItem: {},
         packageType: '1',
         packageItem: {},
@@ -98,7 +97,6 @@
         goodsList: [],
         goodsListSelected: [],
         goodsListGrp: [],
-        grpSelected: '',
         modalTitle: '套餐商品'
       }
     },
@@ -129,6 +127,7 @@
       },
       ...mapGetters([
         'packageSelected',
+        'goodsSelected',
         'roomSelected',
         'ordInfo'
       ])
@@ -137,6 +136,9 @@
       clickPackage(item, index) {
         item.grpSelected = item.grpSelected || ''
         this.packageItem = item
+        if (this.ordInfo.package && this.ordInfo.package.type == this.packageType && this.ordInfo.package.package == this.packageItem.package) {
+          this.$set(this.packageItem, 'grpSelected', Number(this.ordInfo.package.grpSelected) || '')
+        }
         const grp = item.grp.split(',')
         this.modalTitle = `套餐商品（${item.packagem}）`
         this.modalFlag = true
@@ -152,6 +154,10 @@
         })
       },
       selectPackage() {
+        if (this.packageItem.grp != '' && this.packageItem.grpSelected == '') {
+          this.$Message.error('请选择商品')
+          return
+        }
         if (this.roomSelected.status == 1) {
           this.$Modal.confirm({
             title: '确认更换套餐？',
@@ -159,12 +165,17 @@
             onOk: () => {
               let item = deepClone(this.packageItem)
               item.type = this.packageType
-              this.setOrdInfo({data: item, type: 'package'})
-              this.$http.post(apiUrl.updOrder, {
-                data: {ordInfo: this.ordInfo, type: 'package'}
-              }).then(res => {
-
-              })
+              this.setOrdInfo({data: item, type: 'packageMap'})
+              this.totalPrice()
+              if (this.roomSelected.status == 1) {
+                this.$http.post(apiUrl.updOrder, {
+                  data: {ordInfo: this.ordInfo}
+                }).then(res => {
+                  this.modalFlag = false
+                })
+              } else {
+                this.modalFlag = false
+              }
             },
           })
           return
@@ -173,6 +184,15 @@
         this.activeItem = deepClone(this.packageItem)
         this.activeItem.type = this.packageType
         this.setOrdInfo({data: this.activeItem, type: 'packageMap'})
+      },
+      totalPrice() {
+        let price = 0
+        const packagePrice = this.packageSelected.type == '1' ? this.packageSelected.price1 : this.packageSelected.price2
+        for (let key in this.goodsSelected) {
+          price += Number(this.goodsSelected[key].price) * Number(this.goodsSelected[key].qty)
+        }
+        price += Number(packagePrice || 0)
+        this.setOrdInfo({data: {totalPrice: price}})
       },
       ...mapMutations({
         setOrdInfo: 'SET_ORDINFO'
@@ -190,6 +210,7 @@
     watch: {
       roomSelected() {
         this.activeItem = {}
+        this.packageType = this.ordInfo && this.ordInfo.package && (this.ordInfo.package.type + '') || '1'
       }
     },
     components: {

@@ -31,10 +31,13 @@ router.post('/sendVerifyCode', async (ctx) => {
   try {
     const data = ctx.request.body.data
     const phone = data.phone
-    const result = await query(`SELECT * FROM vip WHERE phone = '${phone}'`)
-    if (result.length !== 0) {
-      ctx.body = {code: 500, message: `手机号 ${phone} 已注册`}
-      return
+    const login = data.login
+    if (!login) {
+      const result = await query(`SELECT * FROM vip WHERE phone = ?`, [phone])
+      if (result.length !== 0) {
+        ctx.body = {code: 500, message: `手机号 ${phone} 已注册`}
+        return
+      }
     }
     if (verifyCodeMap[phone] && verifyCodeMap[phone].count < 60) {
       ctx.body = {code: 500, message: '请稍后再发送'}
@@ -63,8 +66,29 @@ router.post('/registerVip', async (ctx) => {
       ctx.body = {code: 500, message: '验证码错误'}
       return
     }
-    await query(`INSERT INTO vip (phone, createTime) VALUES ( '${phone}', '${createTime}' )`)
+    await query(`INSERT INTO vip (phone, createTime) VALUES ( ?, ? )`, [phone, createTime])
     ctx.body = {code: 200, message: '注册成功'}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.post('/loginVip', async (ctx) => {
+  try {
+    const data = ctx.request.body.data
+    const phone = data.phone
+    const verifyCode = data.verifyCode
+    const createTime = new Date().getTime()
+    if (!verifyCodeMap[phone] || verifyCodeMap[phone].verifyCode !== verifyCode) {
+      ctx.body = {code: 500, message: '验证码错误'}
+      return
+    }
+    let result = await query(`SELECT * FROM vip WHERE phone = ? AND off != 1`, [phone])
+    if (result.length === 0) {
+      await query(`INSERT INTO vip (phone, createTime) VALUES ( ?, ? )`, [phone, createTime])
+      result = await query(`SELECT * FROM vip WHERE phone = ? AND off != 1`, [phone])
+    }
+    ctx.body = {code: 200, message: result}
   } catch(err) {
     throw new Error(err)
   }

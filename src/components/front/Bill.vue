@@ -8,7 +8,12 @@
       <ul class="ord-info">
         <li v-for="(ord, i) in ordList" :key="i">
           <span>{{ ord.title }}：</span>
-          <span v-if="ord.key === 'vip' && ordInfo.room && !ordInfo[ord.key]" class="order-vip" @click="loginVip">登陆</span>
+          <span v-if="ord.key === 'vip' && ordInfo.room && !ordInfo[ord.key]" class="order-vip" @click="modalVip = true">登陆</span>
+          <span v-else-if="ord.key === 'balance' && ordInfo.room && ordInfo['vip']">
+            <span class="order-vip-operate" @click="logoutVip">注销</span>
+            <span class="order-vip-operate" @click="modalRecharge = true">充值</span>
+            {{ ordInfo[ord.key] }}
+          </span>
           <span v-else>{{ ordInfo[ord.key] | filterTime(ord.key) }}</span>
         </li>
       </ul>
@@ -19,7 +24,7 @@
           <span>单价</span>
         </li>
         <li>
-          <span>{{ packageSelected.packagem }}({{ packageSelected.type == '1' ? '阳光档' : '黄金档' }})</span>
+          <span>{{ packageSelected.packagem }}{{ packageSelected.type == undefined ? '' : packageSelected.type == '1' ? '(阳光档)' : '(黄金档)' }}</span>
           <span>{{ packageSelected.packagem ? 'x1' : '' }}</span>
           <span>{{ packageSelected.type == '1' ? packageSelected.price1 : packageSelected.price2 }}</span>
         </li>
@@ -38,18 +43,18 @@
         <div class="account-item" v-for="(item, i) in accountList" :key="i">
           <span>{{ item.title }}</span>
           <span :class="item.class" v-if="item.key == 'origin'">{{ totalPrice }} 元</span>
-          <span :class="item.class" v-if="item.key == 'discount'"><input v-model="discountMoney" @input="changeDiscount" /> 元</span>
+          <span :class="item.class" v-if="item.key == 'discount'"><input v-model="discountMoney" @input="changeDiscount" @blur="discountBlur" /> 元</span>
           <span :class="item.class" v-if="item.key == 'pay'">{{ payPrice }} 元</span>
           <span :class="item.class" v-if="item.key == 'paymethos'" @click="openModal">
             <span>{{ payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].title || '选择支付方式' }}</span>
             <icon-font v-show="payMethodMap[ordInfo.payMethod]" :icon="payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].icon" fontSize="12"></icon-font>
           </span>
-          <span :class="item.class" v-if="item.key == 'user'">{{ userInfo.name }}</span>
+          <span :class="item.class" v-if="item.key == 'user'">{{ ordInfo.user || userInfo.name }}</span>
         </div>
       </div>
       <div class="button-wrapper">
         <Button type="primary" :disabled="ordInfo.status == 1" @click="placeOrder">{{ ordInfo.status == 1 ? '已开单' : '开单' }}</Button>
-        <Button type="success">结账</Button>
+        <Button type="success" @click="closeOrder">结账</Button>
       </div>
     </div>
     <Modal
@@ -84,6 +89,16 @@
         <Button type="primary" class="vip-ok" @click="okVip">确定</Button>
       </div>
     </Modal>
+    <Modal
+      v-model="modalRecharge"
+      title="充值"
+      :footer-hide="true">
+      <i-input v-model="rechargeMoney" suffix="logo-yen" placeholder="输入充值金额"></i-input>
+      <div class="recharge-button">
+        <Button @click="cancelRecharge">取消</Button>
+        <Button type="primary" class="recharge-ok" @click="okRecharge">确定</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -96,7 +111,7 @@
     data() {
       return {
         ordList: [
-          {key: 'ordNun', title: '账单号'},
+          {key: 'nun', title: '账单号'},
           {key: 'room', title: '包间号'},
           {key: 'startTime', title: '下单时间'},
           {key: 'vip', title: '会员'},
@@ -116,7 +131,8 @@
           1: {icon: 'icon-big-Pay', title: '支付宝支付'},
           2: {icon: 'icon-weixinzhifu', title: '微信支付'},
           3: {icon: 'icon-zhifupingtai-yinlian', title: '刷卡支付'},
-          4: {icon: 'icon-cash_payment', title: '现金支付'}
+          4: {icon: 'icon-cash_payment', title: '现金支付'},
+          5: {icon: 'icon-available', title: '余额支付'}
         },
         modalVip: false,
         vipFormData: {phone: '', verifyCode: ''},
@@ -128,7 +144,9 @@
           verifyCode: [{required: true, message: '不得为空', trigger: 'blur'}]
         },
         discountMoney: 0,
-        verifyCodeBtn: '发送验证码'
+        verifyCodeBtn: '发送验证码',
+        modalRecharge: false,
+        rechargeMoney: ''
       }
     },
     computed: {
@@ -139,6 +157,7 @@
           price += Number(this.goodsSelected[key].price) * Number(this.goodsSelected[key].qty)
         }
         price += Number(packagePrice || 0)
+        this.setOrdInfo({data: {totalPrice: price}})
         return price
       },
       payPrice() {
@@ -175,7 +194,7 @@
     },
     methods: {
       sendVerifyCode() {
-        const phone = this.formData.phone
+        const phone = this.vipFormData.phone
         if (phone === '' || !/^1[34578]\d{9}$/.test(phone)) {
           this.$Message.error('手机号码有误')
           return
@@ -186,7 +205,7 @@
         }
         this.sending = true
         this.$http.post(apiUrl.sendVerifyCode, {
-          data: {phone}
+          data: {phone, login: true}
         }).then(res => {
           if (res.data.code === 200) {
             this.$Message.success(res.data.message)
@@ -205,17 +224,65 @@
           }
         })
       },
-      loginVip() {
-        this.modalVip = true
-      },
       cancelVip() {
         this.modalVip = false
       },
       okVip() {
-
+        this.$http.post(apiUrl.loginVip, {
+          data: {phone: this.vipFormData.phone, verifyCode: this.vipFormData.verifyCode}
+        }).then(res => {
+          if (res.data.code === 200) {
+            const vipInfo = res.data.message[0]
+            this.setOrdInfo({data: {vip: vipInfo.phone, balance: vipInfo.balance}})
+            this.modalVip = false
+            this.updateOrder()
+          } else {
+            this.$Message.error(res.data.message)
+          }
+        })
+      },
+      logoutVip() {
+        this.$Modal.confirm({
+          title: '退出会员登陆',
+          content: '<h1>确认退出会员登陆？</h1>',
+          onOk: () => {
+            this.setOrdInfo({data: {vip:'', balance:''}})
+            this.updateOrder()
+          }
+        })
+      },
+      okRecharge() {
+        if (this.loading) {
+          this.$Message.error('正在提交，请稍等')
+          return
+        }
+        if (this.rechargeMoney == '' || this.rechargeMoney == '0' || !/^\d*$/.test(this.rechargeMoney)) {
+          this.$Message.error('请填写正确的金额')
+          return
+        }
+        this.loading = true
+        this.$http.post(apiUrl.recharge, {
+          data: {phone: this.ordInfo.vip, rechargeMoney: this.rechargeMoney}
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.$Message.success(res.data.message)
+            this.setOrdInfo({data: {vip:this.ordInfo.vip, balance:Number(this.ordInfo.balance) + Number(this.rechargeMoney)}})
+            this.rechargeMoney = ''
+            this.modalRecharge = false
+          } else {
+            this.$Message.error(res.data.message)
+          }
+          this.loading = false
+        }).catch(() => {
+          this.loading = false
+        })
+      },
+      cancelRecharge() {
+        this.modalRecharge = false
+        this.rechargeMoney = ''
       },
       changeDiscount() {
-        this.discountMoney = this.discountMoney.replace(/[^0-9]/, '')
+        this.discountMoney = (this.discountMoney + '').replace(/[^0-9]/, '')
         if (this.discountMoney[0] == '0') {
           this.discountMoney = this.discountMoney.substr(1)
         }
@@ -223,21 +290,63 @@
           this.discountMoney = this.totalPrice
         }
       },
+      discountBlur() {
+        this.setOrdInfo({data: {discount: this.discountMoney}})
+        this.updateOrder()
+      },
       placeOrder() {
         console.log(this.ordInfo)
-        // const startTime = new Date().getTime()
-        // this.$http.post(apiUrl.insertOrder, {
-        //   data: {ordInfo: this.ordInfo, startTime}
-        // }).then(res => {
-
-        // })
+        if (!this.ordInfo.room || !this.ordInfo.package) {
+          this.$Message.error('请先选择包间和套餐')
+          return
+        }
+        const startTime = new Date().getTime()
+        this.$http.post(apiUrl.insertOrder, {
+          data: {ordInfo: this.ordInfo, startTime}
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.setOrdInfo({data: {nun: res.data.message}})
+          }
+        })
+      },
+      closeOrder() {
+        if (this.roomSelected.status != 1) {
+          this.$Message.error('请先开单')
+          return
+        }
+        if (!this.ordInfo.payMethod) {
+          this.$Message.error('请选择支付方式')
+          return
+        }
+        this.$Modal.confirm({
+          title: '结账',
+          content: '<h1>确认结账</h1>',
+          onOk: () => {
+            this.$http.post(apiUrl.closeOrder, {
+              data: {ordInfo: this.ordInfo}
+            }).then(res => {
+              this.setOrdInfo({data: {room: this.ordInfo.room, status: 0}, type: 'ordInfo'})
+            })
+          },
+        });
+      },
+      updateOrder() {
+        if (this.roomSelected.status != '1') {
+          return
+        }
+        this.$http.post(apiUrl.updOrder, {
+          data: {ordInfo: this.ordInfo}
+        }).then(res => {
+          
+        })
       },
       openModal() {
         this.modalVisible = true
       },
       selectPayMethod(item, key) {
         this.modalVisible = false
-        this.setOrdInfo({data: key, type: 'payMethod'})
+        this.setOrdInfo({data: {payMethod: key}})
+        this.updateOrder()
       },
       ...mapMutations({
         setOrdInfo: 'SET_ORDINFO'
@@ -253,7 +362,7 @@
     },
     watch: {
       roomSelected() {
-        this.discountMoney = this.ordInfo.discountMoney || 0
+        this.discountMoney = this.ordInfo.discount || 0
       }
     },
     components: {
@@ -329,6 +438,14 @@
           text-decoration: underline;
         }
       }
+      .order-vip-operate {
+        color: $color-blue;
+        cursor: pointer;
+        padding: 0 5px;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
     .account-wrapper {
       margin-top: 10px;
@@ -393,6 +510,13 @@
   .vip-button {
     text-align: right;
     .vip-ok {
+      margin-left: 10px;
+    }
+  }
+  .recharge-button {
+    text-align: right;
+    margin-top: 10px;
+    .recharge-ok {
       margin-left: 10px;
     }
   }

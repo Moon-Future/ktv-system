@@ -27,11 +27,12 @@ export const apiUrl = {
 
   insertOrder: '/api/order/insertOrder',
   getOrder: '/api/order/getOrder',
-  deleteOrder: '/api/order/deleteOrder',
+  closeOrder: '/api/order/closeOrder',
   updOrder: '/api/order/updOrder',
 
   sendVerifyCode: '/api/vip/sendVerifyCode',
   registerVip: '/api/vip/registerVip',
+  loginVip: '/api/vip/loginVip',
   getVip: '/api/vip/getVip',
   recharge: '/api/vip/recharge',
   getRechargeRecord: '/api/vip/getRechargeRecord',

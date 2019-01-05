@@ -28,9 +28,10 @@ const mutations = {
           Vue.set(state.ordInfo.goods, data.id, data)
         }
         break;
-      case 'payMethod': 
-        Vue.set(state.ordInfo, 'payMethod', data)
-        break;
+      default:
+        for (let key in data) {
+          Vue.set(state.ordInfo, key, data[key])
+        }
     }
   },
 

@@ -71,7 +71,11 @@
       this.getRoomInfo()
     },
     computed: {
-      ...mapGetters(['userInfo'])
+      ...mapGetters([
+        'userInfo',
+        'roomSelected',
+        'ordInfo'
+      ])
     },
     methods: {
       getRoomInfo() {
@@ -93,7 +97,6 @@
                 }
               }
             })
-
           }
         })
       },
@@ -120,6 +123,11 @@
         setRoomSelected: 'SET_ROOM_SELECTED',
         setOrdInfo: 'SET_ORDINFO'
       }),
+    },
+    watch: {
+      ordInfo() {
+        console.log(arguments)
+      }
     },
     components: {
       RoomDetail,
@@ -170,11 +178,14 @@
           right: 0;
           font-size: 12px;
           padding: 5px;
-          color: $color-red;
+          color: $color-deeporigin;
         }
         &.busy-room {
           background: $color-red;
           color: $color-white;
+          .room-type {
+            color: $color-yellow;
+          }
         }
         &.active-room {
           font-size: 32px;

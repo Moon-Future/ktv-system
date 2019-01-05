@@ -38,6 +38,7 @@
     },
     computed: {
       ...mapGetters([
+        'packageSelected',
         'goodsSelected',
         'ordInfo',
         'roomSelected'
@@ -74,19 +75,29 @@
           this.setOrdInfo({data: deepClone(goods), flag: true, type: 'goods'})
           this.$set(this.goodsMap, goods.id, true)
         }
-        if (this.roomSelected.status == 1) {
-          this.updOrder()
-        }
+        this.totalPrice()
+        this.updOrder()
       },
       change(goods) {
         if (this.ordInfo && this.ordInfo.goods && this.ordInfo.goods[goods.id]) {
           this.setOrdInfo({data: deepClone(goods), flag: true, type: 'goods'})
-          if (this.roomSelected.status == 1) {
-            this.updOrder()
-          }
+          this.totalPrice()
+          this.updOrder()
         }
       },
+      totalPrice() {
+        let price = 0
+        const packagePrice = this.packageSelected.type == '1' ? this.packageSelected.price1 : this.packageSelected.price2
+        for (let key in this.goodsSelected) {
+          price += Number(this.goodsSelected[key].price) * Number(this.goodsSelected[key].qty)
+        }
+        price += Number(packagePrice || 0)
+        this.setOrdInfo({data: {totalPrice: price}})
+      },
       updOrder() {
+        if (this.roomSelected.status != 1) {
+          return
+        }
         this.$http.post(apiUrl.updOrder, {
           data: {ordInfo: this.ordInfo, type: 'goods'}
         }).then(res => {
