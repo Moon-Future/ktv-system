@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50719
 File Encoding         : 65001
 
-Date: 2019-01-06 17:04:09
+Date: 2019-01-06 23:58:09
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -163,9 +163,9 @@ CREATE TABLE `room` (
 -- ----------------------------
 -- Records of room
 -- ----------------------------
-INSERT INTO `room` VALUES ('1', '901039f0-084c-11e9-a567-470a0f92e677', '3', '南天门', '6666', '5e2d9260-104a-11e9-a1db-0d5fe7aa5fe3', '', '1_1', '1545730760693', '1546624957660', '0', '1');
+INSERT INTO `room` VALUES ('1', '901039f0-084c-11e9-a567-470a0f92e677', '3', '南天门', '6666', '5e2d9260-104a-11e9-a1db-0d5fe7aa5fe3', '', '1_1', '1545730760693', '1546624957660', '0', '0');
 INSERT INTO `room` VALUES ('2', 'f4999250-0828-11e9-8b7c-f90e6ffd643f', '1', '慈宁宫', '8011', '31eada50-104a-11e9-a1db-0d5fe7aa5fe3', '来了，老弟', '1_2', '1545746053903', '1546624974155', '0', '0');
-INSERT INTO `room` VALUES ('3', '901039f0-084c-11e9-a567-470a0f92e677', '3', '南天门', '6666', '994a79d0-104a-11e9-a1db-0d5fe7aa5fe3', '', '1_1', '1545746053903', '1546624974155', '0', '1');
+INSERT INTO `room` VALUES ('3', '901039f0-084c-11e9-a567-470a0f92e677', '3', '南天门', '6666', '994a79d0-104a-11e9-a1db-0d5fe7aa5fe3', '', '1_1', '1545746053903', '1546624974155', '0', '0');
 INSERT INTO `room` VALUES ('4', '074c3690-084d-11e9-a567-470a0f92e677', '2', '月仙殿', '8012', '0c62e470-104b-11e9-a1db-0d5fe7aa5fe3', '', '1_3', '1545746253945', '1546625027889', '0', '0');
 INSERT INTO `room` VALUES ('5', '11803670-084d-11e9-a567-470a0f92e677', '2', '景阳宫', '8013', '994a79d0-104a-11e9-a1db-0d5fe7aa5fe3', '', '1_4', '1545746271063', '1546625038040', '0', '0');
 INSERT INTO `room` VALUES ('6', '11803670-084d-11e9-a567-470a0f92e677', '2', '景阳宫', '8013', '31eada50-104a-11e9-a1db-0d5fe7aa5fe3', '', '1_4', '1545746271063', '1546625038040', '0', '0');
@@ -203,7 +203,7 @@ CREATE TABLE `roomorder` (
   `createTime` bigint(20) NOT NULL,
   `off` int(11) DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of roomorder
@@ -216,7 +216,9 @@ INSERT INTO `roomorder` VALUES ('8', '141546755931618', '8011', '1', '31eada50-1
 INSERT INTO `roomorder` VALUES ('9', '451546756144040', '8011', '1', '31eada50-104a-11e9-a1db-0d5fe7aa5fe3', '2', '2', '', '', '1546756143730', null, '198.00', null, '2', null, null, '1546756144040', '1');
 INSERT INTO `roomorder` VALUES ('10', '301546756756733', '8011', '1', '31eada50-104a-11e9-a1db-0d5fe7aa5fe3', '2', '1', '', '', '1546756756729', '13888888888', '198.00', null, '5', null, null, '1546756756733', '1');
 INSERT INTO `roomorder` VALUES ('11', '701546763979100', '6666', '1', '994a79d0-104a-11e9-a1db-0d5fe7aa5fe3', '2', '1', '', '', '1546763979096', '13888888888', '298.00', null, null, null, null, '1546763979100', '1');
-INSERT INTO `roomorder` VALUES ('12', '791546764006256', '6666', '1', '5e2d9260-104a-11e9-a1db-0d5fe7aa5fe3', '2', '', '', '', '1546764005952', '13888888888', '198.00', null, null, null, null, '1546764006256', '0');
+INSERT INTO `roomorder` VALUES ('12', '791546764006256', '6666', '1', '5e2d9260-104a-11e9-a1db-0d5fe7aa5fe3', '2', '', '', '', '1546764005952', '13888888888', '198.00', null, null, null, null, '1546764006256', '1');
+INSERT INTO `roomorder` VALUES ('13', '481546780463624', '6666', '1', '5e2d9260-104a-11e9-a1db-0d5fe7aa5fe3', '1', '', '', '', '1546780463316', '13888888888', '150.00', null, null, null, null, '1546780463624', '1');
+INSERT INTO `roomorder` VALUES ('14', '721546780600433', '6666', '1', '994a79d0-104a-11e9-a1db-0d5fe7aa5fe3', '2', '1', '', '', '1546780600427', null, '298.00', null, null, null, null, '1546780600433', '1');
 
 -- ----------------------------
 -- Table structure for roomtype
@@ -309,5 +311,5 @@ CREATE TABLE `vip` (
 -- Records of vip
 -- ----------------------------
 INSERT INTO `vip` VALUES ('1', '15920055057', '5257.00', null, null, null, null, '1546431572199', null, '14', '0');
-INSERT INTO `vip` VALUES ('2', '13888888888', '198.00', null, null, null, null, '1546495981560', null, '6', '0');
+INSERT INTO `vip` VALUES ('2', '13888888888', '198.00', null, null, null, null, '1546495981560', '0', '6', '0');
 INSERT INTO `vip` VALUES ('3', '15855555557', '0.00', null, null, null, null, '1546763388701', null, '0', '0');

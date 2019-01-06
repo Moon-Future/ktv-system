@@ -103,7 +103,7 @@ router.post('/closeOrder', async (ctx) => {
     await query(`UPDATE roomorder SET off = 1 WHERE nun = ?`, [ordInfo.nun])
     await query(`UPDATE room SET status = 0 WHERE no = ?`, [ordInfo.room])
     if (ordInfo.vip) {
-      await query(`UPDATE vip SET balance = ? WHERE phone = ? AND off != 1`, [Number(ordInfo.totalPrice - ordInfo.discount), ordInfo.vip])
+      await query(`UPDATE vip SET balance = ?, status = ? WHERE phone = ? AND off != 1`, [Number(ordInfo.totalPrice - ordInfo.discount), 0, ordInfo.vip])
     }
     ctx.body = {code: 200, message: '结账成功'}
   } catch(err) {
@@ -123,6 +123,9 @@ router.post('/cancelOrder', async (ctx) => {
     const ordInfo = data.ordInfo
     await query(`UPDATE roomorder SET off = 1 WHERE nun = ?`, [ordInfo.nun])
     await query(`UPDATE room SET status = 0 WHERE no = ?`, [ordInfo.room])
+    if (ordInfo.vip) {
+      await query(`UPDATE vip SET status = ? WHERE phone = ? AND off != 1`, [0, ordInfo.vip])
+    }
     ctx.body = {code: 200, message: '结账成功'}
   } catch(err) {
     throw new Error(err)

@@ -1,6 +1,8 @@
 const Router = require('koa-router')
 const router = new Router()
 const query = require('../database/init')
+const { ajax } = require('./util')
+const axios = require('axios')
 let verifyCodeMap = {}
 
 function createVerifyCode(count = 6) {
@@ -49,6 +51,14 @@ router.post('/sendVerifyCode', async (ctx) => {
     countVerifyCode(phone)
     clearVerifyCode(phone)
     console.log('verifyCode', verifyCode)
+
+    // axios.post('https://api.netease.im/sms/verifycode.action', {
+    //   mobile: phone, code: verifyCode
+    // }).then(res => {
+    //   console.log('res', res)
+    // })
+
+
     ctx.body = {code: 200, message: '发送成功'}
   } catch(err) {
     throw new Error(err)
@@ -85,12 +95,31 @@ router.post('/loginVip', async (ctx) => {
     }
     let result = await query(`SELECT * FROM vip WHERE phone = ? AND off != 1`, [phone])
     if (result.length === 0) {
-      await query(`INSERT INTO vip (phone, createTime) VALUES ( ?, ? )`, [phone, createTime])
+      await query(`INSERT INTO vip (phone, status, createTime) VALUES ( ?, ? )`, [phone, createTime])
       result = await query(`SELECT * FROM vip WHERE phone = ? AND off != 1`, [phone])
+    } else {
+      if (result[0].status == '1') {
+        clearTimeout(verifyCodeMap[phone].intervalTime)
+        delete verifyCodeMap[phone]
+        ctx.body = {code: 500, message: '已登陆，请先注销'}
+        return 
+      }
     }
+    await query(`UPDATE vip SET status = ? WHERE phone = ? AND off != 1`, [1, phone])
     clearTimeout(verifyCodeMap[phone].intervalTime)
     delete verifyCodeMap[phone]
     ctx.body = {code: 200, message: result}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.post('/logoutVip', async (ctx) => {
+  try {
+    const data = ctx.request.body.data
+    const phone = data.phone
+    await query(`UPDATE vip SET status = ? WHERE phone = ? AND off != 1`, [0, phone])
+    ctx.body = {code: 200}
   } catch(err) {
     throw new Error(err)
   }
