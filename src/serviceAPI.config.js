@@ -28,6 +28,7 @@ export const apiUrl = {
   insertOrder: '/api/order/insertOrder',
   getOrder: '/api/order/getOrder',
   closeOrder: '/api/order/closeOrder',
+  cancelOrder: '/api/order/cancelOrder',
   updOrder: '/api/order/updOrder',
 
   sendVerifyCode: '/api/vip/sendVerifyCode',

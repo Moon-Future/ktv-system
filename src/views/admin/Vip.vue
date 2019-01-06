@@ -37,10 +37,18 @@
             {key: 'balance', title: '余额', render: (h, params) => {
               return h('span', {}, params.row.balance + ' 元')
             }},
-            {key: 'recentConsumeTime', title: '最近消费时间'},
-            {key: 'recentConsumeMoney', title: '最近消费金额'},
-            {key: 'totalTime', title: '累计消费次数'},
-            {key: 'totalMoney', title: '累计消费金额'},
+            {key: 'recentConsumeTime', title: '最近消费时间', render: (h, params) => {
+              return h('span', params.row.recentConsumeTime ? dateFormat(params.row.recentConsumeTime, 'yyyy-MM-dd hh:mm') : '暂无消费')
+            }},
+            {key: 'recentConsumeMoney', title: '最近消费金额', render: (h, params) => {
+              return h('span', params.row.recentConsumeMoney + ' 元')
+            }},
+            {key: 'totalTime', title: '累计消费次数', render: (h, params) => {
+              return h('span', params.row.totalTime + ' 次')
+            }},
+            {key: 'totalMoney', title: '累计消费金额', render: (h, params) => {
+              return h('span', params.row.totalMoney + ' 元')
+            }},
             {key: 'record', title: '充值记录', render: (h, params) => {
               return h('span', {
                 class: {'record-time': true},
@@ -74,7 +82,8 @@
           addApi: 'registerVip',
           updApi: 'updVip',
           delApi: 'deleteVip',
-          siftApi: 'getVip'
+          siftApi: 'getVip',
+          searchFlag: true
         },
         modalFlag: false,
         rechargeMoney: '',

@@ -1,6 +1,9 @@
 <template>
   <div class="basetable-container">
     <div class="sift-wrapper">
+      <div class="search-wrapper" v-if="tableOptions.searchFlag">
+        <Input v-model="searchPhone" search enter-button placeholder="查询手机号" @on-search="search" />
+      </div>
       <div class="top-title">
         <h2>总数：{{ total }}</h2>
         <Button type="primary" size="small" @click="goAdd">添加</Button>
@@ -120,7 +123,8 @@
         tableData: [],
         total: '',
         verifyCodeBtn: '发送验证码',
-        sending: false
+        sending: false,
+        searchPhone: ''
       }
     },
     computed: {
@@ -160,6 +164,19 @@
       }
     },
     methods: {
+      search() {
+        if (this.searchPhone !== '' && !/^1[34578]\d{9}$/.test(this.searchPhone)) {
+          this.$Message.error('手机号码有误')
+          return
+        }
+        this.$http.post(apiUrl.getVip, {
+          data: {phone: this.searchPhone}
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.tableData = res.data.message
+          }
+        })
+      },
       changeGoods(selectedList) {
         if (this.tableOptions.transferData) {
           const goodsList = this.tableOptions.formArray[1].options
@@ -308,6 +325,10 @@
 <style lang="scss" scoped>
   @import '@/common/css/variable.scss';
 
+  .search-wrapper {
+    margin-bottom: 20px;
+    width: 200px;
+  }
   .top-title {
     display: flex;
     justify-content: space-between;

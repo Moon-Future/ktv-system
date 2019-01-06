@@ -88,6 +88,8 @@ router.post('/loginVip', async (ctx) => {
       await query(`INSERT INTO vip (phone, createTime) VALUES ( ?, ? )`, [phone, createTime])
       result = await query(`SELECT * FROM vip WHERE phone = ? AND off != 1`, [phone])
     }
+    clearTimeout(verifyCodeMap[phone].intervalTime)
+    delete verifyCodeMap[phone]
     ctx.body = {code: 200, message: result}
   } catch(err) {
     throw new Error(err)
@@ -97,8 +99,66 @@ router.post('/loginVip', async (ctx) => {
 router.post('/getVip', async (ctx) => {
   try {
     const data = ctx.request.body.data
-    const result = await query(`SELECT * FROM vip WHERE off != 1`)
-    ctx.body = {code: 200, message: result}
+    const phone = data.phone
+    let result = []
+    let temp
+    let count
+    if (phone == undefined || phone == '') {
+      const countResult = await query(`SELECT COUNT(*) as count FROM vip WHERE off != 1`)
+      count = countResult[0].count
+      temp = await query(`SELECT v.phone, v.balance, v.createTime, v.record, o.totalPrice, o.discount, o.createTime as consumeTime
+        FROM vip as v 
+        LEFT JOIN roomorder as o on o.vip = v.phone
+        WHERE v.off != 1
+        ORDER BY v.createTime ASC`)
+    } else {
+      temp = await query(`SELECT v.phone, v.balance, v.createTime, v.record, o.totalPrice, o.discount, o.createTime as consumeTime
+        FROM vip as v 
+        LEFT JOIN roomorder as o on o.vip = ?
+        WHERE v.phone = ? AND v.off != 1
+        ORDER BY v.createTime ASC`, [phone, phone])
+      count = 1
+    }
+    let phoneMap = {}
+    temp.forEach(ele => {
+      if (phoneMap[ele.phone] == undefined) {
+        phoneMap[ele.phone] = []
+      }
+      phoneMap[ele.phone].push(ele)
+    });
+    for (let key in phoneMap) {
+      const phoneList = phoneMap[key]
+      let recentConsumeTime = ''
+      let recentConsumeMoney = 0
+      let totalTime = 0
+      let totalMoney = 0
+      if (phoneList.length === 1 && !phoneList[0].totalPrice) {
+        totalTime = 0
+      } else {
+        totalTime = phoneList.length
+      }
+      phoneList.sort((a, b) => {
+        return b.consumeTime - a.consumeTime
+      })
+      recentConsumeTime = phoneList[0].consumeTime || ''
+      recentConsumeMoney = Number(phoneList[0].totalPrice) - Number(phoneList[0].discount)
+      phoneList.forEach(ele => {
+        totalMoney += Number(ele.totalPrice) - Number(ele.discount)
+      })
+      let obj = phoneList[0]
+      obj.recentConsumeTime = recentConsumeTime
+      obj.recentConsumeMoney = recentConsumeMoney
+      obj.totalTime = totalTime
+      obj.totalMoney = totalMoney
+      delete obj.consumeTime
+      delete obj.discount
+      delete obj.totalPrice
+      result.push(obj)
+    }
+    result.sort((a, b) => {
+      return a.createTime - b.createTime
+    })
+    ctx.body = {code: 200, message: result, count: count}
   } catch(err) {
     throw new Error(err)
   }

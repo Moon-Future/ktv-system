@@ -3,27 +3,34 @@
     <div class="left-container">
       <left-menu></left-menu>
     </div>
-    <div class="middle-container">
-      <ktv-order></ktv-order>
-    </div>
-    <div class="right-container">
-      <bill></bill> 
+    <div :class="{'view-wrapper': vipFront}">
+      <router-view></router-view>
     </div>
   </div>
 </template>
 
 <script>
   import LeftMenu from '@/components/front/LeftMenu'
-  import KtvOrder from '@/components/front/KtvOrder'
-  import Bill from '@/components/front/Bill'
+  import Ktv from '@/views/front/Ktv'
+  import Vip from '@/views/admin/Vip'
   import { apiUrl } from '@/serviceAPI.config.js'
   import { mapGetters, mapMutations } from 'vuex'
   export default {
     name: 'home',
+    data() {
+      return {
+        vipFront: false
+      }
+    },
     computed: {
       ...mapGetters(['userInfo'])
     },
     created() {
+      if (this.$route.path == '/vip') {
+        this.vipFront = true
+      } else {
+        this.vipFront = false
+      }
       this.getSession()
     },
     methods: {
@@ -44,10 +51,19 @@
         setUserInfo: 'SET_USERINGO'
       })
     },
+    watch: {
+      $route() {
+        if (this.$route.path == '/vip') {
+          this.vipFront = true
+        } else {
+          this.vipFront = false
+        }
+      }
+    },
     components: {
       LeftMenu,
-      KtvOrder,
-      Bill
+      Ktv,
+      Vip
     }
   }
 </script>
@@ -66,22 +82,9 @@
     width: 60px;
     height: 100%;
   }
-  .middle-container {
-    position: fixed;
-    left: 60px;
-    width: 70%;
-    height: 100%;
-    padding: 10px;
-    box-sizing: border-box;
-    overflow: auto;
-  }
-  .right-container {
-    position: fixed;
-    right: 0;
-    width: 11cm;
-    height: 100%;
-    padding: 10px;
-    box-sizing: border-box;
+  .view-wrapper {
+    margin-left: 60px;
+    padding: 20px;
   }
 </style>
 

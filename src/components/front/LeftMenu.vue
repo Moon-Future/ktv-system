@@ -28,11 +28,18 @@
       return {
         avatar: require('@/assets/avatar.jpg'),
         menuList: [
-          {icon: 'icon-money-bag', text: '收银台', index: '1', to: '/home'},
+          {icon: 'icon-money-bag', text: '收银台', index: '1', to: '/ktv'},
           {icon: 'icon-vip', text: '会员', index: '2', to: '/vip'},
           {icon: 'icon-shezhi', text: '设置', index: '3', to: '/admin/baseinfo/roominfo'}
         ],
         activeIndex: 0
+      }
+    },
+    created() {
+      if (this.$route.path === '/ktv') {
+        this.activeIndex = 0
+      } else if (this.$route.path === '/vip') {
+        this.activeIndex = 1
       }
     },
     methods: {
@@ -52,6 +59,15 @@
       ...mapMutations({
         setUserInfo: 'SET_USERINGO'
       })
+    },
+    watch: {
+      $route() {
+        if (this.$route.path === '/ktv') {
+          this.activeIndex = 0
+        } else if (this.$route.path === '/vip') {
+          this.activeIndex = 1
+        }
+      }
     },
     components: {
       IconFont

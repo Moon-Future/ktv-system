@@ -49,8 +49,13 @@ router.post('/getOrder', async (ctx) => {
     }
 
     const data = ctx.request.body.data
-    const ordInfo = await query(`SELECT * FROM roomorder WHERE room = ? AND off != 1`, [data.no])
+    let ordInfo = await query(`SELECT * FROM roomorder WHERE room = ? AND off != 1`, [data.no])
+
     if (ordInfo.length !== 0) {
+      if (ordInfo[0].vip) {
+        const vipInfo = await query(`SELECT balance FROM vip WHERE phone = ? AND off != 1`, [ordInfo[0].vip])
+        ordInfo[0].balance = vipInfo[0].balance
+      }
       let packageMap = {}
       const packageList = await query(`SELECT p.descr, p.name as packagem, p.uuid as package, p.type1, p.type2, p.price1, p.price2, p.qty, p.grp, g.id as goods, g.name as goodsm, u.name as unitm
         FROM package as p 
@@ -86,6 +91,27 @@ router.post('/getOrder', async (ctx) => {
 })
 
 router.post('/closeOrder', async (ctx) => {
+  try {
+    const checkResult = checkRoot(ctx)
+    if (checkResult.code === 500) {
+      ctx.body = checkResult
+      return
+    }
+    
+    const data = ctx.request.body.data
+    const ordInfo = data.ordInfo
+    await query(`UPDATE roomorder SET off = 1 WHERE nun = ?`, [ordInfo.nun])
+    await query(`UPDATE room SET status = 0 WHERE no = ?`, [ordInfo.room])
+    if (ordInfo.vip) {
+      await query(`UPDATE vip SET balance = ? WHERE phone = ? AND off != 1`, [Number(ordInfo.totalPrice - ordInfo.discount), ordInfo.vip])
+    }
+    ctx.body = {code: 200, message: '结账成功'}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.post('/cancelOrder', async (ctx) => {
   try {
     const checkResult = checkRoot(ctx)
     if (checkResult.code === 500) {

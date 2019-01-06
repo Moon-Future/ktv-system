@@ -32,7 +32,14 @@ const mutations = {
         for (let key in data) {
           Vue.set(state.ordInfo, key, data[key])
         }
+        break;
     }
+    if (opts.roomSelected == 'place') {
+      Vue.set(state.roomSelected, 'status', '1')
+    } else if (opts.roomSelected == 'close') {
+      Vue.set(state.roomSelected, 'status', '0')
+    }
+
   },
 
   [types.SET_USERINGO](state, userInfo) {

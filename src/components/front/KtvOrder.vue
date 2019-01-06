@@ -126,7 +126,6 @@
     },
     watch: {
       ordInfo() {
-        console.log(arguments)
       }
     },
     components: {

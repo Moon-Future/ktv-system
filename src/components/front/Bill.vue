@@ -54,7 +54,9 @@
       </div>
       <div class="button-wrapper">
         <Button type="primary" :disabled="ordInfo.status == 1" @click="placeOrder">{{ ordInfo.status == 1 ? '已开单' : '开单' }}</Button>
-        <Button type="success" @click="closeOrder">结账</Button>
+        <Button v-show="roomSelected.status == '1'" type="error" @click="cancelOrder">取消订单</Button>
+        <Button v-show="roomSelected.status == '1'" type="warning" @click="printOrder">打单</Button>
+        <Button v-show="roomSelected.status == '1'" type="success" @click="closeOrder">结账</Button>
       </div>
     </div>
     <Modal
@@ -295,7 +297,6 @@
         this.updateOrder()
       },
       placeOrder() {
-        console.log(this.ordInfo)
         if (!this.ordInfo.room || !this.ordInfo.package) {
           this.$Message.error('请先选择包间和套餐')
           return
@@ -305,7 +306,7 @@
           data: {ordInfo: this.ordInfo, startTime}
         }).then(res => {
           if (res.data.code === 200) {
-            this.setOrdInfo({data: {nun: res.data.message}})
+            this.setOrdInfo({data: {nun: res.data.message, status: 1}, roomSelected: 'place'})
           }
         })
       },
@@ -325,10 +326,26 @@
             this.$http.post(apiUrl.closeOrder, {
               data: {ordInfo: this.ordInfo}
             }).then(res => {
-              this.setOrdInfo({data: {room: this.ordInfo.room, status: 0}, type: 'ordInfo'})
+              this.setOrdInfo({data: {room: this.ordInfo.room, status: 0}, type: 'ordInfo', roomSelected: 'close'})
             })
           },
-        });
+        })
+      },
+      cancelOrder() {
+        this.$Modal.confirm({
+          title: '取消订单',
+          content: '<h1>确认取消订单</h1>',
+          onOk: () => {
+            this.$http.post(apiUrl.cancelOrder, {
+              data: {ordInfo: this.ordInfo}
+            }).then(res => {
+              this.setOrdInfo({data: {room: this.ordInfo.room, status: 0}, type: 'ordInfo', roomSelected: 'close'})
+            })
+          },
+        })
+      },
+      printOrder() {
+
       },
       updateOrder() {
         if (this.roomSelected.status != '1') {
@@ -344,6 +361,15 @@
         this.modalVisible = true
       },
       selectPayMethod(item, key) {
+        if (key == '5') {
+          if (!this.ordInfo.vip) {
+            this.$Message.error('请先登陆会员')
+            return 
+          } else if(this.ordInfo.balance < this.totalPrice) {
+            this.$Message.error('会员余额不足')
+            return
+          }
+        }
         this.modalVisible = false
         this.setOrdInfo({data: {payMethod: key}})
         this.updateOrder()

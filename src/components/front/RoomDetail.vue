@@ -13,14 +13,14 @@
             <Card
               v-for="(item, j) in packageList1" 
               class="card-item" 
-              :class="{active: (activeItem.type == '1' && activeItem.package == item.package) || (packageSelected.type == '1' && packageSelected.package == item.package)}"
+              :class="{active: ordInfo.package && (activeItem.type == '1' && activeItem.package == item.package) || (packageSelected.type == '1' && packageSelected.package == item.package)}"
               :key="j" 
               @click.native="clickPackage(item, j)">
               <p slot="title">{{ item.packagem }}</p>
               <p slot="extra" class="card-price">{{ item.price1 }} 元</p>
               <p v-for="(descr, k) in item.descr.split('\n')" :key="k">{{ descr }}</p>
               <icon-font 
-                v-show="(activeItem.type == '1' && activeItem.package == item.package) || (packageSelected.type == '1' && packageSelected.package == item.package)" 
+                v-show="ordInfo.package && (activeItem.type == '1' && activeItem.package == item.package) || (packageSelected.type == '1' && packageSelected.package == item.package)" 
                 icon="icon-selected" 
                 fontSize="32" 
                 class="card-selected">
@@ -33,14 +33,14 @@
             <Card
               v-for="(item, j) in packageList2" 
               class="card-item" 
-              :class="{active: (activeItem.type == '2' && activeItem.package == item.package) || (packageSelected.type == '2' && packageSelected.package == item.package)}"
+              :class="{active: ordInfo.package && (activeItem.type == '2' && activeItem.package == item.package) || (packageSelected.type == '2' && packageSelected.package == item.package)}"
               :key="j" 
               @click.native="clickPackage(item, j)">
               <p slot="title">{{ item.packagem }}</p>
               <p slot="extra" class="card-price">{{ item.price2 }} 元</p>
               <p v-for="(descr, k) in item.descr.split('\n')" :key="k">{{ descr }}</p>
               <icon-font 
-                v-show="(activeItem.type == '2' && activeItem.package == item.package) || (packageSelected.type == '2' && packageSelected.package == item.package)" 
+                v-show="ordInfo.package && (activeItem.type == '2' && activeItem.package == item.package) || (packageSelected.type == '2' && packageSelected.package == item.package)" 
                 icon="icon-selected" 
                 fontSize="32" 
                 class="card-selected">
