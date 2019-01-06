@@ -8,7 +8,7 @@
       <ul class="ord-info">
         <li v-for="(ord, i) in ordList" :key="i">
           <span>{{ ord.title }}：</span>
-          <span v-if="ord.key === 'vip' && ordInfo.room && !ordInfo[ord.key]" class="order-vip" @click="modalVip = true">登陆</span>
+          <span v-if="ord.key === 'vip' && ordInfo.room && !ordInfo[ord.key]" class="order-vip" @click="loginVip">登陆</span>
           <span v-else-if="ord.key === 'balance' && ordInfo.room && ordInfo['vip']">
             <span class="order-vip-operate" @click="logoutVip">注销</span>
             <span class="order-vip-operate" @click="modalRecharge = true">充值</span>
@@ -55,7 +55,7 @@
       <div class="button-wrapper">
         <Button type="primary" :disabled="ordInfo.status == 1" @click="placeOrder">{{ ordInfo.status == 1 ? '已开单' : '开单' }}</Button>
         <Button v-show="roomSelected.status == '1'" type="error" @click="cancelOrder">取消订单</Button>
-        <Button v-show="roomSelected.status == '1'" type="warning" @click="printOrder">打单</Button>
+        <Button v-show="roomSelected.status == '1'" type="warning" @click="printFlag = true">打单</Button>
         <Button v-show="roomSelected.status == '1'" type="success" @click="closeOrder">结账</Button>
       </div>
     </div>
@@ -101,11 +101,20 @@
         <Button type="primary" class="recharge-ok" @click="okRecharge">确定</Button>
       </div>
     </Modal>
+    <Modal
+      v-model="printFlag"
+      title="打印账单"
+      fullscreen
+      @on-ok="printOrder">
+      <print-item ref="printWrapper" :ordInfo="ordInfo" :printTime="printTime"></print-item>
+    </Modal>
+    <!-- <print-item v-show="printFlag" ref="printWrapper" :ordInfo="ordInfo" :printTime="printTime"></print-item> -->
   </div>
 </template>
 
 <script>
   import IconFont from '@/components/IconFont'
+  import PrintItem from '@/components/front/Print'
   import { dateFormat } from '@/common/js/util'
   import { apiUrl } from '@/serviceAPI.config.js'
   import { mapGetters, mapMutations } from 'vuex'
@@ -148,7 +157,9 @@
         discountMoney: 0,
         verifyCodeBtn: '发送验证码',
         modalRecharge: false,
-        rechargeMoney: ''
+        rechargeMoney: '',
+        printTime: new Date().getTime(),
+        printFlag: false
       }
     },
     computed: {
@@ -195,6 +206,22 @@
       ])
     },
     methods: {
+      printOrder() {
+        this.printTime = new Date().getTime()
+        this.$nextTick(() => {
+          setTimeout(() => {
+            const printHtml = this.$refs.printWrapper.$el.innerHTML
+            const app = document.getElementById('app')
+            const printPanel = document.getElementById('printPanel')
+            app.style.display = 'none'
+            printPanel.innerHTML = printHtml
+            window.print()
+            printPanel.innerHTML = ''
+            app.style.display = 'block'
+            this.printFlag = false
+          }, 50)
+        })
+      },
       sendVerifyCode() {
         const phone = this.vipFormData.phone
         if (phone === '' || !/^1[34578]\d{9}$/.test(phone)) {
@@ -243,6 +270,17 @@
           }
         })
       },
+      loginVip() {
+        if (!this.ordInfo.nun) {
+          this.$Message.error('请先开单')
+          return
+        }
+        this.vipFormData = {phone: '', verifyCode: ''}
+        this.verifyCodeBtn = '发送验证码'
+        this.sending = false
+        clearInterval(this.sendTimer)
+        this.modalVip = true
+      },
       logoutVip() {
         this.$Modal.confirm({
           title: '退出会员登陆',
@@ -250,6 +288,9 @@
           onOk: () => {
             this.setOrdInfo({data: {vip:'', balance:''}})
             this.updateOrder()
+            this.$http.post(apiUrl.logoutVip, {
+              data: {phone: this.ordInfo.vip}
+            })
           }
         })
       },
@@ -306,7 +347,7 @@
           data: {ordInfo: this.ordInfo, startTime}
         }).then(res => {
           if (res.data.code === 200) {
-            this.setOrdInfo({data: {nun: res.data.message, status: 1}, roomSelected: 'place'})
+            this.setOrdInfo({data: {nun: res.data.message, status: 1, user: this.userInfo.name}, roomSelected: 'place'})
           }
         })
       },
@@ -343,9 +384,6 @@
             })
           },
         })
-      },
-      printOrder() {
-
       },
       updateOrder() {
         if (this.roomSelected.status != '1') {
@@ -392,7 +430,8 @@
       }
     },
     components: {
-      IconFont
+      IconFont,
+      PrintItem
     }
   }
 </script>

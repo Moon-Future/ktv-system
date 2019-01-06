@@ -34,6 +34,7 @@ export const apiUrl = {
   sendVerifyCode: '/api/vip/sendVerifyCode',
   registerVip: '/api/vip/registerVip',
   loginVip: '/api/vip/loginVip',
+  logoutVip: '/api/vip/logoutVip',
   getVip: '/api/vip/getVip',
   recharge: '/api/vip/recharge',
   getRechargeRecord: '/api/vip/getRechargeRecord',
