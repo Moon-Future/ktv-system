@@ -91,7 +91,7 @@ router.post('/loginVip', async (ctx) => {
     }
     let result = await query(`SELECT * FROM vip WHERE phone = ? AND off != 1`, [phone])
     if (result.length === 0) {
-      await query(`INSERT INTO vip (phone, status, createTime) VALUES ( ?, ? )`, [phone, createTime])
+      await query(`INSERT INTO vip (phone, status, createTime) VALUES ( ?, ?, ? )`, [phone, 1, createTime])
       result = await query(`SELECT * FROM vip WHERE phone = ? AND off != 1`, [phone])
     } else {
       if (result[0].status == '1') {

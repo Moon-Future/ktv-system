@@ -324,12 +324,9 @@
         }).then(res => {
           if (res.data.code === 200) {
             this.$Message.success(res.data.message)
-            this.row.balance = Number(this.row.balance) + Number(this.rechargeForm.rechargeMoney) + Number(this.rechargeForm.giveMoney)
-            this.row.record = Number(this.row.record) + 1
-
             this.setOrdInfo({data: {vip:this.ordInfo.vip, balance:Number(this.row.balance) + Number(this.rechargeForm.rechargeMoney) + Number(this.rechargeForm.giveMoney)}})
             this.rechargeForm = {rechargeMoney: '', giveMoney: ''}
-            this.modalFlag = false
+            this.modalRecharge = false
           } else {
             this.$Message.error(res.data.message)
           }
