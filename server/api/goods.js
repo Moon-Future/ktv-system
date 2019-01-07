@@ -66,11 +66,20 @@ router.post('/deleteGoods', async (ctx) => {
     }
     
     const data = ctx.request.body.data
-    let ids = []
-    data.forEach(ele => {
-      ids.push(ele.id)
-    })
-    await query(`UPDATE goods SET off = 1, updateTime = ${new Date().getTime()} WHERE id IN ( ${ids.join()} )`)
+    const goods = data[0]
+    const currentTime = new Date().getTime()
+
+    await query(`DELETE FROM package WHERE goods = ?`, [goods.id])
+
+    const packageList = await query(`SELECT * FROM package WHERE grp LIKE '%?%'`, [goods.id])
+    for (let i = 0, len = packageList.length; i < len; i++) {
+      let grp = packageList[i].grp.split(',')
+      grp.splice(grp.indexOf(goods.id + ''), 1)
+      grp = grp.join(',')
+      await query(`UPDATE package SET grp = ?, updateTime = ? WHERE id = ?`, [grp, currentTime, packageList[i].id])
+    }
+
+    await query(`UPDATE goods SET off = 1, updateTime = ? WHERE id = ?`, [goods.id, new Date().getTime()])
     ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {
     throw new Error(err)
