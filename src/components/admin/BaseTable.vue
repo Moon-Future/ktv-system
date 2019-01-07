@@ -6,7 +6,7 @@
       </div>
       <div class="top-title">
         <h2>总数：{{ total }}</h2>
-        <Button type="primary" size="small" @click="goAdd">添加</Button>
+        <Button type="primary" size="small" @click="goAdd" v-show="!tableOptions.onlySift">添加</Button>
       </div>
       <Table :columns="tableColumns" :data="tableData" :loading="loading" stripe size="small"></Table>
     </div>
@@ -135,6 +135,7 @@
           title: '操作',
           render: (h, params) => {
             return h('div', [
+              this.tableOptions.user ? '' :
               h('span', {
                 class: {'operate-item' : true},
                 on: {
@@ -143,7 +144,7 @@
                   }
                 }
               }, this.tableOptions.vip ? '充值' : '更新'),
-              this.tableOptions.vip ? '' : h('span', {class: {'operate-divide' : true}}, '|'),
+              this.tableOptions.vip || this.tableOptions.user ? '' : h('span', {class: {'operate-divide' : true}}, '|'),
               this.tableOptions.vip ? '' : 
               h('span', {
                 class: {'operate-item' : true},
@@ -345,5 +346,9 @@
     padding: 10px 16px;
     text-align: right;
     background: $color-white;
+    display: flex;
+    button {
+      width: 50%;
+    }
   }
 </style>

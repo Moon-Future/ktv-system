@@ -105,7 +105,15 @@ router.post('/deletePackage', async (ctx) => {
     
     const data = ctx.request.body.data
     const uuid = data[0].uuid
-    await query(`DELETE FROM package WHERE uuid = '${uuid}'`)
+
+    let roomorder = await query(`SELECT * FROM roomorder WHERE package = ? AND off != 1`, [uuid])
+    if (roomorder.length !== 0) {
+      ctx.body = {code: 500, message: '已开单包间中存在该套餐，暂时无法删除！'}
+      return
+    }
+
+    await query(`DELETE FROM package WHERE uuid = ?`, [uuid])
+    await query(`DELETE FROM room WHERE package = ?`, [uuid])
     ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {
     throw new Error(err)

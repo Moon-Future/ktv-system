@@ -15,7 +15,7 @@ router.post('/register', async (ctx) => {
       ctx.body = {code: 500, message: '注册码错误'}
       return
     }
-    const result = await query(`SELECT * FROM user WHERE account = ?`, [account])
+    const result = await query(`SELECT * FROM user WHERE account = ? AND off != 1`, [account])
     if (result.length !== 0) {
       ctx.body = {code: 500, message: `用户 ${account} 已存在`}
       return
@@ -32,7 +32,7 @@ router.post('/login', async (ctx) => {
     const data = ctx.request.body.data
     const account = data.account
     const password = data.password
-    const result = await query(`SELECT * FROM user WHERE account = ?`, [account])
+    const result = await query(`SELECT * FROM user WHERE account = ? AND off != 1`, [account])
     if (result.length === 0) {
       ctx.body = {code: 500, message: '用户不存在'}
     } else if(result[0].password !== password) {
@@ -63,6 +63,30 @@ router.post('/getSession', async (ctx) => {
     } else {
       ctx.body = {code: 500, message: '请先登陆'}
     }
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.post('/getUser', async (ctx) => {
+  try {
+    const data = ctx.request.body.data
+    const result = await query(`SELECT * FROM user WHERE off != 1`)
+    ctx.body = {code: 200, message: result}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.post('/deleteUser', async (ctx) => {
+  try {
+    const data = ctx.request.body.data
+    if (!ctx.session || !ctx.session.userInfo || ctx.session.userInfo.root != 1 ) {
+      ctx.body = {code: 500, message: '无权限'}
+      return
+    }
+    await query(`UPDATE user SET off = 1 WHERE id = ?`, [data[0].id])
+    ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {
     throw new Error(err)
   }

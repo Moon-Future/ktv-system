@@ -69,9 +69,27 @@ router.post('/deleteGoods', async (ctx) => {
     const goods = data[0]
     const currentTime = new Date().getTime()
 
-    await query(`DELETE FROM package WHERE goods = ?`, [goods.id])
+    // 查找当前以开单包间是否存在该商品
+    let roomorder = await query(`SELECT * FROM roomorder WHERE goods LIKE '%?%' AND off != 1`, [goods.id])
+    if (roomorder.length !== 0) {
+      ctx.body = {code: 500, message: '已开单包间中存在该商品，暂时无法删除！'}
+      return
+    }
 
-    const packageList = await query(`SELECT * FROM package WHERE grp LIKE '%?%'`, [goods.id])
+    // 查找当前以开单包间套餐中是否存在该商品
+    let packageList = await query(`SELECT * FROM package WHERE goods = ?`, [goods.id])
+    if (packageList.length !== 0) {
+      for (let i = 0, len = packageList.length; i < len; i++) {
+        let roomorder = await query(`SELECT * FROM roomorder WHERE package = ? AND off != 1`, [packageList[i].uuid])
+        if (roomorder.length !== 0) {
+          ctx.body = {code: 500, message: '已开单包间中所选套餐存在该商品，暂时无法删除！'}
+          return
+        }
+      }
+    }
+
+    await query(`DELETE FROM package WHERE goods = ?`, [goods.id])
+    packageList = await query(`SELECT * FROM package WHERE grp LIKE '%?%'`, [goods.id])
     for (let i = 0, len = packageList.length; i < len; i++) {
       let grp = packageList[i].grp.split(',')
       grp.splice(grp.indexOf(goods.id + ''), 1)
@@ -79,7 +97,7 @@ router.post('/deleteGoods', async (ctx) => {
       await query(`UPDATE package SET grp = ?, updateTime = ? WHERE id = ?`, [grp, currentTime, packageList[i].id])
     }
 
-    await query(`UPDATE goods SET off = 1, updateTime = ? WHERE id = ?`, [goods.id, new Date().getTime()])
+    await query(`UPDATE goods SET off = 1, updateTime = ? WHERE id = ?`, [new Date().getTime(), goods.id])
     ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {
     throw new Error(err)

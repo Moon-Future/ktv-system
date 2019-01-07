@@ -42,5 +42,7 @@ export const apiUrl = {
   register: '/api/user/register',
   login: '/api/user/login',
   logout: '/api/user/logout',
+  getUser: '/api/user/getUser',
+  deleteUser: '/api/user/deleteUser',
   getSession: '/api/user/getSession'
 }

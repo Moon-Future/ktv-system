@@ -1,8 +1,7 @@
 const Router = require('koa-router')
 const router = new Router()
 const query = require('../database/init')
-const { ajax } = require('./util')
-const axios = require('axios')
+const sendMessage = require('./sendMessage')
 let verifyCodeMap = {}
 
 function createVerifyCode(count = 6) {
@@ -51,15 +50,12 @@ router.post('/sendVerifyCode', async (ctx) => {
     countVerifyCode(phone)
     clearVerifyCode(phone)
     console.log('verifyCode', verifyCode)
-
-    // axios.post('https://api.netease.im/sms/verifycode.action', {
-    //   mobile: phone, code: verifyCode
-    // }).then(res => {
-    //   console.log('res', res)
-    // })
-
-
-    ctx.body = {code: 200, message: '发送成功'}
+    const sendResult = await sendMessage(verifyCode)
+    if (sendResult.code == 0) {
+      ctx.body = {code: 200, message: '发送成功'}
+    } else {
+      ctx.body = {code: 500, message: sendResult.message}
+    }
   } catch(err) {
     throw new Error(err)
   }
@@ -198,17 +194,21 @@ router.post('/recharge', async (ctx) => {
     const data = ctx.request.body.data
     const phone = data.phone
     const rechargeMoney = data.rechargeMoney
+    const giveMoney = data.giveMoney || 0
     const result = await query(`SELECT * FROM vip WHERE phone = '${phone}' AND off != 1`)
     if (result.length === 0) {
       ctx.body = {code: 500, message: '账户不存在'}
       return 
     }
-    await query(`UPDATE vip SET balance = ${Number(result[0].balance + Number(rechargeMoney))},
-      record = ${Number(result[0].record + 1)}
-      WHERE phone = '${phone}' AND off != 1;
-      INSERT into rechargerecord (phone, money, time) VALUES ('${phone}', ${rechargeMoney}, ${new Date().getTime()})
-    `)
-    
+    await query(`UPDATE vip SET balance = ?,
+        record = ?
+        WHERE phone = ? AND off != 1;
+        INSERT into rechargerecord (phone, money, recharge, give, time) VALUES (?, ?, ?, ?, ?)
+      `, [
+        Number(result[0].balance) + Number(rechargeMoney) + Number(giveMoney), Number(result[0].record + 1), phone,
+        phone, Number(rechargeMoney) + Number(giveMoney), rechargeMoney, giveMoney, new Date().getTime()
+      ]
+    )
     ctx.body = {code: 200, message: '充值成功'}
   } catch(err) {
     throw new Error(err)

@@ -35,7 +35,7 @@
           <span>{{ item.title }}</span>
           <span :class="item.class" v-if="item.key == 'origin'">{{ ordInfo.totalPrice }} 元</span>
           <span :class="item.class" v-if="item.key == 'discount' && discountShow">{{ ordInfo.discount || 0 }} 元</span>
-          <span :class="item.class" v-if="item.key == 'pay'">{{ ordInfo.totalPrice - ordInfo.discount }} 元</span>
+          <span :class="item.class" v-if="item.key == 'pay'">{{ ordInfo.totalPrice - (ordInfo.discount || 0) }} 元</span>
           <span :class="item.class" v-if="item.key == 'paymethos'">
             <span>{{ payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].title}}</span>
             <icon-font v-show="payMethodMap[ordInfo.payMethod]" :icon="payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].icon" fontSize="12"></icon-font>
@@ -100,9 +100,6 @@
       goodsSelected() {
         return this.ordInfo && this.ordInfo.goods || {}
       },
-      payPrice() {
-        return this.totalPrice - this.discountMoney
-      },
       packageGoods() {
         if (!this.packageSelected || !this.packageSelected.package) {
           return []
@@ -154,12 +151,11 @@
     width: 10cm;
     border: 1px solid $color-gray;
     background: $color-white;
-    // position: absolute;
     left: 10px;
     right: 10px;
     top: 0px;
     bottom: 10px;
-    padding: 20px 10px 10px 10px;
+    padding: 20px 10px 10px 20px;
     font-size: 12px;
     overflow: auto;
     .bill-title {
@@ -180,9 +176,9 @@
         }
         span {
           flex: 1;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          word-break: keep-all;
+          // text-overflow: ellipsis;
+          // overflow: hidden;
+          // word-break: keep-all;
           text-align: right;
           &:first-child {
             text-align: left;
@@ -234,7 +230,7 @@
           font-weight: bold;
         }
         .money-pay {
-          color: $color-origin;
+          color: $color-red;
           font-weight: bold;
         }
         .money-paymethos {

@@ -36,7 +36,7 @@
                     descrArray.push(h('span', {}, ele), h('br'))
                   })
                   array.push(h('Tooltip', {props: {'max-width': '200'}}, [
-                    h('Tag', {props: {color: 'primary'}}, ele.packagem),
+                    h('Tag', {props: {color: 'purple'}}, ele.packagem),
                     h('div', {slot: 'content'}, descrArray)
                   ]))
                 })

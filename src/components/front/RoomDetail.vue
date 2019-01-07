@@ -85,7 +85,6 @@
         titleArray: [
           {title: '房间编号', field: 'no'},
           {title: '房间类型', field: 'roomTypem'},
-          // {title: '价格', field: 'price', after: '元/小时'},
           {title: '状态', field: 'status'},
         ],
         custMap: {vip: '会员', balance: '余额', time: '时间'},
@@ -201,7 +200,7 @@
     filters: {
       status(value, {field, roomInfo}) {
         if (field === 'status') {
-          return roomInfo.status == 0 ? '空闲' : '使用中'
+          return roomInfo.status === undefined ? '' : roomInfo.status == 0 ? '空闲' : '使用中'
         } else {
           return value
         }
@@ -239,7 +238,7 @@
     display: flex;
     flex-wrap: wrap;
     .card-item {
-      width: 200px;
+      width: 250px;
       margin-right: 10px;
       margin-bottom: 10px;
       cursor: pointer;

@@ -1,7 +1,5 @@
 const request = require('request')
 
-const axios = require('axios')
-
 function getRandom(start, end, size) {
   let allRandms = []
   size = size ? (size > end - start ? end - start : size) : 1
@@ -51,63 +49,7 @@ function ajax(url, flag = false) {
   })
 }
 
-/**
- * Created by lanouhn on 18/1/15.
- */
-// var qs = require("querystring");
-// var sha1 = require("sha1");
-// var Appkey = "5e1b6580692f39d409384078fb0d176f";
-// var Appsecret = "4d2dfa5b6f44";
-// var Nonce = "ktv";
-// var time = new Date();
-// var CurTime = time.getTime();
-// var CheckSum = sha1(Appsecret + Nonce + CurTime);
-// var account;
-// var post_data = {
-//     templateid: 3902159,
-//     mobile: '15920055057',
-//     codeLen: '223567'
-// };
-// //这是需要提交的数据
-// var content = qs.stringify(post_data);
-// var proxy_url = 'https://api.netease.im/sms/sendcode.action?' + content;
-// var options = {
-//   url: proxy_url,
-//   method: 'POST',
-//   headers: {
-//     'AppKey': Appkey,
-//     'Nonce' : Nonce,
-//     'CurTime': CurTime,
-//     'CheckSum': CheckSum,
-//     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-//   }
-// };
-// function callback(error, response, body) {
-//   account = JSON.parse(body)
-//   console.log(account);
-//   console.log(account.obj);
-//   // return account
-    
-// }
-// // console.log(account);
-// request(options, callback);
-
-// axios({
-//   url: 'https://api.netease.im/sms/sendtemplate.action',
-//   method: 'post',
-//   headers: {
-//     'AppKey': Appkey,
-//     'Nonce' : Nonce,
-//     'CurTime': CurTime,
-//     'CheckSum': CheckSum,
-//     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-//   }
-// }).then(res => {
-//   console.log('res', res)
-// })
-
 module.exports = {
-  ajax,
   getRandom,
   dateFormat
 }

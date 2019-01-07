@@ -55,7 +55,7 @@
       <div class="button-wrapper">
         <Button type="primary" :disabled="ordInfo.status == 1" @click="placeOrder">{{ ordInfo.status == 1 ? '已开单' : '开单' }}</Button>
         <Button v-show="roomSelected.status == '1'" type="error" @click="cancelOrder">取消订单</Button>
-        <Button v-show="roomSelected.status == '1'" type="warning" @click="printFlag = true">打单</Button>
+        <Button v-show="roomSelected.status == '1'" type="warning" @click="openPrintModal">打单</Button>
         <Button v-show="roomSelected.status == '1'" type="success" @click="closeOrder">结账</Button>
       </div>
     </div>
@@ -95,7 +95,14 @@
       v-model="modalRecharge"
       title="充值"
       :footer-hide="true">
-      <i-input v-model="rechargeMoney" suffix="logo-yen" placeholder="输入充值金额"></i-input>
+      <Form :model="rechargeForm" :label-width="80">
+        <FormItem label="充值金额">
+          <Input v-model="rechargeForm.rechargeMoney" suffix="logo-yen" placeholder="输入充值金额" />
+        </FormItem>
+        <FormItem label="赠送金额">
+          <Input v-model="rechargeForm.giveMoney" suffix="logo-yen" placeholder="输入赠送金额" />
+        </FormItem>
+      </Form>
       <div class="recharge-button">
         <Button @click="cancelRecharge">取消</Button>
         <Button type="primary" class="recharge-ok" @click="okRecharge">确定</Button>
@@ -104,18 +111,20 @@
     <Modal
       v-model="printFlag"
       title="打印账单"
-      fullscreen
-      @on-ok="printOrder">
-      <print-item ref="printWrapper" :ordInfo="ordInfo" :printTime="printTime"></print-item>
+      fullscreen>
+      <print-item ref="printWrapper" :ordInfo="printOrdInfo" :printTime="printTime"></print-item>
+      <div class="drawer-footer" slot="footer" v-show="printFlag">
+        <Button @click="printFlag = false">取消</Button>
+        <Button type="primary" @click="printOrder">确认</Button>
+      </div>
     </Modal>
-    <!-- <print-item v-show="printFlag" ref="printWrapper" :ordInfo="ordInfo" :printTime="printTime"></print-item> -->
   </div>
 </template>
 
 <script>
   import IconFont from '@/components/IconFont'
   import PrintItem from '@/components/front/Print'
-  import { dateFormat } from '@/common/js/util'
+  import { dateFormat, deepClone } from '@/common/js/util'
   import { apiUrl } from '@/serviceAPI.config.js'
   import { mapGetters, mapMutations } from 'vuex'
   export default {
@@ -157,9 +166,10 @@
         discountMoney: 0,
         verifyCodeBtn: '发送验证码',
         modalRecharge: false,
-        rechargeMoney: '',
+        rechargeForm: {rechargeMoney: '', giveMoney: ''},
         printTime: new Date().getTime(),
-        printFlag: false
+        printFlag: false,
+        printOrdInfo: {}
       }
     },
     computed: {
@@ -206,8 +216,13 @@
       ])
     },
     methods: {
+      openPrintModal() {
+        this.printFlag = true
+        this.printOrdInfo = deepClone(this.ordInfo)
+      },
       printOrder() {
         this.printTime = new Date().getTime()
+        this.printFlag = false
         this.$nextTick(() => {
           setTimeout(() => {
             const printHtml = this.$refs.printWrapper.$el.innerHTML
@@ -218,7 +233,6 @@
             window.print()
             printPanel.innerHTML = ''
             app.style.display = 'block'
-            this.printFlag = false
           }, 50)
         })
       },
@@ -299,19 +313,23 @@
           this.$Message.error('正在提交，请稍等')
           return
         }
-        if (this.rechargeMoney == '' || this.rechargeMoney == '0' || !/^\d*$/.test(this.rechargeMoney)) {
+        if (this.rechargeForm.rechargeMoney == '' || this.rechargeForm.rechargeMoney == '0' || !/^\d*$/.test(this.rechargeForm.rechargeMoney) ||
+          (this.rechargeForm.giveMoney != '' &&  !/^\d*$/.test(this.rechargeForm.rechargeMoney)) ) {
           this.$Message.error('请填写正确的金额')
           return
         }
         this.loading = true
         this.$http.post(apiUrl.recharge, {
-          data: {phone: this.ordInfo.vip, rechargeMoney: this.rechargeMoney}
+          data: {phone: this.ordInfo.vip, rechargeMoney: this.rechargeForm.rechargeMoney, giveMoney: this.rechargeForm.giveMoney}
         }).then(res => {
           if (res.data.code === 200) {
             this.$Message.success(res.data.message)
-            this.setOrdInfo({data: {vip:this.ordInfo.vip, balance:Number(this.ordInfo.balance) + Number(this.rechargeMoney)}})
-            this.rechargeMoney = ''
-            this.modalRecharge = false
+            this.row.balance = Number(this.row.balance) + Number(this.rechargeForm.rechargeMoney) + Number(this.rechargeForm.giveMoney)
+            this.row.record = Number(this.row.record) + 1
+
+            this.setOrdInfo({data: {vip:this.ordInfo.vip, balance:Number(this.row.balance) + Number(this.rechargeForm.rechargeMoney) + Number(this.rechargeForm.giveMoney)}})
+            this.rechargeForm = {rechargeMoney: '', giveMoney: ''}
+            this.modalFlag = false
           } else {
             this.$Message.error(res.data.message)
           }
@@ -322,7 +340,7 @@
       },
       cancelRecharge() {
         this.modalRecharge = false
-        this.rechargeMoney = ''
+        this.rechargeForm = {rechargeMoney: '', giveMoney: ''}
       },
       changeDiscount() {
         this.discountMoney = (this.discountMoney + '').replace(/[^0-9]/, '')
@@ -334,6 +352,7 @@
         }
       },
       discountBlur() {
+        this.discountMoney = this.discountMoney == '' ? 0 : this.discountMoney
         this.setOrdInfo({data: {discount: this.discountMoney}})
         this.updateOrder()
       },
@@ -364,6 +383,7 @@
           title: '结账',
           content: '<h1>确认结账</h1>',
           onOk: () => {
+            this.printOrdInfo = deepClone(this.ordInfo)
             this.$http.post(apiUrl.closeOrder, {
               data: {ordInfo: this.ordInfo}
             }).then(res => {
@@ -478,9 +498,9 @@
         }
         span {
           flex: 1;
-          text-overflow: ellipsis;
-          overflow: hidden;
-          word-break: keep-all;
+          // text-overflow: ellipsis;
+          // overflow: hidden;
+          // word-break: keep-all;
           text-align: right;
           &:first-child {
             text-align: left;
@@ -537,7 +557,7 @@
           font-weight: bold;
         }
         .money-pay {
-          color: $color-origin;
+          color: $color-red;
           font-weight: bold;
         }
         .money-paymethos {
@@ -583,6 +603,12 @@
     margin-top: 10px;
     .recharge-ok {
       margin-left: 10px;
+    }
+  }
+  .drawer-footer{
+    display: flex;
+    button {
+      width: 50%;
     }
   }
 </style>

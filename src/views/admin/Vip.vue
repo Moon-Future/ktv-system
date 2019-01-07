@@ -9,7 +9,14 @@
       v-model="modalFlag"
       title="充值"
       :footer-hide="true">
-      <i-input v-model="rechargeMoney" suffix="logo-yen" placeholder="输入充值金额"></i-input>
+      <Form :model="rechargeForm" :label-width="80">
+        <FormItem label="充值金额">
+          <Input v-model="rechargeForm.rechargeMoney" suffix="logo-yen" placeholder="输入充值金额" />
+        </FormItem>
+        <FormItem label="赠送金额">
+          <Input v-model="rechargeForm.giveMoney" suffix="logo-yen" placeholder="输入赠送金额" />
+        </FormItem>
+      </Form>
       <div class="modal-button">
         <Button class="modal-cancel" @click="cancel">取消</Button>
         <Button type="primary" class="modal-ok" @click="ok">确定</Button>
@@ -86,7 +93,7 @@
           searchFlag: true
         },
         modalFlag: false,
-        rechargeMoney: '',
+        rechargeForm: {rechargeMoney: '', giveMoney: ''},
         loading: false,
         row: {},
         recordData: [],
@@ -117,19 +124,20 @@
           this.$Message.error('正在提交，请稍等')
           return
         }
-        if (this.rechargeMoney == '' || this.rechargeMoney == '0' || !/^\d*$/.test(this.rechargeMoney)) {
+        if (this.rechargeForm.rechargeMoney == '' || this.rechargeForm.rechargeMoney == '0' || !/^\d*$/.test(this.rechargeForm.rechargeMoney) ||
+          (this.rechargeForm.giveMoney != '' &&  !/^\d*$/.test(this.rechargeForm.rechargeMoney)) ) {
           this.$Message.error('请填写正确的金额')
           return
         }
         this.loading = true
         this.$http.post(apiUrl.recharge, {
-          data: {phone: this.row.phone, rechargeMoney: this.rechargeMoney}
+          data: {phone: this.row.phone, rechargeMoney: this.rechargeForm.rechargeMoney, giveMoney: this.rechargeForm.giveMoney}
         }).then(res => {
           if (res.data.code === 200) {
             this.$Message.success(res.data.message)
-            this.row.balance = Number(this.row.balance) + Number(this.rechargeMoney)
+            this.row.balance = Number(this.row.balance) + Number(this.rechargeForm.rechargeMoney) + Number(this.rechargeForm.giveMoney)
             this.row.record = Number(this.row.record) + 1
-            this.rechargeMoney = ''
+            this.rechargeForm = {rechargeMoney: '', giveMoney: ''}
             this.modalFlag = false
           } else {
             this.$Message.error(res.data.message)
@@ -141,7 +149,7 @@
       },
       cancel() {
         this.modalFlag = false
-        this.rechargeMoney = ''
+        this.rechargeForm = {rechargeMoney: '', giveMoney: ''}
       },
       recordDetail(params) {
         this.recordTitle = params.row.phone + ' 充值记录'

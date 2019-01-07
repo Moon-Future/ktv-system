@@ -19,7 +19,6 @@
     "mysql": "^2.16.0",
     "node-sass": "^4.11.0",
     "node-xlsx": "^0.12.1",
-    "qcloudsms_js": "^0.1.1",
     "sass-loader": "^7.1.0",
     "sha1": "^1.1.1",
     "uuid": "^3.3.2",
