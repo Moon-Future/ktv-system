@@ -50,7 +50,7 @@ router.post('/sendVerifyCode', async (ctx) => {
     countVerifyCode(phone)
     clearVerifyCode(phone)
     console.log('verifyCode', verifyCode)
-    const sendResult = await sendMessage(verifyCode)
+    const sendResult = await sendMessage(phone, verifyCode)
     if (sendResult.code == 0) {
       ctx.body = {code: 200, message: '发送成功'}
     } else {
