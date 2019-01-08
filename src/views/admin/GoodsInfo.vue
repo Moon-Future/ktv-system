@@ -29,24 +29,25 @@
             }},
             {key: 'unitm', title: '单位'},
             {key: 'descr', title: '描述'},
-            {
-              key: 'vipDiscount',
-              title: '会员折扣',
-              render: (h, params) => {
-                return h('i-switch', {
-                  props: {disabled: 'disabled', value: params.row.vipDiscount}
-                })
-              }
-            },
-            {key: 'discount', title: '折扣'}
+            // {
+            //   key: 'vipDiscount',
+            //   title: '会员折扣',
+            //   render: (h, params) => {
+            //     return h('i-switch', {
+            //       props: {disabled: 'disabled', value: params.row.vipDiscount}
+            //     })
+            //   }
+            // },
+            // {key: 'discount', title: '折扣'},
+            {key: 'qty', title: '库存'}
           ],
           formArray: [
             {key: 'name', title: '名称', type: 'input'},
             {key: 'price', title: '价格', type: 'input'},
             {key: 'unit', title: '单位', type: 'select', options: []},
             {key: 'descr', title: '描述', type: 'textarea'},
-            {key: 'vipDiscount', title: '开启会员折扣', type: 'switch'},
-            {key: 'discount', title: '会员折扣', type: 'input', hide: true}
+            // {key: 'vipDiscount', title: '开启会员折扣', type: 'switch'},
+            // {key: 'discount', title: '会员折扣', type: 'input', hide: true}
           ],
           formData: {
             name: '', picture: '', price: '', vipDiscount: false, discount: '', unit: '', descr: ''
@@ -62,7 +63,8 @@
               {validator: validateDiscount, trigger: 'blur'}
             ]
           },
-          width: 90,
+          width: 50,
+          goods: true,
           addApi: 'insertGoods',
           updApi: 'updGoods',
           delApi: 'deleteGoods',
@@ -91,12 +93,12 @@
         })
       },
       changeSwitch(status) {
-        if (status) {
-          this.tableOptions.formArray.splice(5, 1, {key: 'discount', title: '会员折扣', type: 'input'})
-        } else {
-          this.tableOptions.formArray.splice(5, 1, {key: 'discount', title: '会员折扣', type: 'input', hide: true})
-          this.tableOptions.formData.discount = ''
-        }
+        // if (status) {
+        //   this.tableOptions.formArray.splice(5, 1, {key: 'discount', title: '会员折扣', type: 'input'})
+        // } else {
+        //   this.tableOptions.formArray.splice(5, 1, {key: 'discount', title: '会员折扣', type: 'input', hide: true})
+        //   this.tableOptions.formData.discount = ''
+        // }
       },
       async edit({type, params = {}}) {
         if (!this.hasGet) {

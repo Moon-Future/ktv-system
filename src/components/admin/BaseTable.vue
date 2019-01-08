@@ -90,6 +90,12 @@
         <Button type="primary" @click="submitForm">提交</Button>
       </div>
     </Drawer>
+    <Modal
+      v-model="goodsQtyFlag"
+      :title="params.name"
+      @on-ok="stockIn">
+      <InputNumber v-model="goodsQty" placeholder="库存数量" style="width:100%"></InputNumber>
+    </Modal>
   </div>
 </template>
 
@@ -124,7 +130,10 @@
         total: '',
         verifyCodeBtn: '发送验证码',
         sending: false,
-        searchPhone: ''
+        searchPhone: '',
+        params: {},
+        goodsQtyFlag: false,
+        goodsQty: null
       }
     },
     computed: {
@@ -135,6 +144,18 @@
           title: '操作',
           render: (h, params) => {
             return h('div', [
+              !this.tableOptions.goods ? '' :
+              h('span', {
+                class: {'operate-item' : true},
+                on: {
+                  click: () => {
+                    this.goodsQtyFlag = true
+                    this.params = params.row
+                    this.goodsQty = null
+                  }
+                }
+              }, '入库'),
+              !this.tableOptions.goods ? '' : h('span', {class: {'operate-divide' : true}}, '|'),
               this.tableOptions.user ? '' :
               h('span', {
                 class: {'operate-item' : true},
@@ -277,6 +298,13 @@
           }
         })
       },
+      stockIn() {
+        this.$http.post(apiUrl.stockIn, {
+          data: {params: this.params, qty: this.goodsQty}
+        }).then(res => {
+          
+        })
+      },
       changeSwitch(status) {
         this.$emit('changeSwitch', status)
       },
@@ -349,6 +377,12 @@
     display: flex;
     button {
       width: 50%;
+    }
+  }
+  .goodsQtyModal {
+    div {
+      text-align: right;
+      margin-top: 10px;
     }
   }
 </style>

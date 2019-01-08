@@ -127,4 +127,26 @@ router.post('/updGoods', async (ctx) => {
   }
 })
 
+router.post('/stockIn', async (ctx) => {
+  try {
+    const checkResult = checkRoot(ctx)
+    if (checkResult.code === 500) {
+      ctx.body = checkResult
+      return
+    }
+    
+    const data = ctx.request.body.data
+    const params = data.params
+    const qty = data.qty
+    const currentTime = new Date().getTime()
+
+    await query(`INSERT INTO goodsqty (goods, qty, user, time, createTime) VALUES (?, ?, ?, ?, ?)`, 
+      [params.id, qty, ctx.session.userInfo.name, currentTime, currentTime])
+
+    ctx.body = {code: 200, message: '更新成功', result: result}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
 module.exports = router

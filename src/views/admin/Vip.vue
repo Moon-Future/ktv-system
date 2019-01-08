@@ -100,8 +100,11 @@
         recordFlag: false,
         recordTitle: '充值记录',
         recordColumns: [
-          {key: 'money', title: '充值金额(元)'},
-          {key: 'time', title: '充值日期'}
+          {key: 'money', title: '总金额(元)'},
+          {key: 'recharge', title: '充值金额(元)'},
+          {key: 'give', title: '赠送金额(元)'},
+          {key: 'time', title: '充值日期'},
+          {key: 'user', title: '操作人员'}
         ]
       }
     },

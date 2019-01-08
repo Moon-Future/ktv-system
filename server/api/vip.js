@@ -203,10 +203,10 @@ router.post('/recharge', async (ctx) => {
     await query(`UPDATE vip SET balance = ?,
         record = ?
         WHERE phone = ? AND off != 1;
-        INSERT into rechargerecord (phone, money, recharge, give, time) VALUES (?, ?, ?, ?, ?)
+        INSERT into rechargerecord (phone, money, recharge, give, user, time) VALUES (?, ?, ?, ?, ?, ?)
       `, [
         Number(result[0].balance) + Number(rechargeMoney) + Number(giveMoney), Number(result[0].record + 1), phone,
-        phone, Number(rechargeMoney) + Number(giveMoney), rechargeMoney, giveMoney, new Date().getTime()
+        phone, Number(rechargeMoney) + Number(giveMoney), rechargeMoney, giveMoney, ctx.session.userInfo.name, new Date().getTime()
       ]
     )
     ctx.body = {code: 200, message: '充值成功'}
