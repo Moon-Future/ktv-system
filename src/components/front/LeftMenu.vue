@@ -9,7 +9,7 @@
           tag="li" 
           :to="item.to" 
           v-for="(item, i) in menuList" 
-          :class="{active: i === activeIndex, setup: item.index === '3'}" 
+          :class="{active: i === activeIndex, setup: item.index === '4'}" 
           :key="i" 
           @click="changeIndex(i)">
           <icon-font :icon="i === activeIndex ? `${item.icon}-active` : item.icon" fontSize="22"></icon-font>
@@ -29,18 +29,15 @@
         avatar: require('@/assets/avatar.jpg'),
         menuList: [
           {icon: 'icon-money-bag', text: '收银台', index: '1', to: '/ktv'},
-          {icon: 'icon-vip', text: '会员', index: '2', to: '/vip'},
-          {icon: 'icon-shezhi', text: '设置', index: '3', to: '/admin/baseinfo/roominfo'}
+          {icon: 'icon-order', text: '历史账单', index: '2', to: '/order'},
+          {icon: 'icon-vip', text: '会员', index: '3', to: '/vip'},
+          {icon: 'icon-shezhi', text: '设置', index: '4', to: '/admin/baseinfo/roominfo'}
         ],
         activeIndex: 0
       }
     },
     created() {
-      if (this.$route.path === '/ktv') {
-        this.activeIndex = 0
-      } else if (this.$route.path === '/vip') {
-        this.activeIndex = 1
-      }
+      this.routhPath()
     },
     methods: {
       changeIndex(index) {
@@ -56,17 +53,29 @@
           this.$Message.error('服务器君傲娇啦😭')
         })
       },
+      routhPath() {
+        switch(this.$route.path) {
+          case '/ktv':
+            this.activeIndex = 0
+            break
+          case '/order':
+            this.activeIndex = 1
+            break
+          case '/vip':
+            this.activeIndex = 2
+            break
+          default:
+            this.activeIndex = 0
+            break
+        }
+      },
       ...mapMutations({
         setUserInfo: 'SET_USERINGO'
       })
     },
     watch: {
       $route() {
-        if (this.$route.path === '/ktv') {
-          this.activeIndex = 0
-        } else if (this.$route.path === '/vip') {
-          this.activeIndex = 1
-        }
+        this.routhPath()
       }
     },
     components: {

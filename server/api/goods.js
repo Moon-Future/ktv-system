@@ -42,11 +42,8 @@ router.post('/getGoods', async (ctx) => {
       return
     }
     
-    const data = ctx.request.body.data
-    const pageNo = data && data.pageNo || 1
-    const pageSize = data && data.pageSize || 10
     const count = await query(`SELECT COUNT(*) as count FROM goods WHERE off != 1`)
-    const goodsList = await query(`SELECT g.id, g.name, g.picture, g.price, g.descr, g.vipDiscount, g.discount,
+    const goodsList = await query(`SELECT g.id, g.name, g.picture, g.price, g.descr, g.vipDiscount, g.discount, g.qty, g.record,
       u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.off != 1 ORDER BY g.createTime ASC`)
     goodsList.forEach(ele => {
       ele.vipDiscount = ele.vipDiscount === 1
@@ -139,11 +136,47 @@ router.post('/stockIn', async (ctx) => {
     const params = data.params
     const qty = data.qty
     const currentTime = new Date().getTime()
-
     await query(`INSERT INTO goodsqty (goods, qty, user, time, createTime) VALUES (?, ?, ?, ?, ?)`, 
       [params.id, qty, ctx.session.userInfo.name, currentTime, currentTime])
+    const result = await query(`SELECT * FROM goods WHERE id = ? AND off != 1`, [params.id])
+    await query(`UPDATE goods SET qty = ? WHERE id = ?`, [Number(result[0].qty) + Number(qty), params.id])
+    ctx.body = {code: 200, message: '入库成功'}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
 
-    ctx.body = {code: 200, message: '更新成功', result: result}
+router.post('/getStock', async (ctx) => {
+  try {
+    const checkResult = checkRoot(ctx)
+    if (checkResult.code === 500) {
+      ctx.body = checkResult
+      return
+    }
+    
+    const data = ctx.request.body.data
+    const id = data.id
+    const result = await query(`SELECT q.id, q.goods, q.qty, q.user, q.time, g.name FROM goodsqty as q LEFT JOIN goods as g ON q.goods = g.id WHERE q.goods = ? AND q.off != 1 ORDER BY q.time ASC`, [id])
+    ctx.body = {code: 200, message: result}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.post('/deleteStock', async (ctx) => {
+  try {
+    const checkResult = checkRoot(ctx)
+    if (checkResult.code === 500) {
+      ctx.body = checkResult
+      return
+    }
+    
+    const data = ctx.request.body.data
+    const params = data.params
+    await query(`UPDATE goodsqty SET off = 1 WHERE id = ?`, [params.id])
+    const result = await query(`SELECT * FROM goods WHERE id = ? AND off != 1`, [params.goods])
+    await query(`UPDATE goods SET qty = ?, record = ? WHERE id = ?`, [Number(result[0].qty) - Number(params.qty), Number(result[0].record) - 1, params.goods])
+    ctx.body = {code: 200}
   } catch(err) {
     throw new Error(err)
   }

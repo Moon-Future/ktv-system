@@ -1,15 +1,23 @@
 <template>
   <div class="room-info">
     <base-table
+      ref="baseTable"
       :tableOptions="tableOptions"
-      @changeSwitch="changeSwitch"
       @edit="edit">
     </base-table>
+    <Modal
+      v-model="recordFlag"
+      :title="recordTitle"
+      width="800"
+      :footer-hide="true">
+      <Table :columns="recordColumns" :data="recordData" max-height="500" border size="small"></Table>
+    </Modal>
   </div>
 </template>
 
 <script>
   import BaseTable from '@/components/admin/BaseTable'
+  import { dateFormat } from '@/common/js/util'
   import { apiUrl } from '@/serviceAPI.config.js'
   const validateDiscount = (rule, value, callback) => {
     if (!/^\d+(\.{0,1}\d{1,2}){0,1}$/.test(value) || value < 0 || value > 1) {
@@ -29,25 +37,24 @@
             }},
             {key: 'unitm', title: '单位'},
             {key: 'descr', title: '描述'},
-            // {
-            //   key: 'vipDiscount',
-            //   title: '会员折扣',
-            //   render: (h, params) => {
-            //     return h('i-switch', {
-            //       props: {disabled: 'disabled', value: params.row.vipDiscount}
-            //     })
-            //   }
-            // },
-            // {key: 'discount', title: '折扣'},
-            {key: 'qty', title: '库存'}
+            {key: 'qty', title: '库存'},
+            {key: 'record', title: '入库记录', render: (h, params) => {
+              return h('span', {
+                class: {'record-time': true},
+                on: {
+                  click: () => {
+                    this.params = params
+                    this.recordDetail(params)
+                  }
+                }
+              }, params.row.record + ' 次')
+            }},
           ],
           formArray: [
             {key: 'name', title: '名称', type: 'input'},
             {key: 'price', title: '价格', type: 'input'},
             {key: 'unit', title: '单位', type: 'select', options: []},
             {key: 'descr', title: '描述', type: 'textarea'},
-            // {key: 'vipDiscount', title: '开启会员折扣', type: 'switch'},
-            // {key: 'discount', title: '会员折扣', type: 'input', hide: true}
           ],
           formData: {
             name: '', picture: '', price: '', vipDiscount: false, discount: '', unit: '', descr: ''
@@ -69,7 +76,29 @@
           updApi: 'updGoods',
           delApi: 'deleteGoods',
           siftApi: 'getGoods'
-        }
+        },
+        recordFlag: false,
+        recordTitle: '入库记录',
+        recordColumns: [
+          {key: 'name', title: '名称'},
+          {key: 'qty', title: '入库数量'},
+          {key: 'time', title: '入库日期', render: (h, params) => {
+            return h('span', params.row.time)
+          }},
+          {key: 'user', title: '操作人员'},
+          {key: 'operate', title: '操作', render: (h, params) => {
+            return h('span', {
+              class: {'operate-item' : true},
+              on: {
+                click: () => {
+                  this.deleteStock(params)
+                }
+              }
+            }, '删除')
+          }},
+        ],
+        recordData: [],
+        params: ''
       }
     },
     methods: {
@@ -92,13 +121,37 @@
           })
         })
       },
-      changeSwitch(status) {
-        // if (status) {
-        //   this.tableOptions.formArray.splice(5, 1, {key: 'discount', title: '会员折扣', type: 'input'})
-        // } else {
-        //   this.tableOptions.formArray.splice(5, 1, {key: 'discount', title: '会员折扣', type: 'input', hide: true})
-        //   this.tableOptions.formData.discount = ''
-        // }
+      recordDetail(params) {
+        this.recordTitle = params.row.name + ' 入库记录'
+        this.recordFlag = true
+        if (params.row.record == 0) {
+          this.recordData = []
+          return
+        }
+        this.$http.post(apiUrl.getStock, {
+          data: {id: params.row.id}
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.recordData = res.data.message
+            this.recordData.forEach(ele => {
+              ele.time = dateFormat(ele.time, 'yyyy-MM-dd hh:mm')
+            })
+          }
+        })
+      },
+      deleteStock(params) {
+        this.$Modal.confirm({
+          title: '确认删除',
+          onOk: () => {
+            this.$http.post(apiUrl.deleteStock, {
+              data: {params: params.row}
+            }).then(res => {
+              this.recordData.splice(params.index, 1)
+              this.$set(this.params.row, 'record', this.params.row.record - 1)
+              this.$set(this.params.row, 'qty', this.params.row.qty - params.row.qty)
+            })
+          }
+        })
       },
       async edit({type, params = {}}) {
         if (!this.hasGet) {
@@ -109,14 +162,8 @@
           this.tableOptions.formData = {
             name: '', picture: '', price: '', vipDiscount: false, discount: '', unit: '', descr: ''
           }
-          this.changeSwitch(false)
         } else if (type === 'upd') {
           this.tableOptions.formData = params.row
-          if (params.row.vipDiscount) {
-            this.changeSwitch(true)
-          } else {
-            this.changeSwitch(false)
-          }
           this.tableOptions.formData.price = this.tableOptions.formData.price + ''
           this.tableOptions.formData.unit = this.tableOptions.formData.unit + ''
         }

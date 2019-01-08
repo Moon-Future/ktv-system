@@ -40,7 +40,7 @@
               descr.forEach(ele => {
                 array.push(h('span', {}, ele), h('br'))
               })
-              return h('div', {}, array)
+              return h('div', {style: {'line-height': '20px'}}, array)
             }},
             {key: 'price', title: '价格', render: (h, params) => {
               const row = params.row

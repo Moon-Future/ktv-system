@@ -4,7 +4,10 @@
       <ul class="title-wrapper">
         <li class="title-item" v-for="(item, i) in titleArray" :key="i">
           <span>{{ item.title }}：</span>
-          <span class="title-content">{{ roomInfo[item.field] | status({field: item.field, roomInfo: roomInfo}) }} {{ item.after }}</span>
+          <span v-if="item.field !== 'startTime'" class="title-content">{{ roomInfo[item.field] | status({field: item.field, roomInfo: roomInfo, ordInfo: ordInfo}) }} {{ item.after }}</span>
+          <span v-if="item.field === 'startTime' && ordInfo.startTime" class="title-content">
+            {{ ordInfo.startTime | filterTime(true)}}{{ currentTime | filterTime(false)}}， {{ diffTime }}
+          </span>
         </li>
       </ul>
       <Tabs type="card" v-model="packageType">
@@ -70,7 +73,7 @@
 
 <script>
   import IconFont from '@/components/IconFont'
-  import { deepClone } from '@/common/js/util'
+  import { deepClone, dateFormat } from '@/common/js/util'
   import { apiUrl } from '@/serviceAPI.config.js'
   import { mapGetters, mapMutations } from 'vuex'
   export default {
@@ -86,6 +89,7 @@
           {title: '房间编号', field: 'no'},
           {title: '房间类型', field: 'roomTypem'},
           {title: '状态', field: 'status'},
+          {title: '时长', field: 'startTime'}
         ],
         custMap: {vip: '会员', balance: '余额', time: '时间'},
         maxLen: 3,
@@ -96,8 +100,14 @@
         goodsList: [],
         goodsListSelected: [],
         goodsListGrp: [],
-        modalTitle: '套餐商品'
+        modalTitle: '套餐商品',
+        currentTime: new Date().getTime()
       }
+    },
+    created() {
+      this.timer = setInterval(() => {
+        this.currentTime += 1000
+      }, 1000)
     },
     computed: {
       packageList1() {
@@ -123,6 +133,13 @@
           }
         });
         return packageList
+      },
+      diffTime() {
+        const diff = this.currentTime - this.ordInfo.startTime
+        const hour = Math.floor(diff / (1000 * 60 * 60))
+        const minute = Math.floor((diff - hour) / (1000 * 60))
+        const str = hour === 0 ? `${minute} 分钟` : `${hour} 小时 ${minute} 分钟`
+        return str
       },
       ...mapGetters([
         'packageSelected',
@@ -198,11 +215,18 @@
       })
     },
     filters: {
-      status(value, {field, roomInfo}) {
+      status(value, {field, roomInfo, ordInfo}) {
         if (field === 'status') {
           return roomInfo.status === undefined ? '' : roomInfo.status == 0 ? '空闲' : '使用中'
         } else {
           return value
+        }
+      },
+      filterTime(time, flag) {
+        if (time) {
+          return dateFormat(time, 'hh:mm') + (flag ? ' ~ ' : '')
+        } else {
+          return ''
         }
       }
     },
@@ -210,6 +234,7 @@
       roomSelected() {
         this.activeItem = {}
         this.packageType = this.ordInfo && this.ordInfo.package && (this.ordInfo.package.type + '') || '1'
+        this.currentTime = new Date().getTime()
       }
     },
     components: {
@@ -226,6 +251,7 @@
   }
   .title-wrapper {
     display: flex;
+    padding-bottom: 10px;
     .title-item {
       font-size: 14px;
       margin-right: 10px;
@@ -247,6 +273,9 @@
       }
       &:hover {
         border: 1px solid $color-red;
+      }
+      p {
+        line-height: 22px;
       }
     }
     .card-title {

@@ -3,6 +3,9 @@ export const apiUrl = {
   getGoods: '/api/goods/getGoods',
   deleteGoods: '/api/goods/deleteGoods',
   updGoods: '/api/goods/updGoods',
+  stockIn: '/api/goods/stockIn',
+  getStock: '/api/goods/getStock',
+  deleteStock: '/api/goods/deleteStock',
 
   insertUnit: '/api/unit/insertUnit',
   getUnit: '/api/unit/getUnit',

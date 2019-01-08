@@ -302,7 +302,10 @@
         this.$http.post(apiUrl.stockIn, {
           data: {params: this.params, qty: this.goodsQty}
         }).then(res => {
-          
+          if (res.data.code === 200) {
+            this.$Message.success(res.data.message)
+            this.params.qty = Number(this.params.qty) + Number(this.goodsQty)
+          }
         })
       },
       changeSwitch(status) {

@@ -219,7 +219,7 @@ router.post('/getRechargeRecord', async (ctx) => {
   try {
     const data = ctx.request.body.data
     const phone = data.phone
-    const result = await query(`SELECT * FROM rechargerecord WHERE phone = '${phone}' AND off != 1`)
+    const result = await query(`SELECT * FROM rechargerecord WHERE phone = '${phone}' AND off != 1 ORDER BY time ASC`)
     ctx.body = {code: 200, message: result}
   } catch(err) {
     throw new Error(err)

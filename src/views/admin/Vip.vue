@@ -25,6 +25,7 @@
     <Modal
       v-model="recordFlag"
       :title="recordTitle"
+      width="800"
       :footer-hide="true">
       <Table :columns="recordColumns" :data="recordData" max-height="500" border size="small"></Table>
     </Modal>

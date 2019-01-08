@@ -1,6 +1,5 @@
 <template>
   <div class="room-info">
-    <Button size="small" class="room-position">房间布局</Button>
     <base-table
       :tableOptions="tableOptions"
       @edit="edit">
@@ -35,7 +34,7 @@
                   descr.forEach(ele => {
                     descrArray.push(h('span', {}, ele), h('br'))
                   })
-                  array.push(h('Tooltip', {props: {'max-width': '200'}}, [
+                  array.push(h('Tooltip', {props: {'max-width': '200'}, style: {'padding': '5px 0'}}, [
                     h('Tag', {props: {color: 'purple'}}, ele.packagem),
                     h('div', {slot: 'content'}, descrArray)
                   ]))
@@ -143,7 +142,4 @@
 </script>
 
 <style lang="scss" scoped>
-  .room-position {
-    position: absolute;
-  }
 </style>

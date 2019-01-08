@@ -4,7 +4,7 @@
       <icon-font icon="icon-zhijia" fontSize="80"></icon-font>
     </div>
     <div class="bill-wrapper">
-      <div class="bill-title">KTV消费账单</div>
+      <div class="bill-title">亿民汇KTV 消费账单</div>
       <ul class="ord-info">
         <li v-for="(ord, i) in ordList" :key="i">
           <span>{{ ord.title }}：</span>
@@ -385,6 +385,7 @@
               data: {ordInfo: this.ordInfo}
             }).then(res => {
               this.setOrdInfo({data: {room: this.ordInfo.room, status: 0}, type: 'ordInfo', roomSelected: 'close'})
+              this.discountMoney = 0
             })
           },
         })
@@ -398,6 +399,7 @@
               data: {ordInfo: this.ordInfo}
             }).then(res => {
               this.setOrdInfo({data: {room: this.ordInfo.room, status: 0}, type: 'ordInfo', roomSelected: 'close'})
+              this.discountMoney = 0
             })
           },
         })
