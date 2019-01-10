@@ -10,6 +10,7 @@
           <span>{{ ord.title }}：</span>
           <span v-if="ord.key === 'vip' && ordInfo.room && !ordInfo[ord.key]" class="order-vip" @click="loginVip">登陆</span>
           <span v-else-if="ord.key === 'balance' && ordInfo.room && ordInfo['vip']">
+            <span class="order-vip-operate" @click="logoutVip">寄存</span>
             <span class="order-vip-operate" @click="logoutVip">注销</span>
             <span class="order-vip-operate" @click="modalRecharge = true">充值</span>
             {{ ordInfo[ord.key] }}

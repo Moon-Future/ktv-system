@@ -26,7 +26,7 @@
       ...mapGetters(['userInfo'])
     },
     created() {
-      if (this.$route.path == '/vip') {
+      if (this.$route.path == '/vip' || this.$route.path == '/order') {
         this.vipFront = true
       } else {
         this.vipFront = false
@@ -53,7 +53,7 @@
     },
     watch: {
       $route() {
-        if (this.$route.path == '/vip') {
+        if (this.$route.path == '/vip' || this.$route.path == '/order') {
           this.vipFront = true
         } else {
           this.vipFront = false

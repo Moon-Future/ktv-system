@@ -63,9 +63,11 @@ router.post('/getOrder', async (ctx) => {
         LEFT JOIN unit as u on g.unit = u.id
         WHERE p.uuid = ?`, [ordInfo[0].package])
       packageMap = {descr: packageList[0].descr, package: packageList[0].package, packagem: packageList[0].packagem, type: ordInfo[0].packageType, grpSelected: ordInfo[0].grpSelected,
-        type1: packageList[0].type1, type2: packageList[0].type2, price1: packageList[0].price1, price2: packageList[0].price2, grp: packageList[0].grp, goods: []}
+        type1: packageList[0].type1, type2: packageList[0].type2, price1: packageList[0].price1, price2: packageList[0].price2, grp: packageList[0].grp || '', goods: []}
       packageList.forEach(ele => {
-        packageMap.goods.push({goods: ele.goods, goodsm: ele.goodsm, qty: ele.qty, unitm: ele.unitm})
+        if (ele.goods) {
+          packageMap.goods.push({goods: ele.goods, goodsm: ele.goodsm, qty: ele.qty, unitm: ele.unitm})
+        }
       })
       ordInfo[0].package = packageMap
 
@@ -156,6 +158,62 @@ router.post('/updOrder', async (ctx) => {
       [packageId, packageType, grpSelected, goodsList.join(','), qtyList.join(','), ordInfo.vip, ordInfo.totalPrice, ordInfo.discount, ordInfo.payMethod, ordInfo.room]
     )
     ctx.body = {code: 200, message: '更新成功'}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.post('/getOrderHistory', async (ctx) => {
+  try {
+    const checkResult = checkRoot(ctx)
+    if (checkResult.code === 500) {
+      ctx.body = checkResult
+      return
+    }
+
+    const data = ctx.request.body.data
+    let ordInfo = await query(`SELECT * FROM roomorder WHERE off = 1 ORDER BY createTime DESC`)
+    let count = await query(`SELECT COUNT(*) as count FROM roomorder WHERE off = 1`)
+    let result = []
+
+    for (let i = 0, len = ordInfo.length; i < len; i++) {
+      var item = ordInfo[i]
+      if (item.vip) {
+        const vipInfo = await query(`SELECT balance FROM vip WHERE phone = ? AND off != 1`, [item.vip])
+        item.balance = vipInfo[0].balance
+      }
+      let packageMap = {}
+      const packageList = await query(`SELECT p.descr, p.name as packagem, p.uuid as package, p.type1, p.type2, p.price1, p.price2, p.qty, p.grp, g.id as goods, g.name as goodsm, u.name as unitm
+        FROM package as p 
+        LEFT JOIN goods as g on p.goods = g.id
+        LEFT JOIN unit as u on g.unit = u.id
+        WHERE p.uuid = ?`, [item.package])
+      packageMap = {descr: packageList[0].descr, package: packageList[0].package, packagem: packageList[0].packagem, type: item.packageType, grpSelected: item.grpSelected,
+        type1: packageList[0].type1, type2: packageList[0].type2, price1: packageList[0].price1, price2: packageList[0].price2, grp: packageList[0].grp || '', goods: []}
+      packageList.forEach(ele => {
+        if (ele.goods) {
+          packageMap.goods.push({goods: ele.goods, goodsm: ele.goodsm, qty: ele.qty, unitm: ele.unitm})
+        }
+      })
+      item.package = packageMap
+
+      const goodsList = item.goods ? item.goods.split(',') : []
+      const qtyList = item.qty ? item.qty.split(',') : []
+      let goodsMap = {}
+      for (let i = 0, len = goodsList.length; i < len; i++) {
+        let result = await query(`SELECT * FROM goods WHERE id = ${goodsList[i]}`);
+        goodsMap[goodsList[i]] = result[0]
+        goodsMap[goodsList[i]].qty = qtyList[i]
+      }
+      item.goods = goodsMap
+
+      item.no = item.room
+      delete item.packageType
+      delete item.grpSelected
+      delete item.qty
+      result.push(item)
+    }
+    ctx.body = {code: 200, message: result, count: count.length === 0 ? 0 : count[0].count}
   } catch(err) {
     throw new Error(err)
   }

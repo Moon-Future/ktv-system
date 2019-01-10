@@ -167,7 +167,7 @@
           this.tableOptions.formData.price = this.tableOptions.formData.price + ''
           this.tableOptions.formData.unit = this.tableOptions.formData.unit + ''
         }
-      }
+      },
     },
     components: {
       BaseTable

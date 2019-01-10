@@ -8,7 +8,14 @@
         <h2>总数：{{ total }}</h2>
         <Button type="primary" size="small" @click="goAdd" v-show="!tableOptions.onlySift">添加</Button>
       </div>
-      <Table :columns="tableColumns" :data="tableData" :loading="loading" stripe size="small"></Table>
+      <Table 
+        :highlight-row="highlight" 
+        :columns="tableColumns" 
+        :data="tableData" 
+        :loading="loading" 
+        :stripe="stripe" 
+        size="small"
+        @on-current-change="selectRow"></Table>
     </div>
     <Drawer
       title="新增"
@@ -108,6 +115,14 @@
       tableOptions: {
         type: Object,
         default: {}
+      },
+      stripe: {
+        type: Boolean,
+        default: true
+      },
+      highlight: {
+        type: Boolean,
+        default: false
       }
     },
     mounted() {
@@ -178,7 +193,7 @@
             ])
           }
         }
-        columns.push(obj)
+        this.tableOptions.orderHistory ? false : columns.push(obj)
         return columns
       },
       formData() {
@@ -186,6 +201,9 @@
       }
     },
     methods: {
+      selectRow(currentRow) {
+        this.$emit('selectRow', {currentRow});
+      },
       search() {
         if (this.searchPhone !== '' && !/^1[34578]\d{9}$/.test(this.searchPhone)) {
           this.$Message.error('手机号码有误')

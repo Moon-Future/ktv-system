@@ -33,6 +33,7 @@ export const apiUrl = {
   closeOrder: '/api/order/closeOrder',
   cancelOrder: '/api/order/cancelOrder',
   updOrder: '/api/order/updOrder',
+  getOrderHistory: '/api/order/getOrderHistory',
 
   sendVerifyCode: '/api/vip/sendVerifyCode',
   registerVip: '/api/vip/registerVip',

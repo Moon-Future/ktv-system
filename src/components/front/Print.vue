@@ -33,9 +33,9 @@
       <div class="account-wrapper">
         <div class="account-item" v-for="(item, i) in accountList" :key="i">
           <span>{{ item.title }}</span>
-          <span :class="item.class" v-if="item.key == 'origin'">{{ ordInfo.totalPrice }} 元</span>
+          <span :class="item.class" v-if="item.key == 'origin'">{{ ordInfo.totalPrice || 0 }} 元</span>
           <span :class="item.class" v-if="item.key == 'discount' && discountShow">{{ ordInfo.discount || 0 }} 元</span>
-          <span :class="item.class" v-if="item.key == 'pay'">{{ ordInfo.totalPrice - (ordInfo.discount || 0) }} 元</span>
+          <span :class="item.class" v-if="item.key == 'pay'">{{ (ordInfo.totalPrice - (ordInfo.discount || 0))  || 0}} 元</span>
           <span :class="item.class" v-if="item.key == 'paymethos'">
             <span>{{ payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].title}}</span>
             <icon-font v-show="payMethodMap[ordInfo.payMethod]" :icon="payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].icon" fontSize="12"></icon-font>
@@ -43,6 +43,9 @@
           <span :class="item.class" v-if="item.key == 'user'">{{ ordInfo.user }}</span>
           <span :class="item.class" v-if="item.key == 'time'">{{ printTime | filterTime('startTime') }}</span>
         </div>
+      </div>
+      <div class="print-order">
+        <Button v-show="btnShow" type="warning" @click="printOrder">打单</Button>
       </div>
     </div>
   </div>
@@ -63,6 +66,10 @@
       printTime: {
         type: Number,
         default: new Date().getTime()
+      },
+      btnShow: {
+        type: Boolean,
+        default: false
       }
     },
     data() {
@@ -121,6 +128,11 @@
         })
         return array
       },
+    },
+    methods: {
+      printOrder() {
+        this.$emit('printOrder')
+      }
     },
     filters: {
       filterTime(value, key) {
@@ -240,6 +252,11 @@
             color: $color-blue;
           }
         }
+      }
+    }
+    .print-order {
+      button {
+        width: 100%;
       }
     }
   }

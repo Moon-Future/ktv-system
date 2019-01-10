@@ -57,12 +57,13 @@
       v-model="modalFlag"
       :title="modalTitle"
       :footer-hide="true">
-      <CheckboxGroup v-model="goodsListSelected" class="goods-list">
+      <CheckboxGroup v-show="goodsList.length !== 0" v-model="goodsListSelected" class="goods-list">
         <Checkbox class="goods-list-item" v-for="(item, i) in goodsList" :label="item.goods" disabled :key="i">{{ item.goodsm }}({{ item.qty }}{{ item.unitm }})</Checkbox>
       </CheckboxGroup>
-      <RadioGroup v-model="packageItem.grpSelected">
+      <RadioGroup v-show="goodsListGrp.length !== 0" v-model="packageItem.grpSelected">
         <Radio class="goods-list-item" v-for="(item, i) in goodsListGrp" :label="item.goods" :key="i">{{ item.goodsm }}({{ item.qty }}{{ item.unitm }})</Radio>
       </RadioGroup>
+      <h1 v-show="goodsList.length === 0 && goodsListGrp.length === 0">套餐不含商品</h1>
       <div class="modal-operate">
         <Button @click="modalFlag = false">取消</Button>
         <Button type="primary" @click="selectPackage">确认</Button>
@@ -137,7 +138,7 @@
       diffTime() {
         const diff = this.currentTime - this.ordInfo.startTime
         const hour = Math.floor(diff / (1000 * 60 * 60))
-        const minute = Math.floor((diff - hour) / (1000 * 60))
+        const minute = Math.floor((diff - hour * 60 * 60 * 1000) / (1000 * 60))
         const str = hour === 0 ? `${minute} 分钟` : `${hour} 小时 ${minute} 分钟`
         return str
       },
@@ -151,6 +152,7 @@
     methods: {
       clickPackage(item, index) {
         item.grpSelected = item.grpSelected || ''
+        item.grp = item.grp || ''
         this.packageItem = item
         if (this.ordInfo.package && this.ordInfo.package.type == this.packageType && this.ordInfo.package.package == this.packageItem.package) {
           this.$set(this.packageItem, 'grpSelected', Number(this.ordInfo.package.grpSelected) || '')
@@ -170,7 +172,7 @@
         })
       },
       selectPackage() {
-        if (this.packageItem.grp != '' && this.packageItem.grpSelected == '') {
+        if (this.packageItem.goods.length !== 0 && this.packageItem.grp != '' && this.packageItem.grpSelected == '') {
           this.$Message.error('请选择商品')
           return
         }

@@ -165,7 +165,9 @@ router.post('/getRoomInfo', async (ctx) => {
     result.forEach(ele => {
       if (ele.package) {
         packageGoodsMap[ele.uuid + '_' + ele.package] = packageGoodsMap[ele.uuid + '_' + ele.package] || []
-        packageGoodsMap[ele.uuid + '_' + ele.package].push({goods: ele.goods, goodsm: ele.goodsm, qty: ele.qty, unitm: ele.unitm})
+        if (ele.goods) {
+          packageGoodsMap[ele.uuid + '_' + ele.package].push({goods: ele.goods, goodsm: ele.goodsm, qty: ele.qty, unitm: ele.unitm})
+        }
       }
     })
     result.forEach(ele => {
