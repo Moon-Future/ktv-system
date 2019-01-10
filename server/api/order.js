@@ -75,7 +75,9 @@ router.post('/getOrder', async (ctx) => {
       const qtyList = ordInfo[0].qty ? ordInfo[0].qty.split(',') : []
       let goodsMap = {}
       for (let i = 0, len = goodsList.length; i < len; i++) {
-        let result = await query(`SELECT * FROM goods WHERE id = ${goodsList[i]}`);
+        let result = await query(`SELECT g.id, g.name, g.picture, g.price, g.descr, g.vipDiscount, g.discount, g.qty, g.record,
+          u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.id = ?`, [goodsList[i]])
+
         goodsMap[goodsList[i]] = result[0]
         goodsMap[goodsList[i]].qty = qtyList[i]
       }
@@ -102,7 +104,7 @@ router.post('/closeOrder', async (ctx) => {
     
     const data = ctx.request.body.data
     const ordInfo = data.ordInfo
-    await query(`UPDATE roomorder SET off = 1 WHERE nun = ?`, [ordInfo.nun])
+    await query(`UPDATE roomorder SET off = 1, endTime = ? WHERE nun = ?`, [new Date().getTime(), ordInfo.nun])
     await query(`UPDATE room SET status = 0 WHERE no = ?`, [ordInfo.room])
     if (ordInfo.vip) {
       await query(`UPDATE vip SET balance = ?, status = ? WHERE phone = ? AND off != 1`, [Number(ordInfo.totalPrice - ordInfo.discount), 0, ordInfo.vip])

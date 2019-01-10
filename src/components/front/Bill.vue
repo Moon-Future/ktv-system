@@ -10,7 +10,7 @@
           <span>{{ ord.title }}：</span>
           <span v-if="ord.key === 'vip' && ordInfo.room && !ordInfo[ord.key]" class="order-vip" @click="loginVip">登陆</span>
           <span v-else-if="ord.key === 'balance' && ordInfo.room && ordInfo['vip']">
-            <span class="order-vip-operate" @click="logoutVip">寄存</span>
+            <span class="order-vip-operate" @click="depositFlag = true">寄取</span>
             <span class="order-vip-operate" @click="logoutVip">注销</span>
             <span class="order-vip-operate" @click="modalRecharge = true">充值</span>
             {{ ordInfo[ord.key] }}
@@ -104,9 +104,9 @@
           <Input v-model="rechargeForm.giveMoney" suffix="logo-yen" placeholder="输入赠送金额" />
         </FormItem>
       </Form>
-      <div class="recharge-button">
+      <div class="modal-button">
         <Button @click="cancelRecharge">取消</Button>
-        <Button type="primary" class="recharge-ok" @click="okRecharge">确定</Button>
+        <Button type="primary" @click="okRecharge">确定</Button>
       </div>
     </Modal>
     <Modal
@@ -117,6 +117,26 @@
       <div class="drawer-footer" slot="footer" v-show="printFlag">
         <Button @click="printFlag = false">取消</Button>
         <Button type="primary" @click="printOrder">确认</Button>
+      </div>
+    </Modal>
+    <Modal
+      v-model="depositFlag"
+      title="会员商品寄取"
+      :footer-hide="true">
+      <RadioGroup v-model="depositTakeTab" type="button" size="small" style="margin-bottom:10px">
+        <Radio label="deposit">寄存</Radio>
+        <Radio label="take">取用</Radio>
+      </RadioGroup>
+      <Table
+        v-show="depositTakeTab === 'deposit'"
+        :columns="allGoodsColumns" 
+        :data="allGoodsData" 
+        border
+        size="small"
+        @on-selection-change="depositTakeSelect"></Table>
+      <div class="modal-button">
+        <Button @click="depositFlag = false">取消</Button>
+        <Button type="primary" @click="depositSubmit">确定</Button>
       </div>
     </Modal>
   </div>
@@ -170,7 +190,24 @@
         rechargeForm: {rechargeMoney: '', giveMoney: ''},
         printTime: new Date().getTime(),
         printFlag: false,
-        printOrdInfo: {}
+        printOrdInfo: {},
+        depositFlag: false,
+        depositTakeTab: 'deposit',
+        allGoodsColumns: [
+          {type: 'selection', width: 50, align: 'center'},
+          {key: 'goodsm', title: '商品'},
+          {key: 'qty', title: '数量'},
+          {key: 'depositQty', title: '寄存', render: (h, params) => {
+            return h('InputNumber', {
+              props: {min: 0, max: Number(params.row.qty), value: params.row.depositQty},
+              on: {
+                input(val) {
+                  params.row.depositQty = val
+                }
+              }
+            })
+          }}
+        ]
       }
     },
     computed: {
@@ -207,6 +244,18 @@
           }
         })
         return array
+      },
+      allGoodsData() {
+        let goodsList = deepClone(this.packageGoods)
+        for (let key in this.goodsSelected) {
+          const item = this.goodsSelected[key]
+          const obj = {goods: item.id, goodsm: item.name, qty: item.qty, unitm: item.unitm}
+          goodsList.push(obj)
+        }
+        goodsList.forEach(ele => {
+          ele.depositQty = 0
+        })
+        return goodsList
       },
       ...mapGetters([
         'goodsSelected',
@@ -432,6 +481,12 @@
         this.setOrdInfo({data: {payMethod: key}})
         this.updateOrder()
       },
+      depositSubmit() {
+
+      },
+      depositTakeSelect(selection) {
+        console.log(selection)
+      },
       ...mapMutations({
         setOrdInfo: 'SET_ORDINFO'
       })
@@ -598,11 +653,11 @@
       margin-left: 10px;
     }
   }
-  .recharge-button {
+  .modal-button {
     text-align: right;
     margin-top: 10px;
-    .recharge-ok {
-      margin-left: 10px;
+    button:first-child {
+      margin-right: 10px;
     }
   }
   .drawer-footer{
