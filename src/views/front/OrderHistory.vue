@@ -30,7 +30,7 @@
             {key: 'startTime', title: '开始时间', render: (h, params) => {
               return h('span', dateFormat(params.row.startTime, 'yyyy-MM-dd hh:mm'))
             }},
-            {key: 'endTime', title: '开始时间', render: (h, params) => {
+            {key: 'endTime', title: '结束时间', render: (h, params) => {
               return h('span', dateFormat(params.row.endTime, 'yyyy-MM-dd hh:mm'))
             }},
             {key: 'time', title: '相对时间', render: (h, params) => {

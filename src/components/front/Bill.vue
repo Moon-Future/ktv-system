@@ -10,7 +10,7 @@
           <span>{{ ord.title }}：</span>
           <span v-if="ord.key === 'vip' && ordInfo.room && !ordInfo[ord.key]" class="order-vip" @click="loginVip">登陆</span>
           <span v-else-if="ord.key === 'balance' && ordInfo.room && ordInfo['vip']">
-            <span class="order-vip-operate" @click="depositFlag = true">寄取</span>
+            <span class="order-vip-operate" @click="openDepositModal">寄取</span>
             <span class="order-vip-operate" @click="logoutVip">注销</span>
             <span class="order-vip-operate" @click="modalRecharge = true">充值</span>
             {{ ordInfo[ord.key] }}
@@ -46,7 +46,7 @@
           <span :class="item.class" v-if="item.key == 'origin'">{{ totalPrice }} 元</span>
           <span :class="item.class" v-if="item.key == 'discount'"><input v-model="discountMoney" @input="changeDiscount" @blur="discountBlur" /> 元</span>
           <span :class="item.class" v-if="item.key == 'pay'">{{ payPrice }} 元</span>
-          <span :class="item.class" v-if="item.key == 'paymethos'" @click="openModal">
+          <span :class="item.class" v-if="item.key == 'paymethos'" @click="modalVisible = true">
             <span>{{ payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].title || '选择支付方式' }}</span>
             <icon-font v-show="payMethodMap[ordInfo.payMethod]" :icon="payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].icon" fontSize="12"></icon-font>
           </span>
@@ -193,16 +193,24 @@
         printOrdInfo: {},
         depositFlag: false,
         depositTakeTab: 'deposit',
+        depositList: [],
+        takeList: [],
         allGoodsColumns: [
           {type: 'selection', width: 50, align: 'center'},
           {key: 'goodsm', title: '商品'},
           {key: 'qty', title: '数量'},
           {key: 'depositQty', title: '寄存', render: (h, params) => {
+            const self = this
             return h('InputNumber', {
               props: {min: 0, max: Number(params.row.qty), value: params.row.depositQty},
               on: {
                 input(val) {
-                  params.row.depositQty = val
+                  self.$set(self.allGoodsData[params.index], 'depositQty', val)
+                  self.depositList.forEach(ele => {
+                    if (ele.goods === params.row.goods) {
+                      ele.depositQty = val
+                    }
+                  })
                 }
               }
             })
@@ -464,9 +472,6 @@
           
         })
       },
-      openModal() {
-        this.modalVisible = true
-      },
       selectPayMethod(item, key) {
         if (key == '5') {
           if (!this.ordInfo.vip) {
@@ -481,11 +486,29 @@
         this.setOrdInfo({data: {payMethod: key}})
         this.updateOrder()
       },
-      depositSubmit() {
+      openDepositModal() {
+        this.depositFlag = true
+        this.$http.post(apiUrl.getDeposit, {
+          data: {vip: this.ordInfo.vip, nun: this.ordInfo.nun}
+        }).then(res => {
 
+        })
+      },
+      depositSubmit() {
+        console.log(this.depositList)
+        if (this.depositList.length === 0) {
+          this.$Message.error('请选择寄存的商品')
+          return
+        }
+        this.$http.post(apiUrl.deposit, {
+          data: {vip: this.ordInfo.vip, nun: this.ordInfo.nun, goodsList: this.depositList}
+        }).then(res => {
+
+        })
       },
       depositTakeSelect(selection) {
         console.log(selection)
+        this.depositList = selection
       },
       ...mapMutations({
         setOrdInfo: 'SET_ORDINFO'

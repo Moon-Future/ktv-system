@@ -42,6 +42,9 @@ export const apiUrl = {
   getVip: '/api/vip/getVip',
   recharge: '/api/vip/recharge',
   getRechargeRecord: '/api/vip/getRechargeRecord',
+  deposit: '/api/vip/deposit',
+  getDeposit: '/api/vip/getDeposit',
+  take: '/api/vip/take',
 
   register: '/api/user/register',
   login: '/api/user/login',

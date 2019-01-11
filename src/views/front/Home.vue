@@ -48,7 +48,9 @@
         })
       },
       ...mapMutations({
-        setUserInfo: 'SET_USERINGO'
+        setUserInfo: 'SET_USERINGO',
+        setRoomSelected: 'SET_ROOM_SELECTED',
+        setOrdInfo: 'SET_ORDINFO'
       })
     },
     watch: {
@@ -57,6 +59,8 @@
           this.vipFront = true
         } else {
           this.vipFront = false
+          this.setOrdInfo({data: {}, type: 'ordInfo'})
+          this.setRoomSelected({})
         }
       }
     },

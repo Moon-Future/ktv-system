@@ -226,6 +226,57 @@ router.post('/getRechargeRecord', async (ctx) => {
   }
 })
 
+// 商品寄存
+router.post('/deposit', async (ctx) => {
+  try {
+    const data = ctx.request.body.data
+    const currentTime = new Date().getTime()
+    const nun = data.nun
+    const vip = data.vip
+    const goodsList = data.goodsList
+    await query(`DELETE FROM vipstock WHERE nun = ? AND vip = ? AND off != 1`, [nun, vip])
+    for (let i = 0, len = goodsList.length; i < len; i++) {
+      const item = goodsList[i]
+      const goods = item.goods
+      const qty = item.depositQty
+      if (qty != 0) {
+        await query(`INSERT INTO vipstock (nun, vip, goods, qty) VALUES (?, ?, ?, ?)`, [ nun, vip, goods, qty])
+      }
+    }
+    
+    ctx.body = {code: 200, message: '寄存成功'}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.post('/getDeposit', async (ctx) => {
+  try {
+    const data = ctx.request.body.data
+    const nun = data.nun
+    const vip = data.vip
+    let result
+    if (nun === undefined) {
+      result = await query(`SELECT v.nun, v.vip, v.goods, v.qty as depositQty, g.name as goodsm, u.name as unitm
+        FROM vipstock as v
+        LEFT JOIN goods as g on g.id = v.goods
+        LEFT JOIN unit as u on u.id = g.unit
+        WHERE v.vip = ? AND v.off != 1`, 
+        [vip])
+    } else {
+      result = await query(`SELECT v.nun, v.vip, v.goods, v.qty as depositQty, g.name as goodsm, u.name as unitm
+        FROM vipstock as v
+        LEFT JOIN goods as g on g.id = v.goods
+        LEFT JOIN unit as u on u.id = g.unit
+        WHERE v.nun = ? AND v.vip = ? AND v.off != 1`, 
+        [nun, vip])
+    }
+    ctx.body = {code: 200, message: result}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
 router.post('/getSession', async (ctx) => {
   try {
     const userInfo = ctx.session.userInfo
