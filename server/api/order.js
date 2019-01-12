@@ -83,10 +83,23 @@ router.post('/getOrder', async (ctx) => {
       }
       ordInfo[0].goods = goodsMap
 
+      const stockGoodsList = ordInfo[0].stockGoods ? ordInfo[0].stockGoods.split(',') : []
+      const stockQtyList = ordInfo[0].stockQty ? ordInfo[0].stockQty.split(',') : []
+      let stockGoods = []
+      for (let i = 0, len = stockGoodsList.length; i < len; i++) {
+        let result = await query(`SELECT g.id as goods, g.name as goodsm,
+          u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.id = ?`, [stockGoodsList[i]])
+        result[0].depositQty = stockQtyList[i]
+        stockGoods.push(result[0])
+      }
+      ordInfo[0].goods = goodsMap
+      ordInfo[0].stockGoods = stockGoods
+
       ordInfo[0].no = ordInfo[0].room
       delete ordInfo[0].packageType
       delete ordInfo[0].grpSelected
       delete ordInfo[0].qty
+      delete ordInfo[0].stockQty
     }
     ctx.body = {code: 200, message: ordInfo}
   } catch(err) {
@@ -104,11 +117,23 @@ router.post('/closeOrder', async (ctx) => {
     
     const data = ctx.request.body.data
     const ordInfo = data.ordInfo
+    if (ordInfo.vip) {
+      await query(`UPDATE vip SET balance = ?, status = ? WHERE phone = ? AND off != 1`, [Number(ordInfo.totalPrice) - Number(ordInfo.discount || 0), 0, ordInfo.vip])
+    }
     await query(`UPDATE roomorder SET off = 1, endTime = ? WHERE nun = ?`, [new Date().getTime(), ordInfo.nun])
     await query(`UPDATE room SET status = 0 WHERE no = ?`, [ordInfo.room])
-    if (ordInfo.vip) {
-      await query(`UPDATE vip SET balance = ?, status = ? WHERE phone = ? AND off != 1`, [Number(ordInfo.totalPrice - ordInfo.discount), 0, ordInfo.vip])
+    
+    const result = await query(`SELECT * FROM vipstock WHERE nun = ? AND vip = ? AND off != 1`, [ordInfo.nun, ordInfo.vip])
+    for (let i = 0, len = result.length; i < len; i++) {
+      const exist = await query(`SELECT * FROM vipstock WHERE nun = '' AND vip = ? AND goods = ? AND off != 1`, [ordInfo.vip, result[i].goods])
+      if (exist.length !== 0) {
+        await query(`UPDATE vipstock SET qty = ? WHERE nun = '' AND vip = ? AND goods = ? AND off != 1`, [Number(exist[0].qty) + Number(result[i].qty), ordInfo.vip, result[i].goods])
+        await query(`DELETE FROM vipstock WHERE nun = ? AND vip = ? AND goods = ? AND off != 1`, [ordInfo.nun, ordInfo.vip, result[i].goods])
+      } else {
+        await query(`UPDATE vipstock SET nun = '' WHERE nun = ? AND vip = ? AND goods = ? AND off != 1`, [ordInfo.nun, ordInfo.vip, result[i].goods])
+      }
     }
+
     ctx.body = {code: 200, message: '结账成功'}
   } catch(err) {
     throw new Error(err)
@@ -150,14 +175,22 @@ router.post('/updOrder', async (ctx) => {
     const packageType = ordInfo.package && ordInfo.package.type || ''
     const grpSelected = ordInfo.package && ordInfo.package.grpSelected || ''
     const goodsMap = ordInfo.goods || {}
+    const stockGoods = ordInfo.stockGoods || []
     let goodsList = [], qtyList = []
+    let stockGoodsList = [], stockQtyList = []
     for (let key in goodsMap) {
       goodsList.push(goodsMap[key].id)
       qtyList.push(goodsMap[key].qty)
     }
+    stockGoods.forEach(ele => {
+      if (ele.depositQty != 0) {
+        stockGoodsList.push(ele.goods)
+        stockQtyList.push(ele.depositQty)
+      }
+    })
 
-    await query(`UPDATE roomorder SET package = ?, packageType = ?, grpSelected = ?, goods = ?, qty = ?, vip = ?, totalPrice = ?, discount = ?, paymethod = ? WHERE room = ? AND off != 1`, 
-      [packageId, packageType, grpSelected, goodsList.join(','), qtyList.join(','), ordInfo.vip, ordInfo.totalPrice, ordInfo.discount, ordInfo.payMethod, ordInfo.room]
+    await query(`UPDATE roomorder SET package = ?, packageType = ?, grpSelected = ?, goods = ?, qty = ?, stockGoods = ?, stockQty = ?, vip = ?, totalPrice = ?, discount = ?, paymethod = ? WHERE room = ? AND off != 1`, 
+      [packageId, packageType, grpSelected, goodsList.join(','), qtyList.join(','), stockGoodsList.join(','), stockQtyList.join(','), ordInfo.vip, ordInfo.totalPrice, ordInfo.discount, ordInfo.payMethod, ordInfo.room]
     )
     ctx.body = {code: 200, message: '更新成功'}
   } catch(err) {

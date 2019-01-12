@@ -39,6 +39,11 @@
           <span>x{{ good.qty || 1 }}</span>
           <span>{{ good.price }}</span>
         </li>
+        <li v-for="(good, i) in ordInfo.stockGoods" :key="`${i}_stock_${good.goodsm}`">
+          <span>{{ good.goodsm }}(寄存)</span>
+          <span>x{{ good.depositQty }}</span>
+          <span>{{ 0 }}</span>
+        </li>
       </ul>
       <div class="account-wrapper">
         <div class="account-item" v-for="(item, i) in accountList" :key="i">
@@ -88,7 +93,7 @@
         </FormItem>
       </Form>
       <div class="vip-button">
-        <Button class="vip-cancel" @click="cancelVip">取消</Button>
+        <Button class="vip-cancel" @click="modalVip = false">取消</Button>
         <Button type="primary" class="vip-ok" @click="okVip">确定</Button>
       </div>
     </Modal>
@@ -128,9 +133,8 @@
         <Radio label="take">取用</Radio>
       </RadioGroup>
       <Table
-        v-show="depositTakeTab === 'deposit'"
-        :columns="allGoodsColumns" 
-        :data="allGoodsData" 
+        :columns="depositTakeTab === 'deposit' ? allGoodsColumns : takeGoodsColumns" 
+        :data="depositTakeTab === 'deposit' ? allGoodsData : takeGoodsData" 
         border
         size="small"
         @on-selection-change="depositTakeSelect"></Table>
@@ -191,10 +195,12 @@
         printTime: new Date().getTime(),
         printFlag: false,
         printOrdInfo: {},
+        depositMap: {},
         depositFlag: false,
         depositTakeTab: 'deposit',
         depositList: [],
         takeList: [],
+        takeGoodsData: [],
         allGoodsColumns: [
           {type: 'selection', width: 50, align: 'center'},
           {key: 'goodsm', title: '商品'},
@@ -207,6 +213,27 @@
                 input(val) {
                   self.$set(self.allGoodsData[params.index], 'depositQty', val)
                   self.depositList.forEach(ele => {
+                    if (ele.goods === params.row.goods) {
+                      ele.depositQty = val
+                    }
+                  })
+                }
+              }
+            })
+          }}
+        ],
+        takeGoodsColumns: [
+          {type: 'selection', width: 50, align: 'center'},
+          {key: 'goodsm', title: '商品'},
+          {key: 'qty', title: '数量'},
+          {key: 'depositQty', title: '取用', render: (h, params) => {
+            const self = this
+            return h('InputNumber', {
+              props: {min: 0, max: Number(params.row.qty), value: params.row.depositQty},
+              on: {
+                input(val) {
+                  self.$set(self.takeGoodsData[params.index], 'depositQty', val)
+                  self.takeList.forEach(ele => {
                     if (ele.goods === params.row.goods) {
                       ele.depositQty = val
                     }
@@ -262,6 +289,10 @@
         }
         goodsList.forEach(ele => {
           ele.depositQty = 0
+          if (this.depositMap && this.depositMap[ele.goods]) {
+            ele._checked = true
+            ele.depositQty = Number(this.depositMap[ele.goods].depositQty)
+          }
         })
         return goodsList
       },
@@ -324,9 +355,6 @@
             this.$Message.error(res.data.message)
           }
         })
-      },
-      cancelVip() {
-        this.modalVip = false
       },
       okVip() {
         this.$http.post(apiUrl.loginVip, {
@@ -421,7 +449,7 @@
           data: {ordInfo: this.ordInfo, startTime}
         }).then(res => {
           if (res.data.code === 200) {
-            this.setOrdInfo({data: {nun: res.data.message, status: 1, user: this.userInfo.name}, roomSelected: 'place'})
+            this.setOrdInfo({data: {nun: res.data.message, status: 1, user: this.userInfo.name, startTime}, roomSelected: 'place'})
           }
         })
       },
@@ -491,24 +519,77 @@
         this.$http.post(apiUrl.getDeposit, {
           data: {vip: this.ordInfo.vip, nun: this.ordInfo.nun}
         }).then(res => {
-
+          if (res.data.code === 200) {
+            const depositData = res.data.message.depositData
+            const takeData = res.data.message.takeData
+            let takeMap = {}
+            this.depositMap = {}
+            this.depositList = []
+            depositData.forEach(ele => {
+              this.depositMap[ele.goods] = ele
+            })
+            if (this.ordInfo.stockGoods) {
+              this.ordInfo.stockGoods.forEach(ele => {
+                takeMap[ele.goods] = ele
+              })
+            }
+            takeData.forEach(ele => {
+              ele.qty = Number(ele.depositQty)
+              ele.depositQty = 0
+              if (takeMap[ele.goods]) {
+                ele.depositQty = Number(takeMap[ele.goods].depositQty)
+                ele._checked = true
+              }
+            })
+            this.allGoodsData.forEach(ele => {
+              if (this.depositMap[ele.goods]) {
+                this.depositList.push(ele)
+              }
+            })
+            this.takeGoodsData = takeData
+          }
         })
       },
       depositSubmit() {
-        console.log(this.depositList)
-        if (this.depositList.length === 0) {
-          this.$Message.error('请选择寄存的商品')
-          return
+        if (this.depositTakeTab === 'deposit') {  // 寄存
+          this.$http.post(apiUrl.deposit, {
+            data: {vip: this.ordInfo.vip, nun: this.ordInfo.nun, goodsList: this.depositList}
+          }).then(res => {
+            if (res.data.code === 200) {
+              this.depositFlag = false
+              this.$Message.success('寄存成功')
+            }
+          })
+        } else {  // 取用
+          console.log('takeList', this.takeList)
+          this.setOrdInfo({data: deepClone(this.takeList), type: 'stockGoods'})
+          this.updateOrder()
+          this.depositFlag = false
         }
-        this.$http.post(apiUrl.deposit, {
-          data: {vip: this.ordInfo.vip, nun: this.ordInfo.nun, goodsList: this.depositList}
-        }).then(res => {
-
-        })
       },
       depositTakeSelect(selection) {
-        console.log(selection)
-        this.depositList = selection
+        let goodsList = []
+        selection.forEach(ele => {
+          goodsList.push(ele.goods)
+        })
+        if (this.depositTakeTab === 'deposit') {
+          this.allGoodsData.forEach(ele => {
+            if (goodsList.indexOf(ele.goods) === -1) {
+              delete ele._checked
+            }
+          })
+          this.depositList = deepClone(selection)
+        } else {
+          this.takeGoodsData.forEach(ele => {
+            if (goodsList.indexOf(ele.goods) === -1) {
+              delete ele._checked
+            } else {
+              ele._checked = true
+            }
+          })
+          this.takeList = deepClone(selection)
+        }
+        
       },
       ...mapMutations({
         setOrdInfo: 'SET_ORDINFO'

@@ -28,6 +28,15 @@ const mutations = {
           Vue.set(state.ordInfo.goods, data.id, data)
         }
         break;
+      case 'stockGoods': 
+        let stockGoods = []
+        data.forEach(ele => {
+          if (ele.depositQty != 0) {
+            stockGoods.push(ele)
+          }
+        });
+        Vue.set(state.ordInfo, 'stockGoods', stockGoods)
+        break;
       default:
         for (let key in data) {
           Vue.set(state.ordInfo, key, data[key])

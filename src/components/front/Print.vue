@@ -29,6 +29,11 @@
           <span>x{{ good.qty || 1 }}</span>
           <span>{{ good.price }}</span>
         </li>
+        <li v-for="(good, i) in ordInfo.stockGoods" :key="`${i}_stock_${good.goodsm}`">
+          <span>{{ good.goodsm }}(寄存)</span>
+          <span>x{{ good.depositQty }}</span>
+          <span>{{ 0 }}</span>
+        </li>
       </ul>
       <div class="account-wrapper">
         <div class="account-item" v-for="(item, i) in accountList" :key="i">

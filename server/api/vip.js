@@ -255,23 +255,17 @@ router.post('/getDeposit', async (ctx) => {
     const data = ctx.request.body.data
     const nun = data.nun
     const vip = data.vip
-    let result
-    if (nun === undefined) {
-      result = await query(`SELECT v.nun, v.vip, v.goods, v.qty as depositQty, g.name as goodsm, u.name as unitm
-        FROM vipstock as v
-        LEFT JOIN goods as g on g.id = v.goods
-        LEFT JOIN unit as u on u.id = g.unit
-        WHERE v.vip = ? AND v.off != 1`, 
-        [vip])
-    } else {
-      result = await query(`SELECT v.nun, v.vip, v.goods, v.qty as depositQty, g.name as goodsm, u.name as unitm
-        FROM vipstock as v
-        LEFT JOIN goods as g on g.id = v.goods
-        LEFT JOIN unit as u on u.id = g.unit
-        WHERE v.nun = ? AND v.vip = ? AND v.off != 1`, 
-        [nun, vip])
-    }
-    ctx.body = {code: 200, message: result}
+    const takeData = await query(`SELECT v.id, v.nun, v.vip, v.goods, v.qty as depositQty, g.name as goodsm, u.name as unitm
+      FROM vipstock as v
+      LEFT JOIN goods as g on g.id = v.goods
+      LEFT JOIN unit as u on u.id = g.unit
+      WHERE v.nun = '' AND v.vip = ? AND v.off != 1`, [vip])
+    const depositData = await query(`SELECT v.nun, v.vip, v.goods, v.qty as depositQty, g.name as goodsm, u.name as unitm
+      FROM vipstock as v
+      LEFT JOIN goods as g on g.id = v.goods
+      LEFT JOIN unit as u on u.id = g.unit
+      WHERE v.nun = ? AND v.vip = ? AND v.off != 1`, [nun, vip])
+    ctx.body = {code: 200, message: {depositData, takeData}}
   } catch(err) {
     throw new Error(err)
   }
