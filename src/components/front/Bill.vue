@@ -633,7 +633,7 @@
   .bill-icon {
     position: relative;
     z-index: 10;
-    top: -38px;
+    top: -18px;
   }
   .bill-wrapper {
     width: 10cm;
