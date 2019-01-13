@@ -114,6 +114,14 @@
         this.goodsList.forEach((ele, i) => {
           ele.qty = this.goodsSelected && this.goodsSelected[ele.id] && Number(this.goodsSelected[ele.id].qty) || 1
         })
+      },
+      ordInfo() {
+        if (!this.ordInfo.nun) {
+          this.goodsMap = {}
+          this.goodsList.forEach((ele, i) => {
+            ele.qty = this.goodsSelected && this.goodsSelected[ele.id] && Number(this.goodsSelected[ele.id].qty) || 1
+          })
+        }
       }
     },
     components: {

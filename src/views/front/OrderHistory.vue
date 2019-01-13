@@ -5,7 +5,9 @@
         :stripe="false"
         :highlight="true"
         :tableOptions="tableOptions"
-        @selectRow="selectRow">
+        :pageFlag="pageFlag"
+        @selectRow="selectRow"
+        @delete="deleteRow">
       </base-table>
     </div>
     <div class="order-wrapper">
@@ -39,8 +41,10 @@
           ],
           orderHistory: true,
           siftApi: 'getOrderHistory',
+          delApi: 'deleteOrder',
           onlySift: true
         },
+        pageFlag: true,
         ordInfo: {},
         btnShow: false,
         printTime: new Date().getTime()
@@ -51,6 +55,11 @@
         this.ordInfo = currentRow
         this.btnShow = true
         this.printTime = new Date().getTime()
+      },
+      deleteRow({row}) {
+        if (row.nun === this.ordInfo.nun) {
+          this.ordInfo = {}
+        }
       },
       printOrder() {
         this.printTime = new Date().getTime()

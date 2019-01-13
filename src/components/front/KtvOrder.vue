@@ -124,10 +124,6 @@
         setOrdInfo: 'SET_ORDINFO'
       }),
     },
-    watch: {
-      ordInfo() {
-      }
-    },
     components: {
       RoomDetail,
       GoodsDetail

@@ -253,7 +253,9 @@
           price += Number(this.goodsSelected[key].price) * Number(this.goodsSelected[key].qty)
         }
         price += Number(packagePrice || 0)
-        this.setOrdInfo({data: {totalPrice: price}})
+        if (this.ordInfo.nun && this.packageSelected.package) {
+          this.setOrdInfo({data: {totalPrice: price}})
+        }
         return price
       },
       payPrice() {
@@ -558,6 +560,8 @@
             if (res.data.code === 200) {
               this.depositFlag = false
               this.$Message.success('寄存成功')
+              this.setOrdInfo({data: deepClone(this.depositList), type: 'depositGoods'})
+              this.updateOrder()
             }
           })
         } else {  // 取用
@@ -565,6 +569,7 @@
           this.setOrdInfo({data: deepClone(this.takeList), type: 'stockGoods'})
           this.updateOrder()
           this.depositFlag = false
+          console.log('ordInfo', this.ordInfo)
         }
       },
       depositTakeSelect(selection) {
@@ -657,9 +662,7 @@
         }
         span {
           flex: 1;
-          // text-overflow: ellipsis;
-          // overflow: hidden;
-          // word-break: keep-all;
+          line-height: 16px;
           text-align: right;
           &:first-child {
             text-align: left;

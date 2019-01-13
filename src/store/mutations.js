@@ -1,13 +1,13 @@
 import * as types from './mutation-types'
 import Vue from 'vue'
-import { stat } from 'fs';
+import { deepClone } from '@/common/js/util'
 
 const mutations = {
   [types.SET_ROOM_SELECTED](state, roomSelected) {
     state.roomSelected = roomSelected
   },
   [types.SET_ORDINFO](state, opts) {
-    const data = opts.data
+    const data = deepClone(opts.data)
     const type = opts.type
 
     switch(type) {
@@ -37,6 +37,15 @@ const mutations = {
         });
         Vue.set(state.ordInfo, 'stockGoods', stockGoods)
         break;
+      case 'depositGoods': 
+        let depositGoods = []
+        data.forEach(ele => {
+          if (ele.depositQty != 0) {
+            depositGoods.push(ele)
+          }
+        });
+        Vue.set(state.ordInfo, 'depositGoods', depositGoods)
+        break;
       default:
         for (let key in data) {
           Vue.set(state.ordInfo, key, data[key])
@@ -44,9 +53,15 @@ const mutations = {
         break;
     }
     if (opts.roomSelected == 'place') {
-      Vue.set(state.roomSelected, 'status', '1')
+      // const room = deepClone(state.roomSelected)
+      // room.status = 1
+      // state.roomSelected = room
+      Vue.set(state.roomSelected, 'status', 1)
     } else if (opts.roomSelected == 'close') {
-      Vue.set(state.roomSelected, 'status', '0')
+      // const room = deepClone(state.roomSelected)
+      // room.status = 0
+      // state.roomSelected = room
+      Vue.set(state.roomSelected, 'status', 0)
     }
 
   },

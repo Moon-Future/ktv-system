@@ -34,6 +34,7 @@ export const apiUrl = {
   cancelOrder: '/api/order/cancelOrder',
   updOrder: '/api/order/updOrder',
   getOrderHistory: '/api/order/getOrderHistory',
+  deleteOrder: '/api/order/deleteOrder',
 
   sendVerifyCode: '/api/vip/sendVerifyCode',
   registerVip: '/api/vip/registerVip',

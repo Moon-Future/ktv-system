@@ -92,7 +92,6 @@ router.post('/getOrder', async (ctx) => {
         result[0].depositQty = stockQtyList[i]
         stockGoods.push(result[0])
       }
-      ordInfo[0].goods = goodsMap
       ordInfo[0].stockGoods = stockGoods
 
       ordInfo[0].no = ordInfo[0].room
@@ -117,20 +116,79 @@ router.post('/closeOrder', async (ctx) => {
     
     const data = ctx.request.body.data
     const ordInfo = data.ordInfo
+    let goodsMap = {}
     if (ordInfo.vip) {
       await query(`UPDATE vip SET balance = ?, status = ? WHERE phone = ? AND off != 1`, [Number(ordInfo.totalPrice) - Number(ordInfo.discount || 0), 0, ordInfo.vip])
     }
     await query(`UPDATE roomorder SET off = 1, endTime = ? WHERE nun = ?`, [new Date().getTime(), ordInfo.nun])
     await query(`UPDATE room SET status = 0 WHERE no = ?`, [ordInfo.room])
     
+    // 寄存商品使用
+    const stockGoods = ordInfo.stockGoods || []
+    for (let i = 0, len = stockGoods.length; i < len; i++) {
+      const goods = stockGoods[i].goods
+      const depositQty = stockGoods[i].depositQty
+      const qty = stockGoods[i].qty
+      const diffQty = Number(qty) - Number(depositQty)
+      if (diffQty == 0) {
+        await query(`DELETE FROM vipstock WHERE VIP = ? AND goods = ? AND off != 1`, [ordInfo.vip, goods])
+      } else {
+        await query(`UPDATE vipstock SET qty = ? WHERE VIP = ? AND goods = ? AND off != 1`, [diffQty, ordInfo.vip, goods])
+      }
+      if (goodsMap[goods]) {
+        goodsMap[goods].qty += Number(depositQty)
+      } else {
+        goodsMap[goods] = {qty: Number(depositQty)}
+      }
+    }
+
+    // 寄存商品
     const result = await query(`SELECT * FROM vipstock WHERE nun = ? AND vip = ? AND off != 1`, [ordInfo.nun, ordInfo.vip])
     for (let i = 0, len = result.length; i < len; i++) {
-      const exist = await query(`SELECT * FROM vipstock WHERE nun = '' AND vip = ? AND goods = ? AND off != 1`, [ordInfo.vip, result[i].goods])
-      if (exist.length !== 0) {
-        await query(`UPDATE vipstock SET qty = ? WHERE nun = '' AND vip = ? AND goods = ? AND off != 1`, [Number(exist[0].qty) + Number(result[i].qty), ordInfo.vip, result[i].goods])
-        await query(`DELETE FROM vipstock WHERE nun = ? AND vip = ? AND goods = ? AND off != 1`, [ordInfo.nun, ordInfo.vip, result[i].goods])
+      const item = result[i]
+      if (goodsMap[item.goods]) {
+        goodsMap[item.goods].qty -= Number(item.qty)
       } else {
-        await query(`UPDATE vipstock SET nun = '' WHERE nun = ? AND vip = ? AND goods = ? AND off != 1`, [ordInfo.nun, ordInfo.vip, result[i].goods])
+        goodsMap[item.goods] = {qty: -Number(item.qty)}
+      }
+      const exist = await query(`SELECT * FROM vipstock WHERE nun = '' AND vip = ? AND goods = ? AND off != 1`, [ordInfo.vip, item.goods])
+      if (exist.length !== 0) {
+        await query(`UPDATE vipstock SET qty = ? WHERE nun = '' AND vip = ? AND goods = ? AND off != 1`, [Number(exist[0].qty) + Number(item.qty), ordInfo.vip, item.goods])
+        await query(`DELETE FROM vipstock WHERE nun = ? AND vip = ? AND goods = ? AND off != 1`, [ordInfo.nun, ordInfo.vip, item.goods])
+      } else {
+        await query(`UPDATE vipstock SET nun = '' WHERE nun = ? AND vip = ? AND goods = ? AND off != 1`, [ordInfo.nun, ordInfo.vip, item.goods])
+      }
+    }
+
+    // 商品消耗
+    const selectedGoods = ordInfo.goods || {}
+    for (let key in selectedGoods) {
+      if (goodsMap[key]) {
+        goodsMap[key].qty += Number(selectedGoods[key].qty)
+      } else {
+        goodsMap[key] = {qty: Number(selectedGoods[key].qty)}
+      }
+    }
+
+    const packageGoods = ordInfo.package.goods || []
+    let grp = (ordInfo.package.grp || '').split(',')
+    const grpSelected = (ordInfo.package.grpSelected || '') + ''
+    grp.splice(grp.indexOf(grpSelected), 1)
+    packageGoods.forEach(ele => {
+      let goods = ele.goods + ''
+      if (grp.indexOf(goods) === -1) {
+        if (goodsMap[goods]) {
+          goodsMap[goods].qty += Number(ele.qty)
+        } else {
+          goodsMap[goods] = {qty: Number(ele.qty)}
+        }
+      }
+    })
+
+    for (let key in goodsMap) {
+      let result = await query(`SELECT * FROM goods WHERE id = ? AND off != 1`, [key])
+      if (result.length !== 0) {
+        await query(`UPDATE goods SET qty = ? WHERE id = ? AND off != 1`, [result[0].qty - goodsMap[key].qty, key])
       }
     }
 
@@ -150,12 +208,111 @@ router.post('/cancelOrder', async (ctx) => {
     
     const data = ctx.request.body.data
     const ordInfo = data.ordInfo
-    await query(`UPDATE roomorder SET off = 1 WHERE nun = ?`, [ordInfo.nun])
+    await query(`DELETE FROM roomorder WHERE nun = ?`, [ordInfo.nun])
     await query(`UPDATE room SET status = 0 WHERE no = ?`, [ordInfo.room])
     if (ordInfo.vip) {
       await query(`UPDATE vip SET status = ? WHERE phone = ? AND off != 1`, [0, ordInfo.vip])
     }
     ctx.body = {code: 200, message: '结账成功'}
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
+router.post('/deleteOrder', async (ctx) => {
+  try {
+    const checkResult = checkRoot(ctx)
+    if (checkResult.code === 500) {
+      ctx.body = checkResult
+      return
+    }
+    
+    const data = ctx.request.body.data
+    const ordInfo = data[0]
+    let goodsMap = {}
+
+    const payMethod = ordInfo.payMethod
+     // 返回余额
+    if (payMethod == 5) {
+      const vipInfo = await query(`SELECT * FROM vip WHERE phone = ? AND off != 1`, [ordInfo.vip])
+      if (vipInfo.length !== 0) {
+        await query(`UPDATE vip SET balance = ? WHERE phone = ?`, [Number(vipInfo.balance) + Number(ordInfo.totalPrice) - Number(ordInfo.discount || 0)])
+      }
+    }
+    // 寄存商品扣减
+    if (ordInfo.depositGoods && ordInfo.depositGoods != '') {
+      const depositGoods = (ordInfo.depositGoods || '').split(',')
+      const depositQty = (ordInfo.depositQty || '').split(',')
+      for (let i = 0, len = depositGoods.length; i < len; i++) {
+        if (goodsMap[depositGoods[i]]) {
+          goodsMap[depositGoods[i]].qty -= Number(depositQty[i])
+        } else {
+          goodsMap[depositGoods[i]] = {qty: -Number(depositQty[i])}
+        }
+        let exist = await query(`SELECT * FROM vipstock WHERE vip = ? AND goods = ? AND off != 1`, [ordInfo.vip, depositGoods[i]])
+        let qty = Number(exist[0].qty) - Number(depositQty[i])
+        if (qty <= 0) {
+          await query(`DELETE FROM vipstock WHERE vip = ? AND goods = ? AND off != 1`, [ordInfo.vip, depositGoods[i]])
+        } else {
+          await query(`UPDATE vipstock SET qty = ? WHERE vip = ? AND goods = ? AND off != 1`, [qty, ordInfo.vip, depositGoods[i]])
+        }
+      }
+    }
+    
+    // 寄存使用商品返回
+    if (ordInfo.stockGoods && ordInfo.stockGoods != '') {
+      const stockGoods = (ordInfo.stockGoods || '').split(',')
+      const stockQty = (ordInfo.stockQty || '').split(',')
+      for (let i = 0, len = stockGoods.length; i < len; i++) {
+        if (goodsMap[stockGoods[i]]) {
+          goodsMap[stockGoods[i]].qty += Number(stockQty[i])
+        } else {
+          goodsMap[stockGoods[i]] = {qty: Number(stockQty[i])}
+        }
+        let exist = await query(`SELECT * FROM vipstock WHERE vip = ? AND goods = ? AND off != 1`, [ordInfo.vip, stockGoods[i]])
+        if (exist.length === 0) {
+          await query(`INSERT INTO vipstock (nun, vip, goods, qty) VALUES (?, ?, ?, ?)`, ['', ordInfo.vip, stockGoods[i], stockQty[i]])
+        } else {
+          await query(`UPDATE vipstock SET qty = ? WHERE vip = ? AND goods = ? AND off != 1`, [Number(exist[0].qty) + Number(stockQty[i]), ordInfo.vip, stockGoods[i]])
+        }
+      }
+    }
+
+    // 商品库存
+    const selectedGoods = ordInfo.goods || {}
+    for (let key in selectedGoods) {
+      if (goodsMap[key]) {
+        goodsMap[key].qty += Number(selectedGoods[key].qty)
+      } else {
+        goodsMap[key] = {qty: Number(selectedGoods[key].qty)}
+      }
+    }
+
+    const packageGoods = ordInfo.package.goods || []
+    let grp = (ordInfo.package.grp || '').split(',')
+    const grpSelected = (ordInfo.package.grpSelected || '') + ''
+    grp.splice(grp.indexOf(grpSelected), 1)
+    packageGoods.forEach(ele => {
+      let goods = ele.goods + ''
+      if (grp.indexOf(goods) === -1) {
+        if (goodsMap[goods]) {
+          goodsMap[goods].qty += Number(ele.qty)
+        } else {
+          goodsMap[goods] = {qty: Number(ele.qty)}
+        }
+      }
+    })
+
+    for (let key in goodsMap) {
+      let result = await query(`SELECT * FROM goods WHERE id = ? AND off != 1`, [key])
+      if (result.length !== 0) {
+        await query(`UPDATE goods SET qty = ? WHERE id = ? AND off != 1`, [result[0].qty + goodsMap[key].qty, key])
+      }
+    }
+
+    await query(`DELETE FROM roomorder WHERE nun = ?`, [ordInfo.nun])
+
+    ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {
     throw new Error(err)
   }
@@ -176,8 +333,10 @@ router.post('/updOrder', async (ctx) => {
     const grpSelected = ordInfo.package && ordInfo.package.grpSelected || ''
     const goodsMap = ordInfo.goods || {}
     const stockGoods = ordInfo.stockGoods || []
+    const depositGoods = ordInfo.depositGoods || []
     let goodsList = [], qtyList = []
     let stockGoodsList = [], stockQtyList = []
+    let depositGoodsList = [], depositQtyList = []
     for (let key in goodsMap) {
       goodsList.push(goodsMap[key].id)
       qtyList.push(goodsMap[key].qty)
@@ -188,9 +347,17 @@ router.post('/updOrder', async (ctx) => {
         stockQtyList.push(ele.depositQty)
       }
     })
+    depositGoods.forEach(ele => {
+      if (ele.depositQty != 0) {
+        depositGoodsList.push(ele.goods)
+        depositQtyList.push(ele.depositQty)
+      }
+    })
 
-    await query(`UPDATE roomorder SET package = ?, packageType = ?, grpSelected = ?, goods = ?, qty = ?, stockGoods = ?, stockQty = ?, vip = ?, totalPrice = ?, discount = ?, paymethod = ? WHERE room = ? AND off != 1`, 
-      [packageId, packageType, grpSelected, goodsList.join(','), qtyList.join(','), stockGoodsList.join(','), stockQtyList.join(','), ordInfo.vip, ordInfo.totalPrice, ordInfo.discount, ordInfo.payMethod, ordInfo.room]
+    await query(`UPDATE roomorder SET package = ?, packageType = ?, grpSelected = ?, goods = ?, qty = ?, stockGoods = ?, stockQty = ?, depositGoods = ?, depositQty = ?, 
+      vip = ?, totalPrice = ?, discount = ?, paymethod = ? WHERE room = ? AND off != 1`, 
+      [packageId, packageType, grpSelected, goodsList.join(','), qtyList.join(','), stockGoodsList.join(','), stockQtyList.join(','), depositGoodsList.join(','), depositQtyList.join(','),
+      ordInfo.vip, ordInfo.totalPrice, ordInfo.discount, ordInfo.payMethod, ordInfo.room]
     )
     ctx.body = {code: 200, message: '更新成功'}
   } catch(err) {
@@ -207,7 +374,9 @@ router.post('/getOrderHistory', async (ctx) => {
     }
 
     const data = ctx.request.body.data
-    let ordInfo = await query(`SELECT * FROM roomorder WHERE off = 1 ORDER BY createTime DESC`)
+    const pageNo = data.pageNo || 1
+    const pageSize = data.pageSize || 20
+    let ordInfo = await query(`SELECT * FROM roomorder WHERE off = 1 ORDER BY createTime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`)
     let count = await query(`SELECT COUNT(*) as count FROM roomorder WHERE off = 1`)
     let result = []
 
@@ -242,10 +411,22 @@ router.post('/getOrderHistory', async (ctx) => {
       }
       item.goods = goodsMap
 
+      const stockGoodsList = item.stockGoods ? item.stockGoods.split(',') : []
+      const stockQtyList = item.stockQty ? item.stockQty.split(',') : []
+      let stockGoods = []
+      for (let i = 0, len = stockGoodsList.length; i < len; i++) {
+        let result = await query(`SELECT g.id as goods, g.name as goodsm,
+          u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.id = ?`, [stockGoodsList[i]])
+        result[0].depositQty = stockQtyList[i]
+        stockGoods.push(result[0])
+      }
+      item.stockGoods = stockGoods
+
       item.no = item.room
       delete item.packageType
       delete item.grpSelected
       delete item.qty
+      delete item.stockQty
       result.push(item)
     }
     ctx.body = {code: 200, message: result, count: count.length === 0 ? 0 : count[0].count}

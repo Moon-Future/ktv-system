@@ -16,6 +16,9 @@
         :stripe="stripe" 
         size="small"
         @on-current-change="selectRow"></Table>
+      <div class="page-wrapper">
+        <Page v-if="pageFlag" :total="total" :page-size="20" @on-change="changePage" />
+      </div>
     </div>
     <Drawer
       title="新增"
@@ -123,6 +126,10 @@
       highlight: {
         type: Boolean,
         default: false
+      },
+      pageFlag: {
+        type: Boolean,
+        default: false
       }
     },
     mounted() {
@@ -142,7 +149,7 @@
           position: 'static'
         },
         tableData: [],
-        total: '',
+        total: 0,
         verifyCodeBtn: '发送验证码',
         sending: false,
         searchPhone: '',
@@ -193,7 +200,23 @@
             ])
           }
         }
-        this.tableOptions.orderHistory ? false : columns.push(obj)
+        if (this.tableOptions.orderHistory) {
+          obj = {
+            key: 'operate',
+            title: '操作',
+            render: (h, params) => {
+              return h('span', {
+                class: {'operate-item' : true},
+                on: {
+                  click: () => {
+                    this.goDelete(params)
+                  }
+                }
+              }, '删除')
+            }
+          }
+        }
+        columns.push(obj)
         return columns
       },
       formData() {
@@ -283,6 +306,9 @@
           this.loading = false
         })
       },
+      changePage(currentPage) {
+        this.getData({pageNo: currentPage})
+      },
       goAdd() {
         this.updFlag = false
         this.addFlag = true
@@ -309,6 +335,7 @@
               if (res.data.code === 200) {
                 this.tableData.splice(params.index, 1)
                 this.$Message.success(res.data.message)
+                this.$emit('delete', {row: params.row})
               } else {
                 this.$Message.error(res.data.message)
               }
@@ -405,5 +432,10 @@
       text-align: right;
       margin-top: 10px;
     }
+  }
+
+  .page-wrapper {
+    padding: 10px 0;
+    text-align: right;
   }
 </style>

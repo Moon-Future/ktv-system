@@ -193,9 +193,7 @@
         }
         span {
           flex: 1;
-          // text-overflow: ellipsis;
-          // overflow: hidden;
-          // word-break: keep-all;
+          line-height: 16px;
           text-align: right;
           &:first-child {
             text-align: left;

@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : localhost
-Source Server Version : 50719
+Source Server         : aliyun
+Source Server Version : 80013
 Source Host           : localhost:3306
 Source Database       : ktv
 
 Target Server Type    : MYSQL
-Target Server Version : 50719
+Target Server Version : 80013
 File Encoding         : 65001
 
-Date: 2019-01-14 01:07:54
+Date: 2019-01-14 01:05:42
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -40,9 +40,9 @@ CREATE TABLE `goods` (
 -- Records of goods
 -- ----------------------------
 INSERT INTO `goods` VALUES ('1', '纯啤啤酒', null, '20.00', '1', '', '0', '0', '0', null, '1545710870689', '1546824044487', '1');
-INSERT INTO `goods` VALUES ('2', '七堡1516啤酒', null, '10.00', '1', '畅饮', '0', '0', '0', null, '1545710972654', '1546824080031', '0');
-INSERT INTO `goods` VALUES ('3', '雪花啤酒', null, '10.00', '1', '真的有雪花哦', '0', '0', '0', null, '1545711013154', null, '0');
-INSERT INTO `goods` VALUES ('4', '华夏干红', null, '118.00', '1', '', '0', '0', '0', null, '1545711043902', '1546824183625', '0');
+INSERT INTO `goods` VALUES ('2', '七堡1516啤酒', null, '10.00', '1', '畅饮', '130', '1', '0', null, '1545710972654', '1546824080031', '0');
+INSERT INTO `goods` VALUES ('3', '雪花啤酒', null, '10.00', '1', '真的有雪花哦', '70', '1', '0', null, '1545711013154', null, '0');
+INSERT INTO `goods` VALUES ('4', '华夏干红', null, '118.00', '1', '', '30', '1', '0', null, '1545711043902', '1546824183625', '0');
 INSERT INTO `goods` VALUES ('5', '雪碧', null, '6.00', '6', '透心凉', '0', '0', '0', null, '1545711071418', '1546824199463', '0');
 INSERT INTO `goods` VALUES ('6', '冰红茶', null, '6.00', '1', '', '0', '0', '0', null, '1545711147913', '1546824219695', '0');
 INSERT INTO `goods` VALUES ('7', '爆米花', null, '10.00', '4', '爆！爆！爆！', '0', '0', '0', null, '1545711196951', null, '0');
@@ -76,11 +76,15 @@ CREATE TABLE `goodsqty` (
   `createTime` bigint(20) NOT NULL,
   `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of goodsqty
 -- ----------------------------
+INSERT INTO `goodsqty` VALUES ('1', '2', '50', '收银员1', '1546959816952', '1546959816952', '1');
+INSERT INTO `goodsqty` VALUES ('2', '3', '70', '收银员1', '1546959999047', '1546959999047', '0');
+INSERT INTO `goodsqty` VALUES ('3', '4', '30', '收银员1', '1546960082648', '1546960082648', '0');
+INSERT INTO `goodsqty` VALUES ('4', '2', '130', '收银员1', '1546960087815', '1546960087815', '0');
 
 -- ----------------------------
 -- Table structure for package
@@ -163,11 +167,13 @@ CREATE TABLE `rechargerecord` (
   `time` bigint(20) NOT NULL,
   `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of rechargerecord
 -- ----------------------------
+INSERT INTO `rechargerecord` VALUES ('23', '15920055057', '1500.00', '1000.00', '500.00', '', '1546932727874', '0');
+INSERT INTO `rechargerecord` VALUES ('24', '15920055057', '300.00', '300.00', '0.00', '陈亮', '1546933042178', '0');
 
 -- ----------------------------
 -- Table structure for room
@@ -259,10 +265,6 @@ CREATE TABLE `roomorder` (
   `grpSelected` varchar(50) DEFAULT NULL,
   `goods` varchar(255) DEFAULT NULL,
   `qty` varchar(255) DEFAULT NULL,
-  `stockGoods` varchar(255) DEFAULT NULL COMMENT '使用寄存中的商品',
-  `stockQty` varchar(255) DEFAULT NULL,
-  `depositGoods` varchar(255) DEFAULT NULL COMMENT '寄存商品',
-  `depositQty` varchar(255) DEFAULT NULL,
   `startTime` bigint(20) NOT NULL COMMENT '下单时间',
   `endTime` bigint(20) DEFAULT NULL,
   `vip` varchar(50) DEFAULT NULL,
@@ -274,11 +276,25 @@ CREATE TABLE `roomorder` (
   `createTime` bigint(20) NOT NULL,
   `off` int(11) DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of roomorder
 -- ----------------------------
+INSERT INTO `roomorder` VALUES ('9', '471547135735775', '6666', '1', '1e7e14a0-1225-11e9-9989-d75a6f62cec3', '1', '3', '', '', '1547135735465', '1547135740334', null, '298.00', null, '3', '收银员1', null, '1547135735775', '1');
+INSERT INTO `roomorder` VALUES ('10', '321547135760384', '6666', '1', '1e7e14a0-1225-11e9-9989-d75a6f62cec3', '1', '23', '6,14,16,17,18,21', '1,1,1,5,5,1', '1547135760073', null, '15920055057', '538.00', null, null, '收银员1', null, '1547135760384', '1');
+INSERT INTO `roomorder` VALUES ('11', '291547185874727', '8016', '1', 'de2d8030-1223-11e9-9989-d75a6f62cec3', '1', '3', '', '', '1547185874893', '1547186303675', null, '98.00', '48.00', '4', '收银员1', null, '1547185874727', '1');
+INSERT INTO `roomorder` VALUES ('12', '211547203508309', '8016', '1', 'de2d8030-1223-11e9-9989-d75a6f62cec3', '1', '3', '', '', '1547203508806', null, null, '98.00', null, null, '收银员1', null, '1547203508309', '1');
+INSERT INTO `roomorder` VALUES ('13', '971547211208884', '8016', '1', 'de2d8030-1223-11e9-9989-d75a6f62cec3', '1', '2', '2,6,19', '10,4,3', '1547211208378', null, null, '240.00', '1.00', null, '收银员1', null, '1547211208884', '1');
+INSERT INTO `roomorder` VALUES ('14', '851547211208971', '8016', '1', 'de2d8030-1223-11e9-9989-d75a6f62cec3', '1', '2', '2,6,19', '10,4,3', '1547211209729', null, null, '240.00', '1.00', null, '收银员1', null, '1547211208971', '1');
+INSERT INTO `roomorder` VALUES ('15', '211547373283305', '8016', '1', 'de2d8030-1223-11e9-9989-d75a6f62cec3', '1', '3', '', '', '1547373286861', '1547373311112', null, '98.00', '28.00', '4', '收银员1', null, '1547373283305', '1');
+INSERT INTO `roomorder` VALUES ('16', '091547376260495', '6666', '1', '9d1432e0-13f6-11e9-86ad-915cb8e24559', '1', '', '', '', '1547376264078', null, null, '80.00', null, null, '收银员1', null, '1547376260495', '1');
+INSERT INTO `roomorder` VALUES ('17', '141547377417376', '8011', '1', 'f0664fa0-1720-11e9-b5e7-cd0a8c11a7bb', '2', '', '', '', '1547377420958', null, null, '80.00', null, null, '收银员1', null, '1547377417376', '1');
+INSERT INTO `roomorder` VALUES ('18', '281547377668602', '8016', '1', '15e48c10-1721-11e9-b5e7-cd0a8c11a7bb', '2', '', '', '', '1547377672184', null, null, '60.00', null, null, '收银员1', null, '1547377668602', '1');
+INSERT INTO `roomorder` VALUES ('19', '601547378368631', '8016', '1', '15e48c10-1721-11e9-b5e7-cd0a8c11a7bb', '2', '', '', '', '1547378371882', '1547378377679', null, '60.00', null, '2', '收银员1', null, '1547378368631', '1');
+INSERT INTO `roomorder` VALUES ('20', '241547382971514', '8016', '1', '31eada50-104a-11e9-a1db-0d5fe7aa5fe3', '2', '2', '', '', '1547382974898', '1547387114704', null, '198.00', '48.00', '4', '收银员1', null, '1547382971514', '1');
+INSERT INTO `roomorder` VALUES ('21', '041547384393908', '8012', '1', '4b53d400-121c-11e9-9989-d75a6f62cec3', '2', '3', '', '', '1547384397326', null, null, '298.00', '198.00', '4', '收银员1', null, '1547384393908', '1');
+INSERT INTO `roomorder` VALUES ('22', '061547384998016', '8012', '1', '4b53d400-121c-11e9-9989-d75a6f62cec3', '2', '3', '', '', '1547385001483', '1547385030110', null, '298.00', '198.00', '4', '收银员1', null, '1547384998016', '1');
 
 -- ----------------------------
 -- Table structure for roomtype
@@ -365,22 +381,25 @@ CREATE TABLE `vip` (
   `record` int(11) NOT NULL DEFAULT '0' COMMENT '充值次数',
   `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 
 -- ----------------------------
 -- Records of vip
 -- ----------------------------
+INSERT INTO `vip` VALUES ('2', '13888888888', '0.00', null, null, null, null, '1546495981560', '0', '0', '0');
+INSERT INTO `vip` VALUES ('3', '15855555557', '0.00', null, null, null, null, '1546763388701', null, '0', '0');
+INSERT INTO `vip` VALUES ('4', '15920055057', '168.00', null, null, null, null, '1546877349302', '0', '2', '0');
 
 -- ----------------------------
 -- Table structure for vipstock
 -- ----------------------------
 DROP TABLE IF EXISTS `vipstock`;
 CREATE TABLE `vipstock` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nun` varchar(50) NOT NULL COMMENT '订单编码',
+  `id` int(11) NOT NULL,
   `vip` varchar(50) NOT NULL,
-  `goods` varchar(50) NOT NULL,
-  `qty` varchar(50) NOT NULL,
+  `goods` int(11) NOT NULL,
+  `qty` int(11) NOT NULL,
+  `createTime` bigint(20) NOT NULL,
   `off` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
