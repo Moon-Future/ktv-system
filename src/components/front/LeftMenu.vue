@@ -22,7 +22,7 @@
 <script>
   import IconFont from '@/components/IconFont'
   import { apiUrl } from '@/serviceAPI.config.js'
-  import { mapMutations } from 'vuex'
+  import { mapGetters, mapMutations } from 'vuex'
   export default {
     data() {
       return {
@@ -30,11 +30,13 @@
         menuList: [
           {icon: 'icon-money-bag', text: '收银台', index: '1', to: '/ktv'},
           {icon: 'icon-order', text: '历史账单', index: '2', to: '/order'},
-          {icon: 'icon-vip', text: '会员', index: '3', to: '/vip'},
-          {icon: 'icon-shezhi', text: '设置', index: '4', to: '/admin/baseinfo/roominfo'}
+          {icon: 'icon-vip', text: '会员', index: '3', to: '/vip'}
         ],
         activeIndex: 0
       }
+    },
+    computed: {
+      ...mapGetters(['userInfo'])
     },
     created() {
       this.routhPath()
@@ -76,6 +78,11 @@
     watch: {
       $route() {
         this.routhPath()
+      },
+      userInfo() {
+        if (this.userInfo.root == '1') {
+          this.menuList.push({icon: 'icon-shezhi', text: '设置', index: '4', to: '/admin/baseinfo/roominfo'})
+        }
       }
     },
     components: {
