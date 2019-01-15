@@ -64,6 +64,11 @@
         activeIndex: '0',
         items: [
           {
+            icon: 'icon-tongji',
+            index: '/admin/report',
+            title: '统计报表'
+          },
+          {
             icon: 'icon-shezhi',
             index: '/admin/baseinfo/roominfo',
             title: '基本设置'

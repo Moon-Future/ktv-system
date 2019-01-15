@@ -30,9 +30,9 @@ router.post('/insertOrder', async (ctx) => {
       goodsList.push(goodsMap[key].id)
       qtyList.push(goodsMap[key].qty)
     }
-    await query(`INSERT INTO roomorder (nun, room, status, package, packageType, grpSelected, goods, qty, startTime, vip, totalPrice, discount, paymethod, user, createTime) VALUES 
+    await query(`INSERT INTO roomorder (nun, room, package, packageType, grpSelected, goods, qty, startTime, vip, totalPrice, discount, paymethod, user, createTime) VALUES 
       (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
-      [nun, ordInfo.room, 1, packageId, packageType, grpSelected, goodsList.join(','), qtyList.join(','), data.startTime, ordInfo.vip, ordInfo.totalPrice, ordInfo.discount, ordInfo.payMethod, ordInfo.user, createTime])
+      [nun, ordInfo.room, packageId, packageType, grpSelected, goodsList.join(','), qtyList.join(','), data.startTime, ordInfo.vip, ordInfo.totalPrice, ordInfo.discount, ordInfo.payMethod, ordInfo.user, createTime])
     await query(`UPDATE room SET status = 1 WHERE no = ?`, [ordInfo.room])
     ctx.body = {code: 200, message: nun}
   } catch(err) {
@@ -49,7 +49,7 @@ router.post('/getOrder', async (ctx) => {
     }
 
     const data = ctx.request.body.data
-    let ordInfo = await query(`SELECT * FROM roomorder WHERE room = ? AND off != 1`, [data.no])
+    let ordInfo = await query(`SELECT * FROM roomorder WHERE room = ? AND close != 1 AND off != 1`, [data.no])
 
     if (ordInfo.length !== 0) {
       if (ordInfo[0].vip) {
@@ -117,8 +117,9 @@ router.post('/closeOrder', async (ctx) => {
     const data = ctx.request.body.data
     const ordInfo = data.ordInfo
     let goodsMap = {}
-    if (ordInfo.vip) {
-      await query(`UPDATE vip SET balance = ?, status = ? WHERE phone = ? AND off != 1`, [Number(ordInfo.totalPrice) - Number(ordInfo.discount || 0), 0, ordInfo.vip])
+    if (ordInfo.vip && ordInfo.payMethod == 5) {
+      const vipInfo = await query(`SELECT * FROM vip WHERE phone = ? AND off != 1`, [ordInfo.vip])
+      await query(`UPDATE vip SET balance = ?, status = ? WHERE phone = ? AND off != 1`, [Number(vipInfo[0].balance) - Number(ordInfo.totalPrice) - Number(ordInfo.discount || 0), 0, ordInfo.vip])
     }
     await query(`UPDATE roomorder SET off = 1, endTime = ? WHERE nun = ?`, [new Date().getTime(), ordInfo.nun])
     await query(`UPDATE room SET status = 0 WHERE no = ?`, [ordInfo.room])

@@ -47,6 +47,11 @@ export default new Router({
       component: Admin,
       children: [
         {
+          path: 'report',
+          name: 'report',
+          component: () => import('@/views/admin/reportForm')
+        },
+        {
           path: 'baseinfo',
           name: 'baseinfo',
           component: () => import('@/views/admin/BaseInfo.vue'),

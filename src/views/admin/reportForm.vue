@@ -1,6 +1,8 @@
 <template>
   <div class="report-container">
-
+    <div class="today-wrapper">
+      
+    </div>
   </div>
 </template>
 
