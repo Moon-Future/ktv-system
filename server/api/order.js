@@ -31,7 +31,7 @@ router.post('/insertOrder', async (ctx) => {
       qtyList.push(goodsMap[key].qty)
     }
     await query(`INSERT INTO roomorder (nun, room, package, packageType, grpSelected, goods, qty, startTime, vip, totalPrice, discount, paymethod, user, createTime) VALUES 
-      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
       [nun, ordInfo.room, packageId, packageType, grpSelected, goodsList.join(','), qtyList.join(','), data.startTime, ordInfo.vip, ordInfo.totalPrice, ordInfo.discount, ordInfo.payMethod, ordInfo.user, createTime])
     await query(`UPDATE room SET status = 1 WHERE no = ?`, [ordInfo.room])
     ctx.body = {code: 200, message: nun}
@@ -121,7 +121,7 @@ router.post('/closeOrder', async (ctx) => {
       const vipInfo = await query(`SELECT * FROM vip WHERE phone = ? AND off != 1`, [ordInfo.vip])
       await query(`UPDATE vip SET balance = ?, status = ? WHERE phone = ? AND off != 1`, [Number(vipInfo[0].balance) - Number(ordInfo.totalPrice) - Number(ordInfo.discount || 0), 0, ordInfo.vip])
     }
-    await query(`UPDATE roomorder SET off = 1, endTime = ? WHERE nun = ?`, [new Date().getTime(), ordInfo.nun])
+    await query(`UPDATE roomorder SET close = 1, endTime = ? WHERE nun = ?`, [new Date().getTime(), ordInfo.nun])
     await query(`UPDATE room SET status = 0 WHERE no = ?`, [ordInfo.room])
     
     // 寄存商品使用
@@ -311,7 +311,7 @@ router.post('/deleteOrder', async (ctx) => {
       }
     }
 
-    await query(`DELETE FROM roomorder WHERE nun = ?`, [ordInfo.nun])
+    await query(`UPDATE roomorder SET off = 1 WHERE nun = ?`, [ordInfo.nun])
 
     ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {
@@ -356,7 +356,7 @@ router.post('/updOrder', async (ctx) => {
     })
 
     await query(`UPDATE roomorder SET package = ?, packageType = ?, grpSelected = ?, goods = ?, qty = ?, stockGoods = ?, stockQty = ?, depositGoods = ?, depositQty = ?, 
-      vip = ?, totalPrice = ?, discount = ?, paymethod = ? WHERE room = ? AND off != 1`, 
+      vip = ?, totalPrice = ?, discount = ?, paymethod = ? WHERE room = ? AND close != 1 AND off != 1`, 
       [packageId, packageType, grpSelected, goodsList.join(','), qtyList.join(','), stockGoodsList.join(','), stockQtyList.join(','), depositGoodsList.join(','), depositQtyList.join(','),
       ordInfo.vip, ordInfo.totalPrice, ordInfo.discount, ordInfo.payMethod, ordInfo.room]
     )
@@ -377,8 +377,8 @@ router.post('/getOrderHistory', async (ctx) => {
     const data = ctx.request.body.data
     const pageNo = data.pageNo || 1
     const pageSize = data.pageSize || 20
-    let ordInfo = await query(`SELECT * FROM roomorder WHERE off = 1 ORDER BY createTime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`)
-    let count = await query(`SELECT COUNT(*) as count FROM roomorder WHERE off = 1`)
+    let ordInfo = await query(`SELECT * FROM roomorder WHERE close = 1 AND off != 1 ORDER BY createTime DESC LIMIT ${(pageNo - 1) * pageSize}, ${pageSize}`)
+    let count = await query(`SELECT COUNT(*) as count FROM roomorder WHERE close = 1 AND off != 1`)
     let result = []
 
     for (let i = 0, len = ordInfo.length; i < len; i++) {

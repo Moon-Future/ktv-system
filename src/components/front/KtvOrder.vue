@@ -109,11 +109,11 @@
         }).then(res => {
           if (res.data.code === 200) {
             const message = res.data.message
-            this.setOrdInfo({data: res.data.message[0] || {room: room.no, status: 0, user: this.userInfo.name}, type: 'ordInfo'})
+            this.setOrdInfo({data: res.data.message[0] || {room: room.no, user: this.userInfo.name}, type: 'ordInfo'})
             if (message.length === 0) {
               this.roomInfo.status = 0
             } else {
-              this.roomInfo.status = message[0].status
+              this.roomInfo.status = 1
             }
             this.setRoomSelected(this.roomInfo)
           }

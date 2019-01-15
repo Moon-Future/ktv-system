@@ -59,6 +59,7 @@
       deleteRow({row}) {
         if (row.nun === this.ordInfo.nun) {
           this.ordInfo = {}
+          this.btnShow = false
         }
       },
       printOrder() {

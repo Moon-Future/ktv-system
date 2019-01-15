@@ -59,7 +59,7 @@
         </div>
       </div>
       <div class="button-wrapper">
-        <Button type="primary" :disabled="ordInfo.status == 1" @click="placeOrder">{{ ordInfo.status == 1 ? '已开单' : '开单' }}</Button>
+        <Button type="primary" :disabled="ordInfo.nun !== undefined" @click="placeOrder">{{ ordInfo.nun  !== undefined ? '已开单' : '开单' }}</Button>
         <Button v-show="roomSelected.status == '1'" type="error" @click="cancelOrder">取消订单</Button>
         <Button v-show="roomSelected.status == '1'" type="warning" @click="openPrintModal">打单</Button>
         <Button v-show="roomSelected.status == '1'" type="success" @click="closeOrder">结账</Button>
@@ -451,7 +451,7 @@
           data: {ordInfo: this.ordInfo, startTime}
         }).then(res => {
           if (res.data.code === 200) {
-            this.setOrdInfo({data: {nun: res.data.message, status: 1, user: this.userInfo.name, startTime}, roomSelected: 'place'})
+            this.setOrdInfo({data: {nun: res.data.message, user: this.userInfo.name, startTime}, roomSelected: 'place'})
           }
         })
       },
@@ -472,7 +472,7 @@
             this.$http.post(apiUrl.closeOrder, {
               data: {ordInfo: this.ordInfo}
             }).then(res => {
-              this.setOrdInfo({data: {room: this.ordInfo.room, status: 0}, type: 'ordInfo', roomSelected: 'close'})
+              this.setOrdInfo({data: {room: this.ordInfo.room}, type: 'ordInfo', roomSelected: 'close'})
               this.discountMoney = 0
             })
           },
@@ -486,7 +486,7 @@
             this.$http.post(apiUrl.cancelOrder, {
               data: {ordInfo: this.ordInfo}
             }).then(res => {
-              this.setOrdInfo({data: {room: this.ordInfo.room, status: 0}, type: 'ordInfo', roomSelected: 'close'})
+              this.setOrdInfo({data: {room: this.ordInfo.room}, type: 'ordInfo', roomSelected: 'close'})
               this.discountMoney = 0
             })
           },
