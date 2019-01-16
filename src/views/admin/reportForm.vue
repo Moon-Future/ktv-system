@@ -1,23 +1,23 @@
 <template>
   <div class="report-container">
     <div class="condition-wrapper">
-      <Button type="primary" size="small" @click="getReportData('today')">今天</Button>
-      <Button size="small" @click="getReportData('yesterday')">昨天</Button>
-      <Button size="small" @click="getReportData('week')">最近一周</Button>
-      <Button size="small" @click="getReportData('month')">最近一月</Button>
-      <Button size="small" @click="getReportData('quarter')">最近三月</Button>
-      <Button size="small" @click="getReportData('year')">最近一年</Button>
+      <Button :class="activeIndex === i ? 'active' : ''" size="small" v-for="(item, i) in btnList" @click="getReportData(item.key, i)">{{ item.title }}</Button>  
       <DatePicker type="daterange" placement="bottom-end" placeholder="选择日期" style="width: 200px;font-size: 14px" @on-change="getReportData"></DatePicker>
     </div>
     <div class="report-wrapper">
       <div class="total-wrapper">
         <div class="item-num" v-for="(item, i) in totalList" :key="i">
-          <h1>{{ item.title }}</h1>
-          <div class="num-wrapper">
-            <span>{{ totalData[item.key] }}</span>
-            <span>{{ item.unitm }}</span>
-          </div>
+          <p class="title">{{ item.title }}</p>
+          <p class="num">{{ totalData[item.key] }}</p>
         </div>
+      </div>
+      <div>
+        <Col span="12">
+          <DatePicker type="date" placeholder="Select date" style="width: 200px"></DatePicker>
+        </Col>
+        <Col span="12">
+            <DatePicker type="daterange" placement="bottom-end" placeholder="Select date" style="width: 200px"></DatePicker>
+        </Col>
       </div>
     </div>
   </div>
@@ -30,7 +30,17 @@
   export default {
     data() {
       return {
-        reportData: []
+        btnList: [
+          {key: 'today', title: '今天'},
+          {key: 'all', title: '所有'},
+          {key: 'yesterday', title: '昨天'},
+          {key: 'week', title: '最近一周'},
+          {key: 'month', title: '最近一月'},
+          {key: 'quarter', title: '最近三月'},
+          {key: 'year', title: '最近一年'}
+        ],
+        reportData: [],
+        activeIndex: -1
       }
     },
     computed: {
@@ -46,14 +56,17 @@
     },
     created() {
       this.totalList = [
-        {key: 'total', title: '订单数', unitm: '单'},
-        {key: 'price', title: '营收', unitm: '元'}
+        {key: 'total', title: '订单数（单）'},
+        {key: 'price', title: '营收（元）'}
       ]
+      this.getReportData('today', 0)
     },
     methods: {
-      getReportData(key) {
+      getReportData(key, index) {
+        this.activeIndex = index
         const today = this.getToday()
         let timeRange = []
+        let type = key === 'all' ? 'all' : 'report'
         switch(key) {
           case 'today':
             timeRange = [today, today + 3600 * 1000 * 24]
@@ -78,7 +91,7 @@
             break;
         }
         this.$http.post(apiUrl.getOrderHistory, {
-          data: {startTime: timeRange[0], endTime: timeRange[1], type: 'report'}
+          data: {startTime: timeRange[0], endTime: timeRange[1], type: type}
         }).then(res => {
           if (res.data.code === 200) {
             this.reportData = res.data.message
@@ -107,6 +120,10 @@
     display: flex;
     button {
       margin-right: 20px;
+      &.active {
+        background: $color-blue;
+        color: $color-white;
+      }
     }
   }
 
@@ -120,6 +137,16 @@
     display: flex;
     .item-num {
       padding: 10px 20px;
+      text-align: left;
+      .title {
+        padding-bottom: 5px;
+        font-size: 14px;
+      }
+      .num {
+        font-size: 32px;
+        font-weight: bold;
+        color: $color-red;
+      }
     }
   }
 </style>

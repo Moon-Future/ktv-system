@@ -351,8 +351,11 @@ router.post('/getOrderHistory', async (ctx) => {
     const pageNo = data.pageNo || 1
     const pageSize = data.pageSize || 20
     let ordInfo
-    if (data.type === 'report') {
-      ordInfo = await query(`SELECT * FROM roomorder WHERE close = 1 AND off != 1 AND startTime >= ? AND endTime <= ? ORDER BY startTime DESC`, [data.startTime, data.endTime])
+    if (data.type === 'report' || data.type === 'all') {
+      ordInfo = data.type === 'report' ?
+        await query(`SELECT * FROM roomorder WHERE close = 1 AND off != 1 AND startTime >= ? AND endTime <= ? ORDER BY startTime DESC`, [data.startTime, data.endTime])
+        :
+        await query(`SELECT * FROM roomorder WHERE close = 1 AND off != 1 ORDER BY startTime DESC`)
     } else {
       ordInfo = await query(`SELECT * FROM roomorder WHERE close = 1 AND off != 1 ORDER BY createTime DESC LIMIT ?, ?`, [(pageNo - 1) * pageSize, pageSize])
     }
