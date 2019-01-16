@@ -5,12 +5,12 @@ const rootCode = {
   3: '开源，前后台可看，但不可操作'
 }
 
-const checkRoot = function(ctx, user) {
+const checkRoot = function(ctx, flag) {
   if (!ctx.session || !ctx.session.userInfo) {
     ctx.body = {code: 500, message: '没有权限，请先登录'}
     return false
   }
-  if (ctx.session.userInfo.root !== 1) {
+  if (!flag || ctx.session.userInfo.root !== 1) {
     ctx.body = {code: 500, message: '没有权限'}
     return false
   }

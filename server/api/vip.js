@@ -1,6 +1,7 @@
 const Router = require('koa-router')
 const router = new Router()
 const query = require('../database/init')
+const checkRoot = require('./root')
 const sendMessage = require('./sendMessage')
 let verifyCodeMap = {}
 
@@ -30,6 +31,8 @@ function countVerifyCode(phone) {
 
 router.post('/sendVerifyCode', async (ctx) => {
   try {
+    if (!checkRoot(ctx, true)) { return false }
+
     const data = ctx.request.body.data
     const phone = data.phone
     const login = data.login
@@ -123,6 +126,8 @@ router.post('/logoutVip', async (ctx) => {
 
 router.post('/getVip', async (ctx) => {
   try {
+    if (!checkRoot(ctx, true)) { return false }
+
     const data = ctx.request.body.data
     const phone = data.phone
     let result = []
@@ -191,6 +196,8 @@ router.post('/getVip', async (ctx) => {
 
 router.post('/recharge', async (ctx) => {
   try {
+    if (!checkRoot(ctx, true)) { return false }
+
     const data = ctx.request.body.data
     const phone = data.phone
     const rechargeMoney = data.rechargeMoney
@@ -217,6 +224,8 @@ router.post('/recharge', async (ctx) => {
 
 router.post('/getRechargeRecord', async (ctx) => {
   try {
+    if (!checkRoot(ctx, true)) { return false }
+
     const data = ctx.request.body.data
     const phone = data.phone
     const result = await query(`SELECT * FROM rechargerecord WHERE phone = '${phone}' AND off != 1 ORDER BY time ASC`)
@@ -229,6 +238,8 @@ router.post('/getRechargeRecord', async (ctx) => {
 // 商品寄存
 router.post('/deposit', async (ctx) => {
   try {
+    if (!checkRoot(ctx, true)) { return false }
+
     const data = ctx.request.body.data
     const currentTime = new Date().getTime()
     const nun = data.nun
@@ -252,6 +263,8 @@ router.post('/deposit', async (ctx) => {
 
 router.post('/getDeposit', async (ctx) => {
   try {
+    if (!checkRoot(ctx, true)) { return false }
+
     const data = ctx.request.body.data
     const nun = data.nun
     const vip = data.vip

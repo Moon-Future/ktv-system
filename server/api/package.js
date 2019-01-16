@@ -40,11 +40,7 @@ router.post('/insertPackage', async (ctx) => {
 
 router.post('/getPackage', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx, true)) { return false }
     
     const count = await query(`SELECT COUNT(DISTINCT uuid) as count FROM package WHERE off != 1`)
     const result = await query(`SELECT DISTINCT uuid as uuid, p.createTime, p.name, p.type1, p.price1, p.type2, p.price2, p.descr, p.grp, p.qty, g.id as goods, g.name as goodsm, u.name as unitm 

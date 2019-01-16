@@ -12,11 +12,8 @@ function createNun() {
 
 router.post('/insertOrder', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx, true)) { return false }
+
     const data = ctx.request.body.data
     const nun = createNun()
     const createTime = new Date().getTime()
@@ -42,11 +39,7 @@ router.post('/insertOrder', async (ctx) => {
 
 router.post('/getOrder', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx, true)) { return false }
 
     const data = ctx.request.body.data
     let ordInfo = await query(`SELECT * FROM roomorder WHERE room = ? AND close != 1 AND off != 1`, [data.no])
@@ -108,11 +101,7 @@ router.post('/getOrder', async (ctx) => {
 
 router.post('/closeOrder', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx, true)) { return false }
     
     const data = ctx.request.body.data
     const ordInfo = data.ordInfo
@@ -201,11 +190,7 @@ router.post('/closeOrder', async (ctx) => {
 
 router.post('/cancelOrder', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx, true)) { return false }
     
     const data = ctx.request.body.data
     const ordInfo = data.ordInfo
@@ -222,11 +207,7 @@ router.post('/cancelOrder', async (ctx) => {
 
 router.post('/deleteOrder', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx, true)) { return false }
     
     const data = ctx.request.body.data
     const ordInfo = data[0]
@@ -321,11 +302,7 @@ router.post('/deleteOrder', async (ctx) => {
 
 router.post('/updOrder', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx, true)) { return false }
     
     const data = ctx.request.body.data
     const ordInfo = data.ordInfo || {}
@@ -368,11 +345,7 @@ router.post('/updOrder', async (ctx) => {
 
 router.post('/getOrderHistory', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx, true)) { return false }
 
     const data = ctx.request.body.data
     const pageNo = data.pageNo || 1

@@ -1,6 +1,7 @@
 const Router = require('koa-router')
 const router = new Router()
 const query = require('../database/init')
+const checkRoot = require('./root')
 const { rootCode } = require('../secret.js')
 
 router.post('/register', async (ctx) => {

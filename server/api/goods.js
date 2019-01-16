@@ -33,6 +33,8 @@ router.post('/insertGoods', async (ctx) => {
 
 router.post('/getGoods', async (ctx) => {
   try {
+    if (!checkRoot(ctx, true)) { return false }
+
     const count = await query(`SELECT COUNT(*) as count FROM goods WHERE off != 1`)
     const goodsList = await query(`SELECT g.id, g.name, g.picture, g.price, g.descr, g.vipDiscount, g.discount, g.qty, g.record,
       u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.off != 1 ORDER BY g.createTime ASC`)
@@ -127,6 +129,8 @@ router.post('/stockIn', async (ctx) => {
 
 router.post('/getStock', async (ctx) => {
   try {
+    if (!checkRoot(ctx, true)) { return false }
+      
     const data = ctx.request.body.data
     const id = data.id
     const result = await query(`SELECT q.id, q.goods, q.qty, q.user, q.time, g.name FROM goodsqty as q LEFT JOIN goods as g ON q.goods = g.id WHERE q.goods = ? AND q.off != 1 ORDER BY q.time ASC`, [id])

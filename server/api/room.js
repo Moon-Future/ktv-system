@@ -32,11 +32,7 @@ router.post('/insertRoomType', async (ctx) => {
 
 router.post('/getRoomType', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx, true)) { return false }
     
     const data = ctx.request.body.data
     const pageNo = data && data.pageNo || 1
@@ -125,11 +121,7 @@ router.post('/insertRoomInfo', async (ctx) => {
 
 router.post('/getRoomInfo', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx, true)) { return false }
     
     const count = await query(`SELECT COUNT(DISTINCT uuid) as count FROM room WHERE off != 1`)
     const result = await query(`SELECT DISTINCT r.uuid as uuid, r.createTime, r.name, r.no, r.roomType, r.descr, r.package, r.status, r.position,

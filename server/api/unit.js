@@ -31,11 +31,7 @@ router.post('/insertUnit', async (ctx) => {
 
 router.post('/getUnit', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx, true)) { return false }
     
     const data = ctx.request.body.data
     const pageNo = data && data.pageNo || 1

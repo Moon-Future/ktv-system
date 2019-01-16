@@ -5,6 +5,8 @@ const checkRoot = require('./root')
 
 router.post('/getOptions', async (ctx) => {
   try {
+    if (!checkRoot(ctx, true)) { return false }
+      
     const checkResult = checkRoot(ctx)
     if (checkResult.code === 500) {
       ctx.body = checkResult
