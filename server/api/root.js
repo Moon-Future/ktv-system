@@ -10,7 +10,7 @@ const checkRoot = function(ctx, flag) {
     ctx.body = {code: 500, message: '没有权限，请先登录'}
     return false
   }
-  if (!flag || ctx.session.userInfo.root !== 1) {
+  if (!flag && ctx.session.userInfo.root !== 1) {
     ctx.body = {code: 500, message: '没有权限'}
     return false
   }
