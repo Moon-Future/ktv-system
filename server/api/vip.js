@@ -271,17 +271,4 @@ router.post('/getDeposit', async (ctx) => {
   }
 })
 
-router.post('/getSession', async (ctx) => {
-  try {
-    const userInfo = ctx.session.userInfo
-    if (userInfo) {
-      ctx.body = {code: 200, message: userInfo}
-    } else {
-      ctx.body = {code: 500, message: '请先登陆'}
-    }
-  } catch(err) {
-    throw new Error(err)
-  }
-})
-
 module.exports = router

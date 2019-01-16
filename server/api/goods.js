@@ -5,24 +5,21 @@ const checkRoot = require('./root')
 
 router.post('/insertGoods', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
 
     const data = ctx.request.body.data
     let result = []
     for (let i = 0 , len = data.length; i < len; i++) {
       const item = data[i]
       const currentTime = new Date().getTime()
-      const goods = await query(`SELECT * FROM goods WHERE name = '${item.name}' AND off != 1`)
+      const goods = await query(`SELECT * FROM goods WHERE name = ? AND off != 1`, [item.name])
       if (goods.length !== 0) {
         result.push(item.name)
         continue
       }
-      await query(`INSERT INTO goods (name, price, unit, descr, vipDiscount, discount, createTime) VALUES 
-        ('${item.name}', ${item.price}, ${item.unit}, '${item.descr}', ${item.vipDiscount ? 1 : 0}, ${item.vipDiscount ? item.discount : null}, ${currentTime})`)
+      await query(`INSERT INTO goods (name, price, unit, descr, vipDiscount, discount, createTime) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [item.name, item.price, item.unit, item.descr, item.vipDiscount ? 1 : 0, item.vipDiscount ? item.discount : null, currentTime])
+
     }
     if (result.length === 0) {
       ctx.body = {code: 200, message: '新增成功'}
@@ -36,12 +33,6 @@ router.post('/insertGoods', async (ctx) => {
 
 router.post('/getGoods', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
-    
     const count = await query(`SELECT COUNT(*) as count FROM goods WHERE off != 1`)
     const goodsList = await query(`SELECT g.id, g.name, g.picture, g.price, g.descr, g.vipDiscount, g.discount, g.qty, g.record,
       u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.off != 1 ORDER BY g.createTime ASC`)
@@ -56,11 +47,7 @@ router.post('/getGoods', async (ctx) => {
 
 router.post('/deleteGoods', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
     
     const data = ctx.request.body.data
     const goods = data[0]
@@ -103,21 +90,17 @@ router.post('/deleteGoods', async (ctx) => {
 
 router.post('/updGoods', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
     
     const data = ctx.request.body.data
-    const check = await query(`SELECT * FROM goods WHERE name = '${data.name}' AND off != 1`)
+    const check = await query(`SELECT * FROM goods WHERE name = ? AND off != 1`, [data.name])
     if (check.length !== 0 && check[0].id != data.id) {
       ctx.body = {code: 500, message: `商品 ${data.name} 已存在`}
       return
     }
-    await query(`UPDATE goods SET name = '${data.name}', price = ${data.price}, unit = ${data.unit}, descr = '${data.descr}',
-      vipDiscount = ${data.vipDiscount ? 1 : 0}, discount = ${data.vipDiscount ? data.discount : null}, updateTime = ${new Date().getTime()} WHERE id = ${data.id}`)
-    const result = await query(`SELECT * FROM goods WHERE off != 1 AND id = ${data.id}`)
+    await query(`UPDATE goods SET name = ?, price = ?, unit = ?, descr = ?, vipDiscount = ?, discount = ?, updateTime = ? WHERE id = ?`,
+      [data.name, data.price, data.unit, data.descr, data.vipDiscount ? 1 : 0, data.vipDiscount ? data.discount : null, new Date().getTime(), data.id])
+    const result = await query(`SELECT * FROM goods WHERE off != 1 AND id = ?`, [data.id])
     ctx.body = {code: 200, message: '更新成功', result: result}
   } catch(err) {
     throw new Error(err)
@@ -126,11 +109,7 @@ router.post('/updGoods', async (ctx) => {
 
 router.post('/stockIn', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
     
     const data = ctx.request.body.data
     const params = data.params
@@ -148,12 +127,6 @@ router.post('/stockIn', async (ctx) => {
 
 router.post('/getStock', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
-    
     const data = ctx.request.body.data
     const id = data.id
     const result = await query(`SELECT q.id, q.goods, q.qty, q.user, q.time, g.name FROM goodsqty as q LEFT JOIN goods as g ON q.goods = g.id WHERE q.goods = ? AND q.off != 1 ORDER BY q.time ASC`, [id])
@@ -165,11 +138,7 @@ router.post('/getStock', async (ctx) => {
 
 router.post('/deleteStock', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
     
     const data = ctx.request.body.data
     const params = data.params

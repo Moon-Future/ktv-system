@@ -300,6 +300,7 @@
             this.tableData = res.data.message
             this.total = res.data.count
           } else {
+            this.$Message.error(res.data.message)
             this.tableData = []
             this.total = 0
           }

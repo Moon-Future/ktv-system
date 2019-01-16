@@ -80,11 +80,9 @@ router.post('/getUser', async (ctx) => {
 
 router.post('/deleteUser', async (ctx) => {
   try {
+    if (!checkRoot(ctx)) { return false }
+      
     const data = ctx.request.body.data
-    if (!ctx.session || !ctx.session.userInfo || ctx.session.userInfo.root != 1 ) {
-      ctx.body = {code: 500, message: '无权限'}
-      return
-    }
     await query(`UPDATE user SET off = 1 WHERE id = ?`, [data[0].id])
     ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {

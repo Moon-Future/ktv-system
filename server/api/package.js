@@ -4,29 +4,9 @@ const query = require('../database/init')
 const checkRoot = require('./root')
 const uuidv1 = require('uuid/v1')
 
-/**
-  1、纯啤啤酒12瓶
-  2、冰纯啤酒10瓶
-  3、雪花啤酒8瓶
-  4、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个
-
-  1、华夏干红1支加雪碧2罐
-  2、小吃2份（蚕豆、瓜子），爆米花1包，什锦果盘小拼1个
-
-  1、小吃6份
-  2、茶一壶
-
-  什锦果盘大拼5盘
-
- */
-
 router.post('/insertPackage', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
 
     const data = ctx.request.body.data
     for (let i = 0 , len = data.length; i < len; i++) {
@@ -97,11 +77,7 @@ router.post('/getPackage', async (ctx) => {
 
 router.post('/deletePackage', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
     
     const data = ctx.request.body.data
     const uuid = data[0].uuid
@@ -122,11 +98,7 @@ router.post('/deletePackage', async (ctx) => {
 
 router.post('/updPackage', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
     
     const data = ctx.request.body.data
     const uuid = data.uuid

@@ -6,23 +6,19 @@ const uuidv1 = require('uuid/v1')
 
 router.post('/insertRoomType', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
 
     const data = ctx.request.body.data
     let result = []
     for (let i = 0 , len = data.length; i < len; i++) {
       const item = data[i]
       const currentTime = new Date().getTime()
-      const roomtype = await query(`SELECT * FROM roomtype WHERE name = '${item.name}' AND off != 1`)
+      const roomtype = await query(`SELECT * FROM roomtype WHERE name = ? AND off != 1`, [item.name])
       if (roomtype.length !== 0) {
         result.push(item.name)
         continue
       }
-      await query(`INSERT INTO roomtype (name, createTime) VALUES ('${item.name}', ${currentTime})`)
+      await query(`INSERT INTO roomtype (name, createTime) VALUES (?, ?)`, [item.name, currentTime])
     }
     if (result.length === 0) {
       ctx.body = {code: 200, message: '新增成功'}
@@ -55,18 +51,14 @@ router.post('/getRoomType', async (ctx) => {
 
 router.post('/deleteRoomType', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
     
     const data = ctx.request.body.data
     let ids = []
     data.forEach(ele => {
       ids.push(ele.id)
     })
-    await query(`UPDATE roomtype SET off = 1, updateTime = ${new Date().getTime()} WHERE id IN ( ${ids.join()} )`)
+    await query(`UPDATE roomtype SET off = 1, updateTime = ? WHERE id IN ( ? )`, [new Date().getTime(), ids.join()])
     ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {
     throw new Error(err)
@@ -75,20 +67,16 @@ router.post('/deleteRoomType', async (ctx) => {
 
 router.post('/updRoomType', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
     
     const data = ctx.request.body.data
-    const check = await query(`SELECT * FROM roomtype WHERE name = '${data.name}' AND off != 1`)
+    const check = await query(`SELECT * FROM roomtype WHERE name = ? AND off != 1`, [data.name])
     if (check.length !== 0 && check[0].id != data.id) {
       ctx.body = {code: 500, message: `房间类型 ${data.name} 已存在`}
       return
     }
-    await query(`UPDATE roomtype SET name = '${data.name}', updateTime = ${new Date().getTime()} WHERE id = ${data.id}`)
-    const result = await query(`SELECT * FROM roomtype WHERE off != 1 AND id = ${data.id}`)
+    await query(`UPDATE roomtype SET name = ?, updateTime = ? WHERE id = ?`, [data.name, new Date().getTime(), data.id])
+    const result = await query(`SELECT * FROM roomtype WHERE off != 1 AND id = ?`, [data.id])
     ctx.body = {code: 200, message: '更新成功', result: result}
   } catch(err) {
     throw new Error(err)
@@ -97,11 +85,7 @@ router.post('/updRoomType', async (ctx) => {
 
 router.post('/insertRoomInfo', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
 
     const data = ctx.request.body.data
     let result = []
@@ -211,18 +195,14 @@ router.post('/getRoomInfo', async (ctx) => {
 
 router.post('/deleteRoomInfo', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
     
     const data = ctx.request.body.data
     let uuids = []
     data.forEach(ele => {
       uuids.push(ele.uuid)
     })
-    await query(`DELETE FROM room WHERE uuid IN ( '${uuids.join()}' )`)
+    await query(`DELETE FROM room WHERE uuid IN ( ? )`, [uuids.join()])
     ctx.body = {code: 200, message: '删除成功'}
   } catch(err) {
     throw new Error(err)
@@ -231,11 +211,7 @@ router.post('/deleteRoomInfo', async (ctx) => {
 
 router.post('/updRoomInfo', async (ctx) => {
   try {
-    const checkResult = checkRoot(ctx)
-    if (checkResult.code === 500) {
-      ctx.body = checkResult
-      return
-    }
+    if (!checkRoot(ctx)) { return false }
     
     const data = ctx.request.body.data
     const currentTime = new Date().getTime()
