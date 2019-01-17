@@ -11,7 +11,7 @@
           <p class="num">{{ totalData[item.key] }}</p>
         </div>
       </div>
-      <div>
+      <div class="">
         <Col span="12">
           <DatePicker type="date" placeholder="Select date" style="width: 200px"></DatePicker>
         </Col>
