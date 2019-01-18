@@ -1,7 +1,7 @@
 <template>
   <div class="report-container">
     <div class="condition-wrapper">
-      <Button :class="activeIndex === i ? 'active' : ''" size="small" v-for="(item, i) in btnList" @click="getReportData(item.key, i)">{{ item.title }}</Button>  
+      <Button :class="activeIndex === i ? 'active' : ''" size="small" v-for="(item, i) in btnList" @click="formatReportData(item.key, i)">{{ item.title }}</Button>  
       <DatePicker type="daterange" placement="bottom-end" placeholder="选择日期" style="width: 200px;font-size: 14px" @on-change="getReportData"></DatePicker>
     </div>
     <div class="report-wrapper">
@@ -40,15 +40,16 @@
           {key: 'year', title: '最近一年'}
         ],
         reportData: [],
+        formatData: [],
         activeIndex: -1
       }
     },
     computed: {
       totalData() {
         let data = {}
-        data.total = this.reportData.length
+        data.total = this.formatData.length
         data.price = 0
-        this.reportData.forEach(item => {
+        this.formatData.forEach(item => {
           data.price += Number(item.totalPrice) - Number(item.discount || 0)
         })
         return data
@@ -59,14 +60,27 @@
         {key: 'total', title: '订单数（单）'},
         {key: 'price', title: '营收（元）'}
       ]
-      this.getReportData('today', 0)
+      this.getReportData()
     },
     methods: {
-      getReportData(key, index) {
+      getReportData() {
+        this.$http.post(apiUrl.getOrderHistory, {
+          data: {type: 'all'}
+        }).then(res => {
+          if (res.data.code === 200) {
+            this.reportData = res.data.message
+            this.formatReportData('today', 0)
+          } else {
+            this.$Message.error(res.data.message)
+            this.reportData = []
+            this.formatData = []
+          }
+        })
+      },
+      formatReportData(key, index) {
         this.activeIndex = index
         const today = this.getToday()
         let timeRange = []
-        let type = key === 'all' ? 'all' : 'report'
         switch(key) {
           case 'today':
             timeRange = [today, today + 3600 * 1000 * 24]
@@ -90,15 +104,18 @@
             timeRange = [new Date(key[0]).getTime() - 3600 * 1000 * 8, new Date(key[1]).getTime() + 3600 * 1000 * 16]
             break;
         }
-        this.$http.post(apiUrl.getOrderHistory, {
-          data: {startTime: timeRange[0], endTime: timeRange[1], type: type}
-        }).then(res => {
-          if (res.data.code === 200) {
-            this.reportData = res.data.message
-          } else {
-            this.$Message.error(res.data.message)
-            this.reportData = []
-          }
+        if (key === 'all') {
+          this.formatData = this.reportData
+        } else {
+          this.formatData = []
+          this.reportData.forEach(ele => {
+            if (ele.startTime >= timeRange[0] && ele.startTime <= timeRange[1]) {
+              this.formatData.push(ele)
+            }
+          })
+        }
+        this.formatData.sort((a, b) => {
+          return a.startTime - b.startTime
         })
       },
       getToday() {
