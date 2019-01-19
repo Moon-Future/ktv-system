@@ -82,7 +82,7 @@ router.post('/getOrder', async (ctx) => {
       for (let i = 0, len = stockGoodsList.length; i < len; i++) {
         let result = await query(`SELECT g.id as goods, g.name as goodsm,
           u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.id = ?`, [stockGoodsList[i]])
-        result[0].depositQty = stockQtyList[i]
+        result[0].stockQty = stockQtyList[i]
         stockGoods.push(result[0])
       }
       ordInfo[0].stockGoods = stockGoods
@@ -397,16 +397,28 @@ router.post('/getOrderHistory', async (ctx) => {
       for (let i = 0, len = stockGoodsList.length; i < len; i++) {
         let result = await query(`SELECT g.id as goods, g.name as goodsm,
           u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.id = ?`, [stockGoodsList[i]])
-        result[0].depositQty = stockQtyList[i]
+        result[0].stockQty = stockQtyList[i]
         stockGoods.push(result[0])
       }
       item.stockGoods = stockGoods
+
+      const depositGoodsList = item.depositGoods ? item.depositGoods.split(',') : []
+      const depositQtyList = item.depositQty ? item.depositQty.split(',') : []
+      let depositGoods = []
+      for (let i = 0, len = depositGoodsList.length; i < len; i++) {
+        let result = await query(`SELECT g.id as goods, g.name as goodsm,
+          u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.id = ?`, [depositGoodsList[i]])
+        result[0].depositQty = depositQtyList[i]
+        depositGoods.push(result[0])
+      }
+      item.depositGoods = depositGoods
 
       item.no = item.room
       delete item.packageType
       delete item.grpSelected
       delete item.qty
       delete item.stockQty
+      delete item.depositQty
       result.push(item)
     }
 
@@ -415,7 +427,7 @@ router.post('/getOrderHistory', async (ctx) => {
       message = {}
       message.orderList = result
       message.goodsList = await query(`SELECT g.id, g.name, g.picture, g.price, g.descr, 
-        u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.off != 1 ORDER BY createTime ASC`)
+        u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.off != 1 ORDER BY g.createTime ASC`)
       message.packageList = await query(`SELECT DISTINCT uuid as uuid, name FROM package WHERE off != 1 ORDER BY createTime ASC`)
     } else {
       message = result

@@ -73,7 +73,6 @@
             this.orderList = message.orderList
             this.goodsList = message.goodsList
             this.packageList = message.packageList
-            console.log('goodsList', this.goodsList)
             // this.filterReportData('today', 0)
           } else {
             this.$Message.error(res.data.message)
@@ -126,13 +125,45 @@
           return a.startTime - b.startTime
         })
       },
+      formatGoodsData() {
+        let goodsData = []
+        let goodsQty = []
+        let qtyMap = {}
+        this.orderList.forEach(ele => {
+          let goods = ele.goods
+          for (let key in goods) {
+            let item = goods[key]
+            qtyMap[key] = qtyMap[key] === undefined ? Number(item.qty) : (Number(qtyMap[key]) + Number(item.qty))
+          }
+          let packageMap = ele.package || {}
+          let goodsArray = packageMap.goods || []
+          let grp = (packageMap.grp || '').split(',')
+          let grpSelected = packageMap.grpSelected || ''
+          grp.splice(grp.indexOf(grpSelected), 1)
+          goodsArray.forEach(item => {
+            if (grp.indexOf(item.goods + '') === -1) {
+              qtyMap[item.goods] = qtyMap[item.goods] === undefined ? Number(item.qty) : (Number(qtyMap[item.goods]) + Number(item.qty))
+            }
+          })
+
+          let stockGoods = ele.stockGoods
+          let depositGoods = ele.depositGoods
+          stockGoods.forEach(item => {
+            qtyMap[item.goods] = qtyMap[item.goods] === undefined ? Number(item.stockQty) : (Number(qtyMap[item.goods]) + Number(item.stockQty))
+          })
+          depositGoods.forEach(item => {
+            qtyMap[item.goods] = qtyMap[item.goods] === undefined ? Number(item.depositQty) : (Number(qtyMap[item.goods]) - Number(item.depositQty))
+          })
+        })
+        this.goodsList.forEach(ele => {
+          goodsData.push(ele.name)
+          goodsQty.push(qtyMap[ele.id])
+        })
+        return {goodsData, goodsQty}
+      },
       goodsECharts() {
         const myChart = this.$echarts.init(this.$refs.goodsReport)
-        let titleData = []
-        this.goodsList.forEach(ele => {
-          titleData.push(ele.name)
-        })
-        console.log('data', titleData, this.goodsList)
+        const {goodsData, goodsQty} = this.formatGoodsData()
         const option = {
           title: {
             text: '商品销售统计'
@@ -142,7 +173,7 @@
             data:['销量']
           },
           xAxis: {
-            data: titleData,
+            data: goodsData,
             axisLabel: {
               interval: 0,
               rotate: -45,
@@ -152,15 +183,21 @@
               }
             }
           },
-          yAxis: {},
+          yAxis: {
+
+          },
           series: [{
             name: '销量',
             type: 'bar',
             barWidth: 30,
-            data: [5, 20, 36, 10, 10, 20, 5, 20, 36, 10, 10, 20],
-            lable: {
-              show: true,
-              position: 'top',
+            data: goodsQty,
+            itemStyle:{
+              normal:{
+                label: {
+                  show : true,
+                  position : 'top'
+                }
+              },
             }
           }]
         }
