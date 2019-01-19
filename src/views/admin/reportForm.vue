@@ -1,23 +1,18 @@
 <template>
   <div class="report-container">
     <div class="condition-wrapper">
-      <Button :class="activeIndex === i ? 'active' : ''" size="small" v-for="(item, i) in btnList" @click="formatReportData(item.key, i)">{{ item.title }}</Button>  
+      <Button :class="activeIndex === i ? 'active' : ''" size="small" v-for="(item, i) in btnList" @click="filterReportData(item.key, i)">{{ item.title }}</Button>  
       <DatePicker type="daterange" placement="bottom-end" placeholder="选择日期" style="width: 200px;font-size: 14px" @on-change="getReportData"></DatePicker>
     </div>
     <div class="report-wrapper">
-      <div class="total-wrapper">
+      <div class="report-item total-wrapper">
         <div class="item-num" v-for="(item, i) in totalList" :key="i">
           <p class="title">{{ item.title }}</p>
           <p class="num">{{ totalData[item.key] }}</p>
         </div>
       </div>
-      <div class="">
-        <Col span="12">
-          <DatePicker type="date" placeholder="Select date" style="width: 200px"></DatePicker>
-        </Col>
-        <Col span="12">
-            <DatePicker type="daterange" placement="bottom-end" placeholder="Select date" style="width: 200px"></DatePicker>
-        </Col>
+      <div class="report-item goods-report">
+        <div ref="goodsReport" style="height:300px;"></div>
       </div>
     </div>
   </div>
@@ -39,6 +34,10 @@
           {key: 'quarter', title: '最近三月'},
           {key: 'year', title: '最近一年'}
         ],
+        orderList: [],
+        goodsList: [],
+        packageList: [],
+
         reportData: [],
         formatData: [],
         activeIndex: -1
@@ -60,24 +59,33 @@
         {key: 'total', title: '订单数（单）'},
         {key: 'price', title: '营收（元）'}
       ]
+    },
+    mounted() {
       this.getReportData()
     },
     methods: {
       getReportData() {
         this.$http.post(apiUrl.getOrderHistory, {
-          data: {type: 'all'}
+          data: {type: 'report'}
         }).then(res => {
           if (res.data.code === 200) {
-            this.reportData = res.data.message
-            this.formatReportData('today', 0)
+            const message = res.data.message
+            this.orderList = message.orderList
+            this.goodsList = message.goodsList
+            this.packageList = message.packageList
+            console.log('goodsList', this.goodsList)
+            // this.filterReportData('today', 0)
           } else {
             this.$Message.error(res.data.message)
-            this.reportData = []
+            this.orderList = []
+            this.goodsList = []
+            this.packageList = []
             this.formatData = []
           }
+          this.goodsECharts()
         })
       },
-      formatReportData(key, index) {
+      filterReportData(key, index) {
         this.activeIndex = index
         const today = this.getToday()
         let timeRange = []
@@ -118,6 +126,46 @@
           return a.startTime - b.startTime
         })
       },
+      goodsECharts() {
+        const myChart = this.$echarts.init(this.$refs.goodsReport)
+        let titleData = []
+        this.goodsList.forEach(ele => {
+          titleData.push(ele.name)
+        })
+        console.log('data', titleData, this.goodsList)
+        const option = {
+          title: {
+            text: '商品销售统计'
+          },
+          tooltip: {},
+          legend: {
+            data:['销量']
+          },
+          xAxis: {
+            data: titleData,
+            axisLabel: {
+              interval: 0,
+              rotate: -45,
+              textStyle: {
+                color: 'black',
+                fontFamily: 'Microsoft YaHei'
+              }
+            }
+          },
+          yAxis: {},
+          series: [{
+            name: '销量',
+            type: 'bar',
+            barWidth: 30,
+            data: [5, 20, 36, 10, 10, 20, 5, 20, 36, 10, 10, 20],
+            lable: {
+              show: true,
+              position: 'top',
+            }
+          }]
+        }
+        myChart.setOption(option)
+      },
       getToday() {
         let today = new Date()
         today.setMilliseconds(0)
@@ -146,11 +194,16 @@
 
   .report-wrapper {
     margin-top: 10px;
+    .report-item {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px 0;
+      background: $color-white;
+      border-radius: 5px;
+    }
   }
 
   .total-wrapper {
-    padding: 10px 0;
-    background: $color-white;
     display: flex;
     .item-num {
       padding: 10px 20px;
@@ -165,5 +218,9 @@
         color: $color-red;
       }
     }
+  }
+
+  .goods-report {
+    
   }
 </style>

@@ -43,7 +43,7 @@ router.post('/getPackage', async (ctx) => {
     if (!checkRoot(ctx, true)) { return false }
     
     const count = await query(`SELECT COUNT(DISTINCT uuid) as count FROM package WHERE off != 1`)
-    const result = await query(`SELECT DISTINCT uuid as uuid, p.createTime, p.name, p.type1, p.price1, p.type2, p.price2, p.descr, p.grp, p.qty, g.id as goods, g.name as goodsm, u.name as unitm 
+    const result = await query(`SELECT DISTINCT p.uuid as uuid, p.createTime, p.name, p.type1, p.price1, p.type2, p.price2, p.descr, p.grp, p.qty, g.id as goods, g.name as goodsm, u.name as unitm 
       FROM package as p 
       LEFT JOIN goods as g on p.goods = g.id 
       LEFT JOIN unit as u on g.unit = u.id 

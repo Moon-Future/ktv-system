@@ -351,11 +351,8 @@ router.post('/getOrderHistory', async (ctx) => {
     const pageNo = data.pageNo || 1
     const pageSize = data.pageSize || 20
     let ordInfo
-    if (data.type === 'report' || data.type === 'all') {
-      ordInfo = data.type === 'report' ?
-        await query(`SELECT * FROM roomorder WHERE close = 1 AND off != 1 AND startTime >= ? AND endTime <= ? ORDER BY startTime DESC`, [data.startTime, data.endTime])
-        :
-        await query(`SELECT * FROM roomorder WHERE close = 1 AND off != 1 ORDER BY startTime DESC`)
+    if (data.type === 'report') {
+      ordInfo = await query(`SELECT * FROM roomorder WHERE close = 1 AND off != 1 ORDER BY startTime DESC`)
     } else {
       ordInfo = await query(`SELECT * FROM roomorder WHERE close = 1 AND off != 1 ORDER BY createTime DESC LIMIT ?, ?`, [(pageNo - 1) * pageSize, pageSize])
     }
@@ -412,7 +409,18 @@ router.post('/getOrderHistory', async (ctx) => {
       delete item.stockQty
       result.push(item)
     }
-    ctx.body = {code: 200, message: result, count: count.length === 0 ? 0 : count[0].count}
+
+    let message
+    if (data.type === 'report') {
+      message = {}
+      message.orderList = result
+      message.goodsList = await query(`SELECT g.id, g.name, g.picture, g.price, g.descr, 
+        u.id as unit, u.name as unitm FROM goods g, unit u WHERE u.id = g.unit AND g.off != 1 ORDER BY createTime ASC`)
+      message.packageList = await query(`SELECT DISTINCT uuid as uuid, name FROM package WHERE off != 1 ORDER BY createTime ASC`)
+    } else {
+      message = result
+    }
+    ctx.body = {code: 200, message: message, count: count.length === 0 ? 0 : count[0].count}
   } catch(err) {
     throw new Error(err)
   }
