@@ -5,6 +5,8 @@
 ## 基本业务需求
 ![基本业务需求](http://qiniu.cdn.cl8023.com/ktv/image/jpg/KTV%E6%94%B6%E9%93%B6%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E9%9C%80%E6%B1%82.png)
 
+功能不多，但简单实用
+
 ## 技术点
 - vue-cli 3.0 构建工具快速搭建项目
 - vue-router 路由管理
