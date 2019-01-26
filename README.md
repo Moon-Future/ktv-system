@@ -21,7 +21,7 @@
 ![收银账单](http://qiniu.cdn.cl8023.com/ktv/image/jpg/KTV%E7%95%8C%E9%9D%A21.png)
 
 ## 在线浏览
-- 地址：[test.ktv.cl8023.com](test.ktv.cl8023.com)
+- 地址：[test.ktv.cl8023.com](//test.ktv.cl8023.com)
 - 账号：admin
 - 密码：123456
 - 几百块钱的服务器，首次打开还请耐心等待... 
