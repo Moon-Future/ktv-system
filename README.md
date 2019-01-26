@@ -28,7 +28,18 @@
 ## Github
 [Moon-Future](https://github.com/Moon-Future/ktv-system)
 
-数据表也在其中，有兴趣的同学可以 clone 下来自己耍哦~
+数据表也在其中，有兴趣的同学可以 clone 下来自己耍哦~ 
+
+server 文件夹下应有一个文件：secret.js 存储一些密匙，可以自己建立，内容如下：
+```js
+  module.exports = {
+    rootCode: { // 注册权限选择
+      0: 'xxxxxx',
+      1: 'xxxxxx'
+    },
+    apikey: 'xxxxxxxxxxxx' // 短信验证码
+  }
+```
 
 ## 请原谅全篇没有什么干货（博客搭建、上线部署之前也写过一点），只是想分享一下学习的快乐。
 毕竟
