@@ -188,7 +188,7 @@
                 }
               }, this.tableOptions.vip ? '充值' : '更新'),
               this.tableOptions.vip || this.tableOptions.user ? '' : h('span', {class: {'operate-divide' : true}}, '|'),
-              this.tableOptions.vip ? '' : 
+              this.tableOptions.vip || (this.tableOptions.user && params.row.root == 1) ? '' : 
               h('span', {
                 class: {'operate-item' : true},
                 on: {

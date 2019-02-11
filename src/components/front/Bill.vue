@@ -51,8 +51,8 @@
           <span :class="item.class" v-if="item.key == 'origin'">{{ totalPrice }} 元</span>
           <span :class="item.class" v-if="item.key == 'discount'"><input v-model="discountMoney" @input="changeDiscount" @blur="discountBlur" /> 元</span>
           <span :class="item.class" v-if="item.key == 'pay'">{{ payPrice }} 元</span>
-          <span :class="item.class" v-if="item.key == 'paymethos'" @click="modalVisible = true">
-            <span>{{ payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].title || '选择支付方式' }}</span>
+          <span :class="item.class" v-if="item.key == 'paymethos'" @click="openPayMethod">
+            <span>{{ payMethodMap[ordInfo.payMethod] && (payMethodMap[ordInfo.payMethod].group || payMethodMap[ordInfo.payMethod].title) || '选择支付方式' }}</span>
             <icon-font v-show="payMethodMap[ordInfo.payMethod]" :icon="payMethodMap[ordInfo.payMethod] && payMethodMap[ordInfo.payMethod].icon" fontSize="12"></icon-font>
           </span>
           <span :class="item.class" v-if="item.key == 'user'">{{ ordInfo.user || userInfo.name }}</span>
@@ -73,6 +73,20 @@
         <div class="payment-item" v-for="(item, i) in payMethodMap" :key="i" @click="selectPayMethod(item, i)">
           <icon-font :icon="item.icon" fontSize="64"></icon-font>
           <span>{{ item.title }}</span>
+        </div>
+      </div>
+      <div class="payment-group" v-show="paymentGroupFlag">
+        <div class="payment-group-item">
+          <div><span>支付宝：</span><InputNumber :min="0" v-model="paymentGroup[0]"></InputNumber></div>
+          <div><span>微信：</span><InputNumber :min="0" v-model="paymentGroup[1]"></InputNumber></div>
+          <div><span>现金：</span><InputNumber :min="0" v-model="paymentGroup[2]"></InputNumber></div>
+        </div>
+        <div class="payment-group-item">
+          <div><span>刷卡：</span><InputNumber :min="0" v-model="paymentGroup[3]"></InputNumber></div>
+          <div><span>余额：</span><InputNumber :min="0" v-model="paymentGroup[4]"></InputNumber></div>
+        </div>
+        <div class="payment-submit">
+          <Button type="primary" @click="submitPayMethod">确认</Button>
         </div>
       </div>
     </Modal>
@@ -175,10 +189,13 @@
         payMethodMap: {
           1: {icon: 'icon-big-Pay', title: '支付宝支付'},
           2: {icon: 'icon-weixinzhifu', title: '微信支付'},
-          3: {icon: 'icon-zhifupingtai-yinlian', title: '刷卡支付'},
-          4: {icon: 'icon-cash_payment', title: '现金支付'},
-          5: {icon: 'icon-available', title: '余额支付'}
+          3: {icon: 'icon-cash_payment', title: '现金支付'},
+          4: {icon: 'icon-zhifupingtai-yinlian', title: '刷卡支付'},
+          5: {icon: 'icon-available', title: '余额支付'},
+          6: {icon: 'icon-zuhe-pay', title: '组合支付', group: ''}
         },
+        paymentGroupFlag: false,
+        paymentGroup: [0, 0, 0, 0, 0], // 支付宝 微信 现金 刷卡 余额
         modalVip: false,
         vipFormData: {phone: '', verifyCode: ''},
         ruleValidate: {
@@ -502,7 +519,52 @@
           
         })
       },
+      openPayMethod() {
+        if (!this.ordInfo.nun) {
+          this.$Message.error('请先开单')
+          return
+        }
+        this.modalVisible = true
+      },
+      submitPayMethod() {
+        let sum = 0
+        let title = ''
+        this.paymentGroup.forEach((item, index) => {
+          sum += item
+          if (item != 0) {
+            switch(index) {
+              case 0:
+                title += `支付宝:${item}`
+                break
+              case 1:
+                title += `, 微信:${item}`
+                break
+              case 2:
+                title += `, 现金:${item}`
+                break
+              case 3:
+                title += `, 刷卡:${item}`
+                break
+              case 4:
+                title += `, 余额:${item}`
+                break
+            }
+          }
+        })
+        if (sum !== this.payPrice) {
+          this.$Message.info('金额不对，请重新输入')
+          return
+        }
+        this.payMethodMap['6'].group = title
+        this.modalVisible = false
+        this.setOrdInfo({data: {payMethod: 6}})
+        this.updateOrder()
+      },
       selectPayMethod(item, key) {
+        if (key == '6') {
+          this.paymentGroupFlag = true
+          return
+        }
         if (key == '5') {
           if (!this.ordInfo.vip) {
             this.$Message.error('请先登陆会员')
@@ -569,7 +631,6 @@
           this.setOrdInfo({data: deepClone(this.takeList), type: 'stockGoods'})
           this.updateOrder()
           this.depositFlag = false
-          console.log('ordInfo', this.ordInfo)
         }
       },
       depositTakeSelect(selection) {
@@ -752,6 +813,26 @@
           font-weight: bold;
         }
       }
+    }
+  }
+  .payment-group {
+    margin-top: 10px;
+    p {
+      font-weight: bold;
+    }
+    .payment-group-item {
+      display: flex;
+      margin-top: 10px;
+      div {
+        margin-right: 10px;
+      }
+      span {
+        width: 50px;
+        display: inline-block;
+      }
+    }
+    .payment-submit {
+      text-align: right;
     }
   }
   .vip-button {
