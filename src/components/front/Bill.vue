@@ -193,6 +193,12 @@
           4: {icon: 'icon-zhifupingtai-yinlian', title: '刷卡支付'},
           5: {icon: 'icon-available', title: '余额支付'},
           6: {icon: 'icon-zuhe-pay', title: '组合支付', group: ''}
+
+          // 1: {icon: 'icon-big-Pay', title: '支付宝支付'},
+          // 2: {icon: 'icon-weixinzhifu', title: '微信支付'},
+          // 3: {icon: 'icon-zhifupingtai-yinlian', title: '刷卡支付'},
+          // 4: {icon: 'icon-cash_payment', title: '现金支付'},
+          // 5: {icon: 'icon-available', title: '余额支付'}
         },
         paymentGroupFlag: false,
         paymentGroup: [0, 0, 0, 0, 0], // 支付宝 微信 现金 刷卡 余额
@@ -574,7 +580,9 @@
             return
           }
         }
+        this.paymentGroupFlag = false
         this.modalVisible = false
+        this.paymentGroup = [0, 0, 0, 0, 0]
         this.setOrdInfo({data: {payMethod: key}})
         this.updateOrder()
       },
