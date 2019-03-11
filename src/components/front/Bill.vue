@@ -77,13 +77,13 @@
       </div>
       <div class="payment-group" v-show="paymentGroupFlag">
         <div class="payment-group-item">
-          <div><span>支付宝：</span><InputNumber :min="0" v-model="paymentGroup[0]"></InputNumber></div>
-          <div><span>微信：</span><InputNumber :min="0" v-model="paymentGroup[1]"></InputNumber></div>
-          <div><span>现金：</span><InputNumber :min="0" v-model="paymentGroup[2]"></InputNumber></div>
+          <div><span>支付宝：</span><InputNumber :min="0" v-model="payMoney[0]"></InputNumber></div>
+          <div><span>微信：</span><InputNumber :min="0" v-model="payMoney[1]"></InputNumber></div>
+          <div><span>现金：</span><InputNumber :min="0" v-model="payMoney[2]"></InputNumber></div>
         </div>
         <div class="payment-group-item">
-          <div><span>刷卡：</span><InputNumber :min="0" v-model="paymentGroup[3]"></InputNumber></div>
-          <div><span>余额：</span><InputNumber :min="0" v-model="paymentGroup[4]"></InputNumber></div>
+          <div><span>刷卡：</span><InputNumber :min="0" v-model="payMoney[3]"></InputNumber></div>
+          <div><span>余额：</span><InputNumber :min="0" v-model="payMoney[4]"></InputNumber></div>
         </div>
         <div class="payment-submit">
           <Button type="primary" @click="submitPayMethod">确认</Button>
@@ -201,7 +201,7 @@
           // 5: {icon: 'icon-available', title: '余额支付'}
         },
         paymentGroupFlag: false,
-        paymentGroup: [0, 0, 0, 0, 0], // 支付金额： 支付宝 微信 现金 刷卡 余额
+        payMoney: [0, 0, 0, 0, 0], // 支付金额： 支付宝 微信 现金 刷卡 余额
         modalVip: false,
         vipFormData: {phone: '', verifyCode: ''},
         ruleValidate: {
@@ -530,12 +530,14 @@
           this.$Message.error('请先开单')
           return
         }
+        let sum = this.payTitle().sum
+        this.paymentGroupFlag = sum == this.totalPrice - this.discountMoney ? true : false
         this.modalVisible = true
       },
-      submitPayMethod() {
+      payTitle() {
         let sum = 0
         let title = ''
-        this.paymentGroup.forEach((item, index) => {
+        this.payMoney.forEach((item, index) => {
           sum += item
           if (item != 0) {
             switch(index) {
@@ -557,13 +559,18 @@
             }
           }
         })
+        title = title[0] == ',' ? title.slice(1) : title
+        return {sum, title}
+      },
+      submitPayMethod() {
+        let {sum, title} = this.payTitle()
         if (sum !== this.payPrice) {
           this.$Message.info('金额不对，请重新输入')
           return
         }
         this.payMethodMap['6'].group = title
         this.modalVisible = false
-        this.setOrdInfo({data: {payMethod: 6, payMoney: this.paymentGroup}})
+        this.setOrdInfo({data: {payMethod: 6, payMoney: this.payMoney}})
         this.updateOrder()
       },
       selectPayMethod(item, key) {
@@ -582,7 +589,7 @@
         }
         this.paymentGroupFlag = false
         this.modalVisible = false
-        this.paymentGroup = [0, 0, 0, 0, 0]
+        this.payMoney = [0, 0, 0, 0, 0]
         this.setOrdInfo({data: {payMethod: key}})
         this.updateOrder()
       },
@@ -680,6 +687,11 @@
     watch: {
       roomSelected() {
         this.discountMoney = this.ordInfo.discount || 0
+        if (this.ordInfo && this.ordInfo.payMethod !== undefined) {
+          this.paymentGroupFlag = this.ordInfo.payMethod == 6 ? true : false
+          this.payMoney = this.ordInfo.payMoney.length === 0 ? [0, 0, 0, 0, 0] : this.ordInfo.payMoney
+          this.payMethodMap['6'].group = this.payTitle().title
+        }
       }
     },
     components: {

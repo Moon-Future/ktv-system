@@ -98,9 +98,16 @@
         payMethodMap: {
           1: {icon: 'icon-big-Pay', title: '支付宝支付'},
           2: {icon: 'icon-weixinzhifu', title: '微信支付'},
-          3: {icon: 'icon-zhifupingtai-yinlian', title: '刷卡支付'},
-          4: {icon: 'icon-cash_payment', title: '现金支付'},
-          5: {icon: 'icon-available', title: '余额支付'}
+          3: {icon: 'icon-cash_payment', title: '现金支付'},
+          4: {icon: 'icon-zhifupingtai-yinlian', title: '刷卡支付'},
+          5: {icon: 'icon-available', title: '余额支付'},
+          6: {icon: 'icon-zuhe-pay', title: '组合支付'}
+
+          // 1: {icon: 'icon-big-Pay', title: '支付宝支付'},
+          // 2: {icon: 'icon-weixinzhifu', title: '微信支付'},
+          // 3: {icon: 'icon-zhifupingtai-yinlian', title: '刷卡支付'},
+          // 4: {icon: 'icon-cash_payment', title: '现金支付'},
+          // 5: {icon: 'icon-available', title: '余额支付'}
         },
         discountShow: true
       }
@@ -135,6 +142,34 @@
       },
     },
     methods: {
+      payTitle() {
+        let sum = 0
+        let title = ''
+        this.payMoney.forEach((item, index) => {
+          sum += item
+          if (item != 0) {
+            switch(index) {
+              case 0:
+                title += `支付宝:${item}`
+                break
+              case 1:
+                title += `, 微信:${item}`
+                break
+              case 2:
+                title += `, 现金:${item}`
+                break
+              case 3:
+                title += `, 刷卡:${item}`
+                break
+              case 4:
+                title += `, 余额:${item}`
+                break
+            }
+          }
+        })
+        title = title[0] == ',' ? title.slice(1) : title
+        return {sum, title}
+      },
       printOrder() {
         this.$emit('printOrder')
       }
@@ -148,8 +183,9 @@
       }
     },
     watch: {
-      roomSelected() {
-        this.discountMoney = this.ordInfo.discount || 0
+      ordInfo() {
+        this.payMoney = this.ordInfo.payMoney
+        this.payMethodMap['6'].title = this.payTitle().title
       }
     },
     components: {

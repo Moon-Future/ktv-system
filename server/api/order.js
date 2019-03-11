@@ -87,6 +87,8 @@ router.post('/getOrder', async (ctx) => {
       }
       ordInfo[0].stockGoods = stockGoods
 
+      ordInfo[0].payMoney = ordInfo[0].payMoney ? ordInfo[0].payMoney.split(',') : []
+      ordInfo[0].payMoney = ordInfo[0].payMoney.map(Number)
       ordInfo[0].no = ordInfo[0].room
       delete ordInfo[0].packageType
       delete ordInfo[0].grpSelected
@@ -416,6 +418,7 @@ router.post('/getOrderHistory', async (ctx) => {
       item.depositGoods = depositGoods
 
       item.payMoney = item.payMoney ? item.payMoney.split(',') : []
+      item.payMoney = item.payMoney.map(Number)
       item.no = item.room
       delete item.packageType
       delete item.grpSelected
