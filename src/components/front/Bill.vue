@@ -201,7 +201,7 @@
           // 5: {icon: 'icon-available', title: '余额支付'}
         },
         paymentGroupFlag: false,
-        paymentGroup: [0, 0, 0, 0, 0], // 支付宝 微信 现金 刷卡 余额
+        paymentGroup: [0, 0, 0, 0, 0], // 支付金额： 支付宝 微信 现金 刷卡 余额
         modalVip: false,
         vipFormData: {phone: '', verifyCode: ''},
         ruleValidate: {
@@ -563,7 +563,7 @@
         }
         this.payMethodMap['6'].group = title
         this.modalVisible = false
-        this.setOrdInfo({data: {payMethod: 6}})
+        this.setOrdInfo({data: {payMethod: 6, payMoney: this.paymentGroup}})
         this.updateOrder()
       },
       selectPayMethod(item, key) {

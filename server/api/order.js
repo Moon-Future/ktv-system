@@ -312,6 +312,8 @@ router.post('/updOrder', async (ctx) => {
     const goodsMap = ordInfo.goods || {}
     const stockGoods = ordInfo.stockGoods || []
     const depositGoods = ordInfo.depositGoods || []
+    const payMethod = ordInfo.payMethod
+    const payMoney = payMethod === 6 ? ordInfo.payMoney.join(',') : ''
     let goodsList = [], qtyList = []
     let stockGoodsList = [], stockQtyList = []
     let depositGoodsList = [], depositQtyList = []
@@ -333,9 +335,9 @@ router.post('/updOrder', async (ctx) => {
     })
 
     await query(`UPDATE roomorder SET package = ?, packageType = ?, grpSelected = ?, goods = ?, qty = ?, stockGoods = ?, stockQty = ?, depositGoods = ?, depositQty = ?, 
-      vip = ?, totalPrice = ?, discount = ?, paymethod = ? WHERE room = ? AND close != 1 AND off != 1`, 
+      vip = ?, totalPrice = ?, discount = ?, payMethod = ?, payMoney = ? WHERE room = ? AND close != 1 AND off != 1`, 
       [packageId, packageType, grpSelected, goodsList.join(','), qtyList.join(','), stockGoodsList.join(','), stockQtyList.join(','), depositGoodsList.join(','), depositQtyList.join(','),
-      ordInfo.vip, ordInfo.totalPrice, ordInfo.discount, ordInfo.payMethod, ordInfo.room]
+      ordInfo.vip, ordInfo.totalPrice, ordInfo.discount, payMethod, payMoney, ordInfo.room]
     )
     ctx.body = {code: 200, message: '更新成功'}
   } catch(err) {
@@ -413,6 +415,7 @@ router.post('/getOrderHistory', async (ctx) => {
       }
       item.depositGoods = depositGoods
 
+      item.payMoney = item.payMoney ? item.payMoney.split(',') : []
       item.no = item.room
       delete item.packageType
       delete item.grpSelected
