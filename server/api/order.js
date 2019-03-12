@@ -444,4 +444,37 @@ router.post('/getOrderHistory', async (ctx) => {
   }
 })
 
+router.get('/handleData', async (ctx) => {
+  return
+  try {
+    const orderList = await query(`SELECT * FROM roomorder`)
+    // 1: {icon: 'icon-big-Pay', title: '支付宝支付'},
+    // 2: {icon: 'icon-weixinzhifu', title: '微信支付'},
+    // 3: {icon: 'icon-cash_payment', title: '现金支付'},
+    // 4: {icon: 'icon-zhifupingtai-yinlian', title: '刷卡支付'},
+    // 5: {icon: 'icon-available', title: '余额支付'},
+    // 6: {icon: 'icon-zuhe-pay', title: '组合支付', group: ''}
+
+    // 1: {icon: 'icon-big-Pay', title: '支付宝支付'},
+    // 2: {icon: 'icon-weixinzhifu', title: '微信支付'},
+    // 3: {icon: 'icon-zhifupingtai-yinlian', title: '刷卡支付'},
+    // 4: {icon: 'icon-cash_payment', title: '现金支付'},
+    // 5: {icon: 'icon-available', title: '余额支付'}
+    const keyMap = {
+      1: 1,
+      2: 2,
+      3: 4,
+      4: 3,
+      5: 5,
+      6: 6
+    }
+    orderList.forEach(item => {
+      item.payMethod = keyMap[item.payMethod]
+    })
+    ctx.body = orderList
+  } catch(err) {
+    throw new Error(err)
+  }
+})
+
 module.exports = router
