@@ -1,5 +1,5 @@
 <template>
-  <div class="ktv-container">
+  <div class="ktv-container" :class="mobileFlag ? 'moblie-ktv-container' : ''">
     <div class="room-container">
       <div class="room-menu">包间</div>
       <ul class="room-list">
@@ -74,7 +74,8 @@
       ...mapGetters([
         'userInfo',
         'roomSelected',
-        'ordInfo'
+        'ordInfo',
+        'mobileFlag'
       ])
     },
     methods: {
@@ -192,5 +193,9 @@
         }
       }
     }
+  }
+
+  .moblie-ktv-container {
+    
   }
 </style>

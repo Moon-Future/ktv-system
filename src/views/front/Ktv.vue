@@ -1,9 +1,9 @@
 <template>
-  <div class="ktv-container">
+  <div>
     <div class="middle-container">
       <ktv-order></ktv-order>
     </div>
-    <div class="right-container">
+    <div class="right-container" v-if="!mobileFlag">
       <bill></bill> 
     </div>
   </div>
@@ -13,11 +13,15 @@
   import KtvOrder from '@/components/front/KtvOrder'
   import Bill from '@/components/front/Bill'
   import { apiUrl } from '@/serviceAPI.config.js'
+  import { mapGetters } from 'vuex'
   export default {
     name: 'ktv',
     components: {
       KtvOrder,
       Bill
+    },
+    computed: {
+      ...mapGetters(['mobileFlag'])
     }
   }
 </script>

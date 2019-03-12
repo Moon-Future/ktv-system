@@ -1,6 +1,6 @@
 <template>
-    <div class="menu-container">
-      <Button class="user-logout" type="primary" size="small" @click="logout">退出</Button>
+    <div class="menu-container" :class="mobileFlag ? 'moblie-menu-container' : ''">
+      <Button class="user-logout" type="primary" size="small" @click="logout" v-if="!mobileFlag">退出</Button>
       <div class="user-avatar">
         <img :src="avatar" alt="">
       </div>
@@ -8,12 +8,12 @@
         <router-link 
           tag="li" 
           :to="item.to" 
-          v-for="(item, i) in menuList" 
+          v-for="(item, i) in menuList"
           :class="{active: i === activeIndex, setup: item.index === '4'}" 
           :key="i" 
           @click="changeIndex(i)">
-          <icon-font :icon="i === activeIndex ? `${item.icon}-active` : item.icon" fontSize="22"></icon-font>
-          <p>{{ item.text }}</p>
+          <icon-font :icon="i === activeIndex ? `${item.icon}-active` : item.icon" fontSize="22" v-if="!mobileFlag || item.index != 3"></icon-font>
+          <p v-if="!mobileFlag || item.index != 3">{{ item.text }}</p>
         </router-link>
       </ul>
     </div>
@@ -36,7 +36,7 @@
       }
     },
     computed: {
-      ...mapGetters(['userInfo'])
+      ...mapGetters(['userInfo', 'mobileFlag'])
     },
     created() {
       this.routhPath()
@@ -104,13 +104,11 @@
     margin-top: 20px;
     background: $color-shallowblack;
   }
-  .user-avatar {
-    img {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      margin: 20px 0;
-    }
+  .user-avatar img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin: 20px 0;
   }
   .menu-wrapper {
     font-size: 14px;
@@ -131,6 +129,27 @@
         position: absolute;
         bottom: 0;
         width: 100%;
+      }
+    }
+  }
+
+  .moblie-menu-container {
+    display: flex;
+    height: auto;
+    .user-avatar {
+      width: 20%;
+      img {
+        margin: 5px 0;
+      }
+    }
+    .menu-wrapper {
+      width: 80%;
+      display: flex;
+      justify-content: space-evenly;
+      li {
+        display: flex;
+        align-items: center;
+        padding: 10px;
       }
     }
   }

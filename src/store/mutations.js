@@ -69,6 +69,10 @@ const mutations = {
   [types.SET_USERINGO](state, userInfo) {
     state.userInfo = userInfo
   },
+
+  [types.SET_MOBILE_FLAG](state, flag) {
+    state.mobileFlag = flag
+  }
 }
 
 export default mutations

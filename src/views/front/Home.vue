@@ -1,6 +1,6 @@
 <template>
   <div class="home" v-show="userInfo">
-    <div class="left-container">
+    <div class="left-container" :class="mobileFlag ? 'moblie-left-container' : ''">
       <left-menu></left-menu>
     </div>
     <div :class="{'view-wrapper': vipFront}">
@@ -19,13 +19,15 @@
     name: 'home',
     data() {
       return {
-        vipFront: false
+        vipFront: false,
+        mobileFlag: false
       }
     },
     computed: {
       ...mapGetters(['userInfo'])
     },
     created() {
+      this.setMobile()
       if (this.$route.path == '/vip' || this.$route.path == '/order') {
         this.vipFront = true
       } else {
@@ -34,6 +36,15 @@
       this.getSession()
     },
     methods: {
+      setMobile() {
+        const width = document.documentElement.clientWidth
+        if (width <= 736) {
+          this.mobileFlag = true
+        } else {
+          this.mobileFlag = false
+        }
+        this.setMobileFlag(this.mobileFlag)
+      },
       getSession() {
         this.$http.post(apiUrl.getSession).then(res => {
           if (res.data.code === 200) {
@@ -50,7 +61,8 @@
       ...mapMutations({
         setUserInfo: 'SET_USERINGO',
         setRoomSelected: 'SET_ROOM_SELECTED',
-        setOrdInfo: 'SET_ORDINFO'
+        setOrdInfo: 'SET_ORDINFO',
+        setMobileFlag: 'SET_MOBILE_FLAG'
       })
     },
     watch: {
@@ -89,6 +101,10 @@
   .view-wrapper {
     margin-left: 60px;
     padding: 20px;
+  }
+
+  .moblie-left-container {
+    width: 100%;
   }
 </style>
 

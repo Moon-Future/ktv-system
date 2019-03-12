@@ -7,3 +7,5 @@ export const roomSelected = state => state.roomSelected
 export const ordInfo = state => state.ordInfo
 
 export const userInfo = state => state.userInfo
+
+export const mobileFlag = state => state.mobileFlag
