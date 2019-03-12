@@ -445,7 +445,6 @@ router.post('/getOrderHistory', async (ctx) => {
 })
 
 router.get('/handleData', async (ctx) => {
-  return
   try {
     const orderList = await query(`SELECT * FROM roomorder`)
     // 1: {icon: 'icon-big-Pay', title: '支付宝支付'},
@@ -468,10 +467,12 @@ router.get('/handleData', async (ctx) => {
       5: 5,
       6: 6
     }
-    orderList.forEach(item => {
+    for (let i = 0, len = orderList.length; i < len; i++) {
+      let item = orderList[i]
       item.payMethod = keyMap[item.payMethod]
-    })
-    ctx.body = orderList
+      await query(`UPDATE roomorder SET payMethod = ? WHERE nun = ?`, [item.payMethod, item.nun])
+    }
+    ctx.body = '数据处理。。。'
   } catch(err) {
     throw new Error(err)
   }
