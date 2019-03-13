@@ -5,3 +5,5 @@ export const SET_ORDINFO = 'SET_ORDINFO'
 export const SET_USERINGO = 'SET_USERINGO'
 
 export const SET_MOBILE_FLAG = 'SET_MOBILE_FLAG'
+
+export const SET_MOBILE_BILL_SHOW = 'SET_MOBILE_BILL_SHOW'

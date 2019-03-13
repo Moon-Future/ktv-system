@@ -72,6 +72,10 @@ const mutations = {
 
   [types.SET_MOBILE_FLAG](state, flag) {
     state.mobileFlag = flag
+  },
+
+  [types.SET_MOBILE_BILL_SHOW](state, status) {
+    state.mobileBillShow = status
   }
 }
 

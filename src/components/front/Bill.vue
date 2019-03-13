@@ -1,15 +1,22 @@
 <template>
-  <div class="bill-container">
-    <div class="bill-icon">
+  <div class="bill-container" :class="mobileFlag ? 'mobileFlag-bill-container' : ''">
+    <div class="bill-icon" v-if="!mobileFlag">
       <icon-font icon="icon-zhijia" fontSize="80"></icon-font>
     </div>
     <div class="bill-wrapper">
+      <div v-if="mobileFlag">
+        <div class="mobile-back" @click="hideBill"><icon-font icon="icon-back" fontSize="22"></icon-font></div>
+        <div class="mobile-roominfo">
+          <p>房间号：{{ ordInfo.room }}</p>
+          <p>时长：</p>
+        </div>
+      </div>
       <div class="bill-title">亿民汇KTV 消费账单</div>
       <ul class="ord-info">
         <li v-for="(ord, i) in ordList" :key="i">
           <span>{{ ord.title }}：</span>
-          <span v-if="ord.key === 'vip' && ordInfo.room && !ordInfo[ord.key]" class="order-vip" @click="loginVip">登陆</span>
-          <span v-else-if="ord.key === 'balance' && ordInfo.room && ordInfo['vip']">
+          <span v-if="ord.key === 'vip' && ordInfo.room && !ordInfo[ord.key] && !mobileFlag" class="order-vip" @click="loginVip">登陆</span>
+          <span v-else-if="ord.key === 'balance' && ordInfo.room && ordInfo['vip'] && !mobileFlag">
             <span class="order-vip-operate" @click="openDepositModal">寄取</span>
             <span class="order-vip-operate" @click="logoutVip">注销</span>
             <span class="order-vip-operate" @click="modalRecharge = true">充值</span>
@@ -49,7 +56,7 @@
         <div class="account-item" v-for="(item, i) in accountList" :key="i">
           <span>{{ item.title }}</span>
           <span :class="item.class" v-if="item.key == 'origin'">{{ totalPrice }} 元</span>
-          <span :class="item.class" v-if="item.key == 'discount'"><input v-model="discountMoney" @input="changeDiscount" @blur="discountBlur" /> 元</span>
+          <span :class="item.class" v-if="item.key == 'discount'"><input v-model="discountMoney" @input="changeDiscount" @blur="discountBlur" :readonly="mobileFlag" /> 元</span>
           <span :class="item.class" v-if="item.key == 'pay'">{{ payPrice }} 元</span>
           <span :class="item.class" v-if="item.key == 'paymethos'" @click="openPayMethod">
             <span>{{ payMethodMap[ordInfo.payMethod] && (payMethodMap[ordInfo.payMethod].group || payMethodMap[ordInfo.payMethod].title) || '选择支付方式' }}</span>
@@ -58,7 +65,7 @@
           <span :class="item.class" v-if="item.key == 'user'">{{ ordInfo.user || userInfo.name }}</span>
         </div>
       </div>
-      <div class="button-wrapper">
+      <div class="button-wrapper" v-if="!mobileFlag">
         <Button type="primary" :disabled="ordInfo.nun !== undefined" @click="placeOrder">{{ ordInfo.nun  !== undefined ? '已开单' : '开单' }}</Button>
         <Button v-show="roomSelected.status == '1'" type="error" @click="cancelOrder">取消订单</Button>
         <Button v-show="roomSelected.status == '1'" type="warning" @click="openPrintModal">打单</Button>
@@ -326,10 +333,14 @@
         'packageSelected',
         'roomSelected',
         'ordInfo',
-        'userInfo'
+        'userInfo',
+        'mobileFlag'
       ])
     },
     methods: {
+      hideBill() {
+        this.setMobileBillShow(0);
+      },
       openPrintModal() {
         this.printFlag = true
         this.printOrdInfo = deepClone(this.ordInfo)
@@ -526,6 +537,9 @@
         })
       },
       openPayMethod() {
+        if (this.mobileFlag) {
+          return
+        }
         if (!this.ordInfo.nun) {
           this.$Message.error('请先开单')
           return
@@ -673,7 +687,8 @@
         
       },
       ...mapMutations({
-        setOrdInfo: 'SET_ORDINFO'
+        setOrdInfo: 'SET_ORDINFO',
+        setMobileBillShow: 'SET_MOBILE_BILL_SHOW'
       })
     },
     filters: {
@@ -872,6 +887,25 @@
     display: flex;
     button {
       width: 50%;
+    }
+  }
+
+  .mobileFlag-bill-container {
+    .bill-wrapper {
+      position: initial;
+      width: auto;
+      margin-top: 63px;
+      padding: 10px 10px 10px 10px;
+    }
+    .mobile-back {
+      text-align: left;
+    }
+    .mobile-roominfo {
+      text-align: left;
+      margin-top: 10px;
+      p {
+        padding: 3px 0;
+      }
     }
   }
 </style>

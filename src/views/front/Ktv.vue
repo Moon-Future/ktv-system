@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <div class="middle-container">
+  <div :class="mobileFlag ? 'mobileFlag-ktv-container' : ''">
+    <div class="middle-container" v-show="!mobileFlag || mobileBillShow === 0">
       <ktv-order></ktv-order>
     </div>
-    <div class="right-container" v-if="!mobileFlag">
+    <div class="right-container" v-show="!mobileFlag || mobileBillShow === 1">
       <bill></bill> 
     </div>
   </div>
@@ -21,7 +21,7 @@
       Bill
     },
     computed: {
-      ...mapGetters(['mobileFlag'])
+      ...mapGetters(['mobileFlag', 'mobileBillShow'])
     }
   }
 </script>
@@ -44,6 +44,20 @@
     height: 100%;
     padding: 10px;
     box-sizing: border-box;
+  }
+
+  .mobileFlag-ktv-container {
+    .middle-container {
+      position: initial;
+      width: auto;
+      padding: 0;
+      margin-top: 63px;
+    }
+    .right-container {
+      position: initial;
+      width: auto;
+      padding: 0;
+    }
   }
 </style>
 

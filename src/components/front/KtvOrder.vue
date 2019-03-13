@@ -2,6 +2,7 @@
   <div class="ktv-container" :class="mobileFlag ? 'moblie-ktv-container' : ''">
     <div class="room-container">
       <div class="room-menu">包间</div>
+      <h2 v-if="mobileFlag && roomListLine1.length !== 0" class="floor-no">三楼</h2>
       <ul class="room-list">
         <li class="room"
           :class="{'active-room': activeRoom === room.no, 'busy-room': room.status == '1'}"
@@ -12,6 +13,7 @@
           {{ room.no }}
         </li>
       </ul>
+      <h2 v-if="mobileFlag && roomListLine2.length !== 0" class="floor-no">四楼</h2>
       <ul class="room-list">
         <li class="room"
           :class="{'active-room': activeRoom === room.no, 'busy-room': room.status == '1'}"
@@ -32,7 +34,7 @@
         </li>
       </ul>
     </div>
-    <div class="ktv-detail">
+    <div class="ktv-detail" v-if="!mobileFlag">
       <div class="tab-wrapper">
         <Tabs v-model="activeName">
           <TabPane label="包间信息" name="first">
@@ -117,12 +119,14 @@
               this.roomInfo.status = 1
             }
             this.setRoomSelected(this.roomInfo)
+            this.setMobileBillShow(1);
           }
         })
       },
       ...mapMutations({
         setRoomSelected: 'SET_ROOM_SELECTED',
-        setOrdInfo: 'SET_ORDINFO'
+        setOrdInfo: 'SET_ORDINFO',
+        setMobileBillShow: 'SET_MOBILE_BILL_SHOW'
       }),
     },
     components: {
@@ -196,6 +200,13 @@
   }
 
   .moblie-ktv-container {
-    
+    .room-container .room-list .room {
+      min-width: 40%;
+      max-width: inherit;
+    }
+    .floor-no {
+      padding-top: 10px;
+      font-weight: bold;
+    }
   }
 </style>
