@@ -12,8 +12,8 @@
           :class="{active: i === activeIndex, setup: item.index === '4'}" 
           :key="i" 
           @click="changeIndex(i)">
-          <icon-font :icon="i === activeIndex ? `${item.icon}-active` : item.icon" fontSize="22" v-if="!mobileFlag || item.index != 3"></icon-font>
-          <p v-if="!mobileFlag || item.index != 3">{{ item.text }}</p>
+          <icon-font :icon="i === activeIndex ? `${item.icon}-active` : item.icon" fontSize="22" v-if="!mobileFlag || (item.index != 3 && item.index != 4)"></icon-font>
+          <p v-if="!mobileFlag || (item.index != 3 && item.index != 4)">{{ item.text }}</p>
         </router-link>
       </ul>
     </div>

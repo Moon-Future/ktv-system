@@ -208,5 +208,9 @@
       padding-top: 10px;
       font-weight: bold;
     }
+    .room:hover {
+      font-size: initial;
+      font-weight: initial;
+    }
   }
 </style>
