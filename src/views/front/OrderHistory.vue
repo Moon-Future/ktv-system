@@ -1,16 +1,17 @@
 <template>
-  <div class="history-container">
+  <div class="history-container" :class="mobileFlag ? 'mobileFlag-history-container' : ''">
     <div class="table-wrapper">
       <base-table
         :stripe="false"
         :highlight="true"
         :tableOptions="tableOptions"
         :pageFlag="pageFlag"
+        :mobileFlag="mobileFlag"
         @selectRow="selectRow"
         @delete="deleteRow">
       </base-table>
     </div>
-    <div class="order-wrapper">
+    <div class="order-wrapper" v-show="!mobileFlag || mobileBillShow === 2">
       <print ref="printWrapper" :ordInfo="ordInfo" :btnShow="btnShow" :printTime="printTime" @printOrder="printOrder"></print>
     </div>
   </div>
@@ -21,6 +22,7 @@
   import Print from '@/components/front/Print'
   import { dateFormat } from '@/common/js/util'
   import { apiUrl } from '@/serviceAPI.config.js'
+  import { mapGetters } from 'vuex'
   export default {
     name: 'ktv',
     data() {
@@ -49,6 +51,9 @@
         btnShow: false,
         printTime: new Date().getTime()
       }
+    },
+    computed: {
+      ...mapGetters(['mobileFlag', 'mobileBillShow'])
     },
     methods: {
       selectRow({currentRow}) {
@@ -97,6 +102,19 @@
     }
     .order-wrapper {
       width: 30%;
+    }
+  }
+
+  .mobileFlag-history-container {
+    .table-wrapper {
+      width: 100%;
+    }
+    .order-wrapper {
+      width: 100%;
+      position: fixed;
+      top: 63px;
+      bottom: 0;
+      overflow: auto;
     }
   }
 </style>

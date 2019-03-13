@@ -72,12 +72,16 @@
         }
       },
       ...mapMutations({
-        setUserInfo: 'SET_USERINGO'
+        setUserInfo: 'SET_USERINGO',
+        setMobileBillShow: 'SET_MOBILE_BILL_SHOW'
       })
     },
     watch: {
       $route() {
         this.routhPath()
+        if (this.mobileFlag) {
+          this.setMobileBillShow(0)
+        }
       },
       userInfo() {
         if (this.userInfo.root == '1') {

@@ -6,10 +6,10 @@
     <div class="bill-wrapper">
       <div v-if="mobileFlag">
         <div class="mobile-back" @click="hideBill"><icon-font icon="icon-back" fontSize="22"></icon-font></div>
-        <div class="mobile-roominfo">
+        <!-- <div class="mobile-roominfo">
           <p>房间号：{{ ordInfo.room }}</p>
           <p>时长：</p>
-        </div>
+        </div> -->
       </div>
       <div class="bill-title">亿民汇KTV 消费账单</div>
       <ul class="ord-info">
@@ -891,6 +891,8 @@
   }
 
   .mobileFlag-bill-container {
+    height: auto;
+    min-height: 100%;
     .bill-wrapper {
       position: initial;
       width: auto;

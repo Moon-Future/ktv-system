@@ -1,6 +1,6 @@
 <template>
   <div :class="mobileFlag ? 'mobileFlag-ktv-container' : ''">
-    <div class="middle-container" v-show="!mobileFlag || mobileBillShow === 0">
+    <div class="middle-container">
       <ktv-order></ktv-order>
     </div>
     <div class="right-container" v-show="!mobileFlag || mobileBillShow === 1">
@@ -54,7 +54,9 @@
       margin-top: 63px;
     }
     .right-container {
-      position: initial;
+      position: absolute;
+      top: 0;
+      left: 0;
       width: auto;
       padding: 0;
     }

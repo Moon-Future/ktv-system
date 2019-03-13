@@ -226,7 +226,7 @@
       },
       filterTime(time, flag) {
         if (time) {
-          return dateFormat(time, 'hh:mm') + (flag ? ' ~ ' : '')
+          return dateFormat(time, 'yyyy-MM-dd hh:mm') + (flag ? ' ~ ' : '')
         } else {
           return ''
         }

@@ -127,7 +127,7 @@
         setRoomSelected: 'SET_ROOM_SELECTED',
         setOrdInfo: 'SET_ORDINFO',
         setMobileBillShow: 'SET_MOBILE_BILL_SHOW'
-      }),
+      })
     },
     components: {
       RoomDetail,

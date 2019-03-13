@@ -1,6 +1,6 @@
 <template>
-  <div class="home" v-show="userInfo">
-    <div class="left-container" :class="mobileFlag ? 'mobileFlag-left-container' : ''">
+  <div class="home" v-show="userInfo" :class="mobileFlag ? 'mobileFlag-home' : ''">
+    <div class="left-container">
       <left-menu></left-menu>
     </div>
     <div :class="{'view-wrapper': vipFront}">
@@ -103,11 +103,18 @@
     padding: 20px;
   }
 
-  .mobileFlag-left-container {
-    position: fixed;
-    width: 100%;
-    height: auto;
-    z-index: 99;
+  .mobileFlag-home {
+    .left-container {
+      position: fixed;
+      width: 100%;
+      height: auto;
+      z-index: 99;
+    }
+    .view-wrapper {
+      margin-left: 0;
+      padding: 0;
+      margin-top: 63px;
+    }
   }
 </style>
 

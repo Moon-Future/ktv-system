@@ -1,6 +1,9 @@
 <template>
-  <div class="print-container">
+  <div class="print-container" :class="mobileFlag ? 'mobileFlag-print-container' : ''">
     <div class="print-wrapper">
+      <div v-if="mobileFlag">
+        <div class="mobile-back" @click="hideBill"><icon-font icon="icon-back" fontSize="22"></icon-font></div>
+      </div>
       <div class="bill-title">KTV消费账单</div>
       <ul class="ord-info">
         <li v-for="(ord, i) in ordList" :key="i">
@@ -49,7 +52,7 @@
           <span :class="item.class" v-if="item.key == 'time'">{{ printTime | filterTime('startTime') }}</span>
         </div>
       </div>
-      <div class="print-order">
+      <div class="print-order" v-if="!mobileFlag">
         <Button v-show="btnShow" type="warning" @click="printOrder">打单</Button>
       </div>
     </div>
@@ -141,8 +144,14 @@
         })
         return array
       },
+      ...mapGetters([
+        'mobileFlag'
+      ])
     },
     methods: {
+      hideBill() {
+        this.setMobileBillShow(0);
+      },
       payTitle() {
         let sum = 0
         let title = ''
@@ -173,7 +182,10 @@
       },
       printOrder() {
         this.$emit('printOrder')
-      }
+      },
+      ...mapMutations({
+        setMobileBillShow: 'SET_MOBILE_BILL_SHOW'
+      })
     },
     filters: {
       filterTime(value, key) {
@@ -297,6 +309,24 @@
     .print-order {
       button {
         width: 100%;
+      }
+    }
+  }
+
+  .mobileFlag-print-container {
+    height: auto;
+    min-height: 100%;
+    .print-wrapper {
+      padding: 10px;
+    }
+    .mobile-back {
+      text-align: left;
+    }
+    .mobile-roominfo {
+      text-align: left;
+      margin-top: 10px;
+      p {
+        padding: 3px 0;
       }
     }
   }

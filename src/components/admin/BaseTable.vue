@@ -8,7 +8,8 @@
         <h2>总数：{{ total }}</h2>
         <Button type="primary" size="small" @click="goAdd" v-show="!tableOptions.onlySift">添加</Button>
       </div>
-      <Table 
+      <Table
+        v-if="!mobileFlag" 
         :highlight-row="highlight" 
         :columns="tableColumns" 
         :data="tableData" 
@@ -16,8 +17,16 @@
         :stripe="stripe" 
         size="small"
         @on-current-change="selectRow"></Table>
-      <div class="page-wrapper">
-        <Page v-if="pageFlag" :total="total" :page-size="20" @on-change="changePage" />
+      <div class="order-list" v-if="mobileFlag">
+        <div class="order-item" v-for="(item, i) in tableData" :key="i" @click="selectRow(item)">
+          <p><span class="order-item-title">包间号</span>{{ item.room  }}</p>
+          <p><span class="order-item-title">开始时间</span>{{ item.startTime | filterTime }}</p>
+          <p><span class="order-item-title">结束时间</span>{{ item.endTime | filterTime  }}</p>
+          <p><span class="order-item-title">相对时间</span><Time :time="item.endTime"></Time></p>
+        </div>
+      </div>
+      <div class="page-wrapper" v-show="tableData.length !== 0">
+        <Page v-if="pageFlag" :total="total" :page-size="20" size="small"  @on-change="changePage" />
       </div>
     </div>
     <Drawer
@@ -112,7 +121,9 @@
 <script>
   import { packageType } from '@/common/js/const'
   import { deepClone } from '@/common/js/util'
+  import { dateFormat } from '@/common/js/util'
   import { apiUrl } from '@/serviceAPI.config.js'
+  import { mapMutations } from 'vuex'
   export default {
     props: {
       tableOptions: {
@@ -128,6 +139,10 @@
         default: false
       },
       pageFlag: {
+        type: Boolean,
+        default: false
+      },
+      mobileFlag: {
         type: Boolean,
         default: false
       }
@@ -226,6 +241,9 @@
     methods: {
       selectRow(currentRow) {
         this.$emit('selectRow', {currentRow});
+        if (this.mobileFlag) {
+          this.setMobileBillShow(2);
+        }
       },
       search() {
         if (this.searchPhone !== '' && !/^1[34578]\d{9}$/.test(this.searchPhone)) {
@@ -395,6 +413,14 @@
             })
           }
         })
+      },
+      ...mapMutations({
+        setMobileBillShow: 'SET_MOBILE_BILL_SHOW'
+      })
+    },
+    filters: {
+      filterTime(time) {
+        return dateFormat(time, 'yyyy-MM-dd hh:mm')
       }
     }
   }
@@ -413,6 +439,8 @@
     align-items: center;
     font-size: 14px;
     margin-bottom: 10px;
+    padding: 10px 0 0 10px;
+    font-size: 16px;
   }
   .drawer-footer{
     width: 100%;
@@ -438,5 +466,25 @@
   .page-wrapper {
     padding: 10px 0;
     text-align: right;
+  }
+
+  .order-list {
+    .order-item {
+      font-size: 14px;
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #c0c0c0; 
+      p {
+        padding: 3px;
+        color: #d45801;
+      }
+      span.order-item-title {
+        font-weight: bold;
+        color: #000;
+        width: 70px;
+        display: inline-block;
+        margin-right: 10px;
+      }
+    }
   }
 </style>
