@@ -109,6 +109,7 @@
           // 4: {icon: 'icon-cash_payment', title: '现金支付'},
           // 5: {icon: 'icon-available', title: '余额支付'}
         },
+        payMoney: [],
         discountShow: true
       }
     },
@@ -184,7 +185,7 @@
     },
     watch: {
       ordInfo() {
-        this.payMoney = this.ordInfo.payMoney
+        this.payMoney = this.ordInfo.payMoney || []
         this.payMethodMap['6'].title = this.payTitle().title
       }
     },
