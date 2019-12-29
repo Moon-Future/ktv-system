@@ -3,7 +3,7 @@
     <div class="left-container">
       <left-menu></left-menu>
     </div>
-    <div :class="{'view-wrapper': vipFront}">
+    <div class="view-container" :class="{'view-wrapper': vipFront}">
       <router-view></router-view>
     </div>
   </div>
@@ -101,6 +101,13 @@
   .view-wrapper {
     margin-left: 60px;
     padding: 20px;
+  }
+  .view-container {
+    height: 100%;
+    background-image: url('~@/assets/spring.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
   }
 
   .mobileFlag-home {

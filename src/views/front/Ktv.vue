@@ -31,15 +31,15 @@
   .middle-container {
     position: fixed;
     left: 60px;
-    width: 70%;
+    // width: 90%;
+    min-width: 90%;
     height: 100%;
-    padding: 10px;
     box-sizing: border-box;
     overflow: auto;
   }
   .right-container {
     position: fixed;
-    right: 0;
+    right: 20px;
     width: 11cm;
     height: 100%;
     padding: 10px;

@@ -1,5 +1,5 @@
 import * as types from './mutation-types'
-import Vue from 'vue'
+// import Vue from 'vue'
 import { deepClone } from '@/common/js/util'
 
 const mutations = {

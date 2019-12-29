@@ -1,7 +1,7 @@
 <template>
   <div class="report-container">
     <div class="condition-wrapper">
-      <Button :class="activeIndex === i ? 'active' : ''" size="small" v-for="(item, i) in btnList" @click="filterReportData(item.key, i)">{{ item.title }}</Button>  
+      <Button :class="activeIndex === i ? 'active' : ''" size="small" v-for="(item, i) in btnList" @click="filterReportData(item.key, i)" :key="i">{{ item.title }}</Button>  
       <DatePicker type="daterange" placement="bottom-end" placeholder="选择日期" style="width: 200px;font-size: 14px" @on-change="getReportData"></DatePicker>
     </div>
     <div class="report-wrapper">

@@ -1,5 +1,5 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+// import Vue from 'vue'
+// import Router from 'vue-router'
 import Home from './views/front/Home.vue'
 import Login from './views/front/Login.vue'
 import Ktv from './views/front/Ktv.vue'
@@ -7,9 +7,9 @@ import OrderHistory from './views/front/OrderHistory.vue'
 import Vip from './views/admin/Vip.vue'
 import Admin from './views/admin/Admin.vue'
 
-Vue.use(Router)
+Vue.use(VueRouter)
 
-export default new Router({
+export default new VueRouter({
   // mode: 'history',
   base: process.env.BASE_URL,
   routes: [
