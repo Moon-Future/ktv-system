@@ -14,30 +14,10 @@
   import { apiUrl } from '@/serviceAPI.config.js'
   import { mapGetters, mapMutations } from 'vuex'
   export default {
-    created() {
-      this.getSession()
-    },
     computed: {
       ...mapGetters(['userInfo'])
     },
     methods: {
-      getSession() {
-        this.$http.post(apiUrl.getSession).then(res => {
-          if (res.data.code === 200) {
-            this.setUserInfo(res.data.message)
-            if (res.data.message.root != 1) {
-              this.$Message.error('没有权限')
-              this.$router.push({path: '/ktv'})
-            }
-          } else {
-            this.$Message.info(res.data.message)
-            this.$router.push({path: '/login'})
-          }
-        }).catch(err => {
-          this.$router.push({path: '/login'})
-          this.$Message.error(res.data.message)
-        })
-      },
       ...mapMutations({
         setUserInfo: 'SET_USERINGO'
       })

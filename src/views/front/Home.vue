@@ -33,7 +33,6 @@
       } else {
         this.vipFront = false
       }
-      this.getSession()
     },
     methods: {
       setMobile() {
@@ -44,19 +43,6 @@
           this.mobileFlag = false
         }
         this.setMobileFlag(this.mobileFlag)
-      },
-      getSession() {
-        this.$http.post(apiUrl.getSession).then(res => {
-          if (res.data.code === 200) {
-            this.setUserInfo(res.data.message)
-          } else {
-            this.$Message.info(res.data.message)
-            this.$router.push({path: '/login'})
-          }
-        }).catch(err => {
-          this.$router.push({path: '/login'})
-          this.$Message.error(res.data.message)
-        })
       },
       ...mapMutations({
         setUserInfo: 'SET_USERINGO',
@@ -108,6 +94,7 @@
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    overflow: auto;
   }
 
   .mobileFlag-home {

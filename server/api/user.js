@@ -39,8 +39,10 @@ router.post('/login', async (ctx) => {
     } else if(result[0].password !== password) {
       ctx.body = {code: 500, message: '密码错误'}
     } else {
-      ctx.session.userInfo = result[0]
-      ctx.body = {code: 200, message: '登陆成功', userInfo: result[0]}
+      let userInfo = result[0]
+      delete userInfo.password
+      ctx.session.userInfo = userInfo
+      ctx.body = {code: 200, message: '登陆成功', userInfo: userInfo}
     }
   } catch(err) {
     throw new Error(err)

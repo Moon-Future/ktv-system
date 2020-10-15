@@ -86,17 +86,7 @@
         userType: '0'
       }
     },
-    created() {
-      this.getSession()
-    },
     methods: {
-      getSession() {
-        this.$http.post(apiUrl.getSession).then(res => {
-          if (res.data.code === 200) {
-            res.data.message.type == '0' ? this.$router.push({path: '/'}) : this.$router.push({path: '/admin/baseinfo/roominfo'})
-          }
-        })
-      },
       register() {
         if (!this.registerFlag) {
           this.registerFlag = true

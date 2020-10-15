@@ -12,6 +12,9 @@
       </base-table>
     </div>
     <div class="order-wrapper" v-show="!mobileFlag || mobileBillShow === 2">
+      <div class="top-title">
+        <h2>占位</h2>
+      </div>
       <print ref="printWrapper" :ordInfo="ordInfo" :btnShow="btnShow" :printTime="printTime" @printOrder="printOrder"></print>
     </div>
   </div>
@@ -98,7 +101,8 @@
   .history-container {
     display: flex;
     .table-wrapper {
-      width: 70%;
+      width: 68%;
+      margin-right: 1%;
     }
     .order-wrapper {
       width: 30%;
@@ -115,6 +119,19 @@
       top: 63px;
       bottom: 0;
       overflow: auto;
+    }
+  }
+
+  .top-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    margin-bottom: 10px;
+    padding: 10px 0 0 10px;
+    font-size: 16px;
+    h2 {
+      visibility: hidden;
     }
   }
 </style>
