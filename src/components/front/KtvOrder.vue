@@ -190,11 +190,11 @@
           }
         }
         &.active-room {
-          font-size: 32px;
+          font-size: 1.2rem;
           font-weight: bold;
         }
         &:hover {
-          font-size: 32px;
+          font-size: 1.2rem;
           font-weight: bold;
         }
       }
